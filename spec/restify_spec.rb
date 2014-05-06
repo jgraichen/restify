@@ -4,10 +4,10 @@ describe Restify do
 
   context 'as a dynamic HATEOAS client' do
     before do
-      stub_request(:get, 'http://srv/base').to_return do |req|
-        <<-EOF.strip_heredoc
+      stub_request(:get, 'http://srv/base').to_return do
+        <<-EOF.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
-          Content-Type: application/vnd.myapp+json; charset=utf8
+          Content-Type: application/vnd.myapp+json; charset=utf-8
           Transfer-Encoding: chunked
           Link: <http://srv/base/users{/id}>; rel="users"
           Link: <http://srv/base/courses{/id}>; rel="courses"
@@ -19,10 +19,10 @@ describe Restify do
         EOF
       end
 
-      stub_request(:get, 'http://srv/base/users').to_return do |req|
-        <<-EOF.strip_heredoc
+      stub_request(:get, 'http://srv/base/users').to_return do
+        <<-EOF.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
-          Content-Type: application/vnd.myapp+json; charset=utf8
+          Content-Type: application/vnd.myapp+json; charset=utf-8
           Transfer-Encoding: chunked
 
           [{"user": {
@@ -37,10 +37,10 @@ describe Restify do
         EOF
       end
 
-      stub_request(:get, 'http://srv/base/users/john.smith/blurb').to_return do |req|
-        <<-EOF.strip_heredoc
+      stub_request(:get, 'http://srv/base/users/john.smith/blurb').to_return do
+        <<-EOF.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
-          Content-Type: application/vnd.myapp+json; charset=utf8
+          Content-Type: application/vnd.myapp+json; charset=utf-8
           Link: <http://srv/base/users/john.smith>; rel="user"
           Transfer-Encoding: chunked
 
@@ -53,16 +53,11 @@ describe Restify do
     end
 
     let(:c) do
-      Restify.new('http://srv/base')
+      Restify.new('http://srv/base').value
     end
 
     it 'should consume the API' do
-      expect(c.methods).to include :users
-      expect(c.methods).to include :courses
-      expect(c.methods).to include :profile
-      expect(c.methods).to include :search
-
-      users = c.users
+      users = c.rel(:users).get
       expect(users).to be_a Obligation
 
       users = users.value
@@ -70,8 +65,8 @@ describe Restify do
 
       user = users.first
       expect(user).to include name: 'John Smith'
-      expect(user).to have_rel :self
-      expect(user).to have_rel :blurb
+      expect(user).to have_relation :self
+      expect(user).to have_relation :blurb
 
       blurb_promise = user.rel(:blurb)
       expect(blurb_promise).to be_a Obligation
