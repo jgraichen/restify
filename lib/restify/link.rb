@@ -1,4 +1,5 @@
 require 'active_support/hash_with_indifferent_access'
+require 'addressable/template'
 
 module Restify
   #
@@ -19,58 +20,83 @@ module Restify
     #
     attr_reader :metadata
 
-    REGEXP_URI = /<[^>]*>\s*/
-    REGEXP_PAR = /;\s*\w+\s*=\s*/i
-    REGEXP_QUT = /"[^"]*"\s*/
-    REGEXP_ARG = /\w+\s*/i
-
     def initialize(uri, metadata = {})
       @uri      = uri
       @metadata = HashWithIndifferentAccess.new(metadata)
     end
 
     class << self
-      # TODO: Refactor
+      REGEXP_URI = /<[^>]*>\s*/
+      REGEXP_PAR = /;\s*\w+\s*=\s*/i
+      REGEXP_QUT = /"[^"]*"\s*/
+      REGEXP_ARG = /\w+\s*/i
+
       def parse(string)
-        links   = []
         scanner = StringScanner.new(string.strip)
-        catch(:unknown_token) do
-          loop do
-            if (m = scanner.scan(REGEXP_URI))
-              begin
-                if (uri = Addressable::URI.parse(m.strip[1..-2]))
-                  catch(:param) do
-                    params = {}
-                    loop do
-                      if (m = scanner.scan(REGEXP_PAR))
-                        key = m.strip[1..-2].strip
-                        if (m = scanner.scan(REGEXP_QUT))
-                          params[key] = m.strip[1..-2]
-                        elsif (m = scanner.scan(REGEXP_ARG))
-                          params[key] = m.strip
-                        else
-                          throw :unknown_token, true
-                        end
-                      elsif scanner.scan(/,\s*/) || scanner.eos?
-                        links << new(uri, params)
-                        throw :param
-                      else
-                        throw :unknown_token, true
-                      end
-                    end
-                  end
-                end
-              rescue Addressable::URI::InvalidURIError
-                raise ArgumentError, "Invalid URI: #{m.strip[1..-2]}"
-              end
-            elsif scanner.eos?
-              return links
-            else
-              throw :unknown_token, true
-            end
+
+        catch(:invalid) do
+          return parse_links(scanner)
+        end
+
+        fail ArgumentError,
+             "Invalid token at #{scanner.pos}: '#{scanner.rest}'"
+      end
+
+      private
+
+      def parse_links(scanner)
+        links = []
+        loop do
+          if (link = parse_link(scanner))
+            links << link
+          elsif scanner.eos?
+            return links
+          else
+            throw :invalid
           end
-        end && fail(ArgumentError,
-                    "Invalid token at #{scanner.pos}: '#{scanner.rest}'")
+        end
+      end
+
+      def parse_link(scanner)
+        if (m = scanner.scan(REGEXP_URI))
+          uri    = Addressable::Template.new(m.strip[1..-2])
+          params = parse_params(scanner)
+          new uri, params
+        else
+          false
+        end
+      end
+
+      def parse_params(scanner)
+        params = {}
+        loop do
+          if (p = parse_param(scanner))
+            params[p[0]] = p[1]
+          elsif scanner.scan(/,\s*/) || scanner.eos?
+            return params
+          else
+            throw :invalid
+          end
+        end
+      end
+
+      def parse_param(scanner)
+        if (m = scanner.scan(REGEXP_PAR))
+          key = m.strip[1..-2].strip
+          [key, parse_value(scanner)]
+        else
+          false
+        end
+      end
+
+      def parse_value(scanner)
+        if (m = scanner.scan(REGEXP_QUT))
+          m.strip[1..-2]
+        elsif (m = scanner.scan(REGEXP_ARG))
+          m.strip
+        else
+          throw :invalid
+        end
       end
     end
   end
