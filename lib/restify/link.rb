@@ -1,6 +1,3 @@
-require 'active_support/hash_with_indifferent_access'
-require 'addressable/template'
-
 module Restify
   #
   # A {Link} represents a single entry from the Link header
@@ -10,7 +7,7 @@ module Restify
     #
     # URI of the link interpreted as a RFC6570 template.
     #
-    # @return [Addressable::Template] Link URI.
+    # @return [Addressable::Template] URI template.
     #
     attr_reader :uri
 

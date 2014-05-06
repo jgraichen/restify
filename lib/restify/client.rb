@@ -9,11 +9,16 @@ module Restify
       request = Request.new method: method, uri: base.join(path)
       ::Restify.adapter.call(request).then do |response|
         data = if response.headers['Content-Type'] == 'application/json'
-                 MultiJSON.load response.body
+                 MultiJson.load response.body
                else
                  {}
                end
-        Resource.build(data, response)
+
+        if data.is_a?(Array)
+          Collection.create(self, data, response)
+        else
+          Resource.create(self, data, response)
+        end
       end
     end
 

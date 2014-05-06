@@ -24,6 +24,16 @@ module Restify
       end
     end
 
+    def relations(client)
+      relations = {}
+      links.each do |link|
+        if (rel = link.metadata['rel'])
+          relations[rel] = Relation.new(client, link.uri)
+        end
+      end
+      relations
+    end
+
     class << self
       def build(body, headers)
         Class.new(self) do
