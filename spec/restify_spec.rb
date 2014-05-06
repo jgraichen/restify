@@ -57,24 +57,44 @@ describe Restify do
     end
 
     it 'should consume the API' do
-      users = c.rel(:users).get
-      expect(users).to be_a Obligation
+      # Let's get all users
 
-      users = users.value
+      # Therefore we need the `users` relations of our root
+      # resource.
+      users_relation = c.rel(:users)
+
+      # The relation is a `Restify::Relation` and provides
+      # method to enqueue e.g. GET or POST requests with
+      # parameters to fill in possible URI template placeholders.
+      expect(users_relation).to be_a Restify::Relation
+
+      # Let's fetch users using GET.
+      # This method returns instantly and returns an `Obligation`.
+      # This `Obligation` represents the future value.
+      users_promise = users_relation.get
+      expect(users_promise).to be_a Obligation
+
+      # We could do some other stuff - like requesting other
+      # resources here - while the users are fetched in the background.
+      # When we really need our users we call `#value`. This will block
+      # until the users are here.
+      users = users_promise.value
+
+      # We get a collection back (Restify::Collection).
       expect(users).to have(2).items
 
+      # Let's get the first one.
       user = users.first
+
+      # We have all our attributes and relations here as defined in the
+      # responses from the server.
       expect(user).to have_key :name
       expect(user[:name]).to eq 'John Smith'
       expect(user).to have_relation :self
       expect(user).to have_relation :blurb
 
-      blurb_rel = user.rel(:blurb)
-
-      blurb_promise = blurb_rel.get
-      expect(blurb_promise).to be_a Obligation
-
-      blurb = blurb_promise.value
+      # Let's get the blurb.
+      blurb = user.rel(:blurb).get.value
 
       expect(blurb).to have_key :title
       expect(blurb).to have_key :image

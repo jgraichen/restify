@@ -3,13 +3,10 @@ module Restify
   module Adapter
     #
     class EM
-      def initialize
-        Thread.new { EventMachine.run {} } unless EventMachine.reactor_running?
-      end
 
       def call(request)
         Obligation.create do |w|
-          EventMachine.next_tick do
+          next_tick do
             conn = ConnectionPool.get(request.uri)
             req  = conn.get keepalive: true,
                             path: request.uri.normalized_path,
@@ -19,6 +16,17 @@ module Restify
             end
           end
         end
+      end
+
+      private
+
+      def next_tick(&block)
+        ensure_running
+        EventMachine.next_tick(&block)
+      end
+
+      def ensure_running
+        Thread.new { EventMachine.run {} } unless EventMachine.reactor_running?
       end
 
       #
