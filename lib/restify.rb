@@ -1,9 +1,12 @@
 require 'restify/version'
 require 'addressable/uri'
 require 'addressable/template'
+require 'active_support'
+require 'active_support/core_ext'
 require 'active_support/hash_with_indifferent_access'
 require 'active_support/core_ext/module/delegation'
 require 'multi_json'
+require 'obligation'
 
 #
 module Restify

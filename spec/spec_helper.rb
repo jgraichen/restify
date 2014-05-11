@@ -8,9 +8,6 @@ if ENV['CI'] || (defined?(:RUBY_ENGINE) && RUBY_ENGINE != 'rbx')
   end
 end
 
-require 'bundler'
-Bundler.require :default, :test
-
 require 'restify'
 
 Dir[File.expand_path('spec/support/**/*.rb')].each { |f| require f }
