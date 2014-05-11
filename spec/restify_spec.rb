@@ -13,7 +13,8 @@ describe Restify do
 
           {
             "profile_url": "http://localhost/base/profile",
-            "search_url": "http://localhost/base/search?q={query}{&page,per_page}"
+            "search_url": "http://localhost/base/search?q={query}",
+            "mirror_url": null
           }
         EOF
       end
@@ -36,8 +37,8 @@ describe Restify do
         EOF
       end
 
-      stub_request(:get, 'http://localhost/base/users/john.smith/blurb').to_return do
-        <<-EOF.gsub(/^ {10}/, '')
+      stub_request(:get, 'http://localhost/base/users/john.smith/blurb')
+        .to_return do <<-EOF.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
           Content-Type: application/json
           Link: <http://localhost/base/users/john.smith>; rel="user"

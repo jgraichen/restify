@@ -77,8 +77,8 @@ module Restify
                 next
               end
 
-              unless res.rel?(name)
-                res.relations[name] = Relation.new(client, data[key])
+              unless res.rel?(name) || data[key].to_s.blank?
+                res.relations[name] = Relation.new(client, data[key].to_s)
               end
             end
           end
