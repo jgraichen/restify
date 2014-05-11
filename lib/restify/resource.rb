@@ -51,10 +51,10 @@ module Restify
       @attributes ||= HashWithIndifferentAccess.new
     end
 
-    private
-
-    def initialize(client)
-      @client = client
+    def initialize(client, relations = {}, attributes = {})
+      @client     = client
+      @relations  = HashWithIndifferentAccess.new relations
+      @attributes = HashWithIndifferentAccess.new attributes
     end
 
     class << self
@@ -62,37 +62,39 @@ module Restify
       # Build a resource from given response.
       #
       def create(client, data, response)
-        new(client).tap do |res|
-          res.relations.merge! response.relations(client) if response
+        relations = {}
+        relations = response.relations(client) if response
 
-          if data
-            data.each do |key, value|
-              res.attributes[key] = case value
-                                    when Array
-                                      Collection.create(client, value, nil)
-                                    when Hash
-                                      Resource.create(client, value, nil)
-                                    else
-                                      value
-                                    end
+        hash = {}
+        if data
+          data.each do |key, value|
+            hash[key] = case value
+                        when Array
+                          Collection.create(client, value, nil)
+                        when Hash
+                          Resource.create(client, value, nil)
+                        else
+                          value
+                        end
+          end
+
+          data.keys.each do |key|
+            name = nil
+            if (m = /\A(\w+)_url\z/.match(key))
+              name = m[1]
+            elsif key == 'url'
+              name = :self
+            else
+              next
             end
 
-            data.keys.each do |key|
-              name = nil
-              if (m = /\A(\w+)_url\z/.match(key))
-                name = m[1]
-              elsif key == 'url'
-                name = :self
-              else
-                next
-              end
-
-              unless res.rel?(name) || data[key].to_s.blank?
-                res.relations[name] = Relation.new(client, data[key].to_s)
-              end
+            unless relations.key?(name) || data[key].to_s.blank?
+              relations[name] = Relation.new(client, data[key].to_s)
             end
           end
         end
+
+        new client, relations, hash
       end
     end
   end

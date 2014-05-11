@@ -2,7 +2,9 @@ require 'spec_helper'
 
 describe Restify::Resource do
   let(:client) { double 'client' }
-  let(:res)    { described_class.new(client) }
+  let(:relations) { {} }
+  let(:attributes) { {} }
+  let(:res)    { described_class.new(client, relations, attributes) }
 
   describe '#rel?' do
     before do
@@ -55,7 +57,7 @@ describe Restify::Resource do
   end
 
   describe '#key?' do
-    before { res.attributes.merge! a: 0, 'b' => 1, 0 => 2 }
+    let(:attributes) { {a: 0, 'b' => 1, 0 => 2} }
 
     it 'should test for key inclusion' do
       expect(res.key?(:a)).to eq true
@@ -79,7 +81,7 @@ describe Restify::Resource do
   end
 
   describe '#each' do
-    before { res.attributes.merge! a: 0, b: 1 }
+    let(:attributes) { {a: 0, b: 1} }
 
     it 'should yield' do
       expect { |cb| res.each(&cb) }.to yield_control.twice
