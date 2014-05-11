@@ -1,3 +1,6 @@
+require 'eventmachine'
+require 'em-http-request'
+
 module Restify
   #
   module Adapter
@@ -14,6 +17,10 @@ module Restify
             req.callback do
               w.fulfill Response.new(req.response, req.response_header)
             end
+
+            req.errback do
+              w.reject RuntimeError.new
+            end
           end
         end
       end
@@ -26,7 +33,14 @@ module Restify
       end
 
       def ensure_running
-        Thread.new { EventMachine.run {} } unless EventMachine.reactor_running?
+        Thread.new do
+          begin
+            EventMachine.run {}
+          rescue => e
+            puts "Resitfy::Adapter::EM -> #{e}\n#{e.backtrace.join("\n")}"
+            raise e
+          end
+        end unless EventMachine.reactor_running?
       end
 
       #
