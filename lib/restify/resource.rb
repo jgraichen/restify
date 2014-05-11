@@ -66,7 +66,17 @@ module Restify
           res.relations.merge! response.relations(client) if response
 
           if data
-            res.attributes.merge! data
+            data.each do |key, value|
+              res.attributes[key] = case value
+                                    when Array
+                                      Collection.create(client, value, nil)
+                                    when Hash
+                                      Resource.create(client, value, nil)
+                                    else
+                                      value
+                                    end
+            end
+
             data.keys.each do |key|
               name = nil
               if (m = /\A(\w+)_url\z/.match(key))
