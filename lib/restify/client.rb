@@ -8,7 +8,7 @@ module Restify
     def request(method, path = '')
       request = Request.new method: method, uri: base.join(path)
       ::Restify.adapter.call(request).then do |response|
-        data = if response.headers['Content-Type'] == 'application/json'
+        data = if response.headers['Content-Type'] =~ /\Aapplication\/json($|;)/
                  MultiJson.load response.body
                else
                  {}
