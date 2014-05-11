@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Restify do
-
   context 'as a dynamic HATEOAS client' do
     before do
       stub_request(:get, 'http://localhost/base').to_return do
@@ -56,51 +55,85 @@ describe Restify do
       Restify.new('http://localhost/base').value
     end
 
-    it 'should consume the API' do
-      # Let's get all users
+    context 'within threads' do
+      it 'should consume the API' do
+        # Let's get all users
 
-      # Therefore we need the `users` relations of our root
-      # resource.
-      users_relation = c.rel(:users)
+        # Therefore we need the `users` relations of our root
+        # resource.
+        users_relation = c.rel(:users)
 
-      # The relation is a `Restify::Relation` and provides
-      # method to enqueue e.g. GET or POST requests with
-      # parameters to fill in possible URI template placeholders.
-      expect(users_relation).to be_a Restify::Relation
+        # The relation is a `Restify::Relation` and provides
+        # method to enqueue e.g. GET or POST requests with
+        # parameters to fill in possible URI template placeholders.
+        expect(users_relation).to be_a Restify::Relation
 
-      # Let's fetch users using GET.
-      # This method returns instantly and returns an `Obligation`.
-      # This `Obligation` represents the future value.
-      users_promise = users_relation.get
-      expect(users_promise).to be_a Obligation
+        # Let's fetch users using GET.
+        # This method returns instantly and returns an `Obligation`.
+        # This `Obligation` represents the future value.
+        users_promise = users_relation.get
+        expect(users_promise).to be_a Obligation
 
-      # We could do some other stuff - like requesting other
-      # resources here - while the users are fetched in the background.
-      # When we really need our users we call `#value`. This will block
-      # until the users are here.
-      users = users_promise.value
+        # We could do some other stuff - like requesting other
+        # resources here - while the users are fetched in the background.
+        # When we really need our users we call `#value`. This will block
+        # until the users are here.
+        users = users_promise.value
 
-      # We get a collection back (Restify::Collection).
-      expect(users).to have(2).items
+        # We get a collection back (Restify::Collection).
+        expect(users).to have(2).items
 
-      # Let's get the first one.
-      user = users.first
+        # Let's get the first one.
+        user = users.first
 
-      # We have all our attributes and relations here as defined in the
-      # responses from the server.
-      expect(user).to have_key :name
-      expect(user[:name]).to eq 'John Smith'
-      expect(user).to have_relation :self
-      expect(user).to have_relation :blurb
+        # We have all our attributes and relations here as defined in the
+        # responses from the server.
+        expect(user).to have_key :name
+        expect(user[:name]).to eq 'John Smith'
+        expect(user).to have_relation :self
+        expect(user).to have_relation :blurb
 
-      # Let's get the blurb.
-      blurb = user.rel(:blurb).get.value
+        # Let's get the blurb.
+        blurb = user.rel(:blurb).get.value
 
-      expect(blurb).to have_key :title
-      expect(blurb).to have_key :image
+        expect(blurb).to have_key :title
+        expect(blurb).to have_key :image
 
-      expect(blurb[:title]).to eq 'Prof. Dr. John Smith'
-      expect(blurb[:image]).to eq 'http://example.org/avatar.png'
+        expect(blurb[:title]).to eq 'Prof. Dr. John Smith'
+        expect(blurb[:image]).to eq 'http://example.org/avatar.png'
+      end
+    end
+
+    context 'within eventmachine' do
+      it 'should consume the API' do
+        pending
+
+        EventMachine.run do
+          users_promise = c.rel(:users).get
+          users_promise.then do |users|
+            expect(users).to have(2).items
+
+            user = users.first
+            expect(user).to have_key :name
+            expect(user[:name]).to eq 'John Smith'
+            expect(user).to have_relation :self
+            expect(user).to have_relation :blurb
+
+            user.rel(:blurb).get.then do |blurb|
+              expect(blurb).to have_key :title
+              expect(blurb).to have_key :image
+
+              expect(blurb[:title]).to eq 'Prof. Dr. John Smith'
+              expect(blurb[:image]).to eq 'http://example.org/avatar.png'
+
+              EventMachine.stop
+              @done = true
+            end
+          end
+        end
+
+        expect(@done).to be true
+      end
     end
   end
 end
