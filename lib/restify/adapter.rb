@@ -11,11 +11,21 @@ module Restify
         Obligation.create do |w|
           next_tick do
             conn = ConnectionPool.get(request.uri)
-            req  = conn.get keepalive: true,
-                            path: request.uri.normalized_path,
-                            query: request.uri.normalized_query
+            req  = conn.send request.method.downcase,
+                             keepalive: true,
+                             redirects: 3,
+                             path: request.uri.normalized_path,
+                             query: request.uri.normalized_query,
+                             body: request.body,
+                             head: request.headers
+
             req.callback do
-              w.fulfill Response.new(req.response, req.response_header)
+              w.fulfill Response.new(
+                request,
+                req.response_header.status,
+                req.response_header,
+                req.response
+              )
             end
 
             req.errback do

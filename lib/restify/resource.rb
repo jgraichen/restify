@@ -51,8 +51,38 @@ module Restify
       @attributes ||= HashWithIndifferentAccess.new
     end
 
-    def initialize(client, relations = {}, attributes = {})
+    # @!method status
+    #   Return response status if available.
+    #
+    #   @return [Symbol] Response status.
+    #   @see Response#status
+    #
+    delegate :status, to: :@response, allow_nil: true
+
+    # @!method code
+    #   Return response status code if available.
+    #
+    #   @return [Fixnum] Response status code.
+    #   @see Response#code
+    #
+    delegate :code, to: :@response, allow_nil: true
+
+    # Follow the Location header from the response of
+    # this resource if available.
+    #
+    # @return [Obligation<Resource>] Followed resource.
+    #
+    def follow
+      if @response && @response.headers['LOCATION']
+        @client.request :get, @response.headers['LOCATION']
+      else
+        raise RuntimeError.new 'Nothing to follow.'
+      end
+    end
+
+    def initialize(client, relations = {}, attributes = {}, response = nil)
       @client     = client
+      @response   = response
       @relations  = HashWithIndifferentAccess.new relations
       @attributes = HashWithIndifferentAccess.new attributes
     end
@@ -94,7 +124,7 @@ module Restify
           end
         end
 
-        new client, relations, hash
+        new client, relations, hash, response
       end
     end
   end

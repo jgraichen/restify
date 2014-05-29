@@ -22,7 +22,7 @@ module Restify
 
   class << self
     def new(url)
-      Client.new(url).request(:GET)
+      Client.new(url).request(:GET, nil)
     end
 
     def adapter

@@ -37,6 +37,49 @@ describe Restify do
         EOF
       end
 
+      stub_request(:post, 'http://localhost/base/users')
+        .with(body: {})
+        .to_return do
+          <<-EOF.gsub(/^ {12}/, '')
+            HTTP/1.1 422 Unprocessable Entity
+            Content-Type: application/json
+            Transfer-Encoding: chunked
+
+            {"errors":{"name":["can't be blank"]}}
+          EOF
+      end
+
+      stub_request(:post, 'http://localhost/base/users')
+        .with(body: {name: 'John Smith'})
+        .to_return do
+          <<-EOF.gsub(/^ {12}/, '')
+            HTTP/1.1 201 Created
+            Content-Type: application/json
+            Location: http://localhost/base/users/john.smith
+            Transfer-Encoding: chunked
+
+            {
+              "name": "John Smith",
+              "url": "http://localhost/base/users/john.smith",
+              "blurb_url": "http://localhost/base/users/john.smith/blurb"
+            }
+          EOF
+      end
+
+      stub_request(:get, 'http://localhost/base/users/john.smith')
+        .to_return do <<-EOF.gsub(/^ {10}/, '')
+          HTTP/1.1 200 OK
+          Content-Type: application/json
+          Link: <http://localhost/base/users/john.smith>; rel="self"
+          Transfer-Encoding: chunked
+
+          {
+            "name": "John Smith",
+            "url": "http://localhost/base/users/john.smith"
+          }
+        EOF
+      end
+
       stub_request(:get, 'http://localhost/base/users/john.smith/blurb')
         .to_return do <<-EOF.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
@@ -69,17 +112,53 @@ describe Restify do
         # parameters to fill in possible URI template placeholders.
         expect(users_relation).to be_a Restify::Relation
 
-        # Let's fetch users using GET.
+        # Let's create a user first.
         # This method returns instantly and returns an `Obligation`.
         # This `Obligation` represents the future value.
-        users_promise = users_relation.get
-        expect(users_promise).to be_a Obligation
+        # We can pass parameters to a request. They will be used
+        # to expand the URI template behind the relation. Additional
+        # fields will be encoding in e.g. JSON and send if not a GET
+        # request.
+        create_user_promise = users_relation.post
+        expect(create_user_promise).to be_a Obligation
 
-        # We could do some other stuff - like requesting other
-        # resources here - while the users are fetched in the background.
-        # When we really need our users we call `#value`. This will block
-        # until the users are here.
-        users = users_promise.value
+        # We can do other things while the request is processed in
+        # the background. When we need the response with can call
+        # {#value} on the promise that will block the thread until
+        # the result is here.
+        begin
+          create_user_promise.value
+        rescue Restify::ClientError => e
+          # Because we forgot to send a "name" the server complains
+          # with an error code that will lead to a raised error.
+
+          expect(e.status).to eq :unprocessable_entity
+          expect(e.code).to eq 422
+          expect(e.errors).to eq 'name' => ["can't be blank"]
+        end
+
+        # Let's try again.
+        created_user = users_relation.post(name: 'John Smith').value
+
+        # The server returns a 201 Created response with the created
+        # resource.
+        expect(created_user.status).to eq :created
+        expect(created_user.code).to eq 201
+
+        expect(created_user).to have_key :name
+        expect(created_user[:name]).to eq 'John Smith'
+
+        # Let's follow the "Location" header.
+        followed_resource = created_user.follow.value
+
+        expect(followed_resource.status).to eq :ok
+        expect(followed_resource.code).to eq 200
+
+        expect(followed_resource).to have_key :name
+        expect(followed_resource[:name]).to eq 'John Smith'
+
+        # Now we will fetch a list of all users.
+        users = users_relation.get.value
 
         # We get a collection back (Restify::Collection).
         expect(users).to have(2).items
