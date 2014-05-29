@@ -4,7 +4,7 @@ Restify is a experimental hypermedia REST client that uses parallel, keep-alive 
 
 Restify scans Link headers and returned resource for links and relations to other resources, represented as RFC6570 URI Templates, and exposes those to the developer.
 
-Restify can be used to consume hyper-media REST APIs (like GitHubs), to build a site-specific library or to use within your own backend services.
+Restify can be used to consume hypermedia REST APIs (like GitHubs), to build a site-specific library or to use within your own backend services.
 
 Restify is build upon
 
