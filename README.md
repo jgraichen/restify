@@ -49,25 +49,25 @@ The `value` call resolves the returned `Obligation` (like a Future object) by bl
 
 Get a relation described by the root resource. Restify supports Link headers as well as JSON encoded relations (`*_url` fields).
 
-```
+```ruby
 repositories = gh.rel(:repository)
 ```
 
 Send a GET request for a specific repository using given parameters. They will be used to expand the URI template behind the `repositories` relation.
 
-```
+```ruby
 repo = repositories.get(owner: 'jgraichen', repo: 'restify').value
 ```
 
 Now fetch a list of commits for this repo and get this first one:
 
-```
+```ruby
 commit = repo.rel(:commits).get.value.first
 ```
 
 And print it:
 
-```
+```ruby
 puts "Last commit: #{commit[:sha]}"
 puts "By #{commit[:commit][:author][:name]} <#{commit[:commit][:author][:email]}>"
 puts "#{commit[:commit][:message]}"
