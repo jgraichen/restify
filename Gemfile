@@ -10,3 +10,8 @@ group :test do
   gem 'webmock'
   gem 'coveralls'
 end
+
+group :development do
+  gem 'yard'
+  gem 'redcarpet', platform: :ruby
+end
