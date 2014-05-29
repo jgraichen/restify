@@ -27,6 +27,7 @@ and can decode and encode
 
 Planned features:
 
+* API versions via header/URI
 * Content-Type and Language negotiation
 * Encode and decode MessagePack
 * ZeroMQ FLP backend
