@@ -4,7 +4,6 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'obligation', path: '~/workspace/obligation'
 
 group :test do
   gem 'rspec'
