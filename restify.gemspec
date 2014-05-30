@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Restify::VERSION
   spec.authors       = ['Jan Graichen']
   spec.email         = ['jg@altimos.de']
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{An experimental hypermedia REST client that uses parallel, keep-alive and pipelined requests by default.}
+  spec.description   = %q{An experimental hypermedia REST client that uses parallel, keep-alive and pipelined requests by default.}
   spec.homepage      = 'https://github.com/jgraichen/restify'
   spec.license       = 'LGPLv3'
 
