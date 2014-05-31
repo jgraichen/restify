@@ -17,6 +17,14 @@ module Restify
     #
     delegate :[], to: :attributes
 
+    # @!method []=(key, value)
+    #   Set value for given key.
+    #
+    #   @param key [String, Symbol] Data key.
+    #   @param key [String, Fixnum, Object] Data value.
+    #
+    delegate :[]=, to: :attributes
+
     # @!method key?(name)
     #   Check if resource has given key.
     #
@@ -99,12 +107,12 @@ module Restify
         if data
           data.each do |key, value|
             hash[key] = case value
-                        when Array
-                          Collection.create(client, value, nil)
-                        when Hash
-                          Resource.create(client, value, nil)
-                        else
-                          value
+                          when Array
+                            Collection.create(client, value, nil)
+                          when Hash
+                            Resource.create(client, value, nil)
+                          else
+                            value
                         end
           end
 

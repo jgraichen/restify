@@ -84,13 +84,35 @@ describe Restify::Resource do
     let(:attributes) { {a: 0, b: 1} }
 
     it 'should yield' do
-      expect { |cb| res.each(&cb) }.to yield_control.twice
-      expect { |cb| res.each(&cb) }.to yield_successive_args ['a', 0], ['b', 1]
+      expect{|cb| res.each(&cb) }.to yield_control.twice
+      expect{|cb| res.each(&cb) }.to yield_successive_args ['a', 0], ['b', 1]
     end
 
     it 'should return enumerator' do
       expect(res.each).to be_a Enumerator
       expect(res.each.to_a).to eq [['a', 0], ['b', 1]]
+    end
+  end
+
+  describe '#[]' do
+    let(:attributes) { {a: 0, b: 1} }
+
+    it 'should return attributes' do
+      expect(res[:a]).to eq 0
+      expect(res[:b]).to eq 1
+    end
+  end
+
+  describe '#[]=' do
+    let(:attributes) { {a: 0, b: 1} }
+
+    it 'should return attributes' do
+      res[:a] = 5
+      res[:c] = 15
+
+      expect(res[:a]).to eq 5
+      expect(res[:b]).to eq 1
+      expect(res[:c]).to eq 15
     end
   end
 end
