@@ -10,12 +10,12 @@ module Restify
                   end
     end
 
-    def get(opts = {})
-      request :get, opts
+    def get(params = {})
+      request :get, params
     end
 
-    def post(opts = {})
-      request :post, opts
+    def post(data = {}, params = {})
+      request :post, params.merge(data: data)
     end
 
     private
