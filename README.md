@@ -78,7 +78,7 @@ See commented example in main spec [`spec/restify_spec.rb`](https://github.com/j
 
 ## Contributing
 
-1. Fork it ( http://github.com/jgraichen/restify/fork )
+1. [Fork it](http://github.com/jgraichen/restify/fork)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit specs for your feature so that I do not break it later
 4. Commit your changes (`git commit -am 'Add some feature'`)
