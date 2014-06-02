@@ -6,7 +6,8 @@ gemspec
 gem 'rake'
 
 group :test do
-  gem 'rspec'
+  gem 'rspec', '~> 3.0'
+  gem 'rspec-collection_matchers'
   gem 'webmock'
   gem 'coveralls'
 end

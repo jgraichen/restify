@@ -186,7 +186,7 @@ describe Restify do
 
     context 'within eventmachine' do
       it 'should consume the API' do
-        pending
+        skip
 
         EventMachine.run do
           users_promise = c.rel(:users).get
