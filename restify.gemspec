@@ -26,4 +26,9 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'rack'
 
   spec.add_development_dependency 'bundler', '~> 1.5'
+
+  if ENV['TRAVIS_BUILD_NUMBER']
+    # Append travis build number for auto-releases
+    spec.version = "#{spec.version}.1.b#{ENV['TRAVIS_BUILD_NUMBER']}"
+  end
 end

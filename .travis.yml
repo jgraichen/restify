@@ -9,3 +9,11 @@ matrix:
   allow_failures:
     - rvm: jruby
     - rvm: rbx
+deploy:
+  provider: rubygems
+  api_key:
+    secure: CZRklWmwJbZA9neinCUQGzu4XjLLvPO7PAEoLaZUriNANBBSeAk5p2E/s7wOIwRPIQV9pzr0P8sghtWKYrTfipHBqau122MRoOuDf6TRN7MDyJRNMrGlsvBa2lOYOWr+ZbSbqu4yVOTQ5uxvvfeyEoYtfMDz3VoMC5YbqnyVsaw=
+  gem: restify
+  on:
+    branch: master
+    rvm: '2.1'
