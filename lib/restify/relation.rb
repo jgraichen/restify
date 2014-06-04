@@ -18,6 +18,18 @@ module Restify
       request :post, params.merge(data: data)
     end
 
+    def put(data = {}, params = {})
+      request :put, params.merge(data: data)
+    end
+
+    def patch(data = {}, params = {})
+      request :patch, params.merge(data: data)
+    end
+
+    def delete(data = {}, params = {})
+      request :delete, params.merge(data: data)
+    end
+
     private
 
     attr_reader :client, :template
