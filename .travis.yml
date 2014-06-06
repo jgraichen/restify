@@ -4,11 +4,11 @@ rvm:
 - '2.0'
 - 1.9.3
 - jruby
-- rbx
+- rbx-2
 matrix:
   allow_failures:
   - rvm: jruby
-  - rvm: rbx
+  - rvm: rbx-2
 deploy:
   provider: rubygems
   api_key:
