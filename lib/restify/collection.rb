@@ -59,7 +59,17 @@ module Restify
 
     class << self
       def create(client, data, response)
-        data      = data.map { |s| Resource.create(client, s, nil) } if data
+        data = data.map do |value|
+          case value
+            when Hash
+              Resource.create client, value, nil
+            when Array
+              create client, value, nil
+            else
+              value
+          end
+        end
+
         relations = response ? response.relations(client) : nil
 
         new client, relations, data

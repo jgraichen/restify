@@ -28,7 +28,8 @@ describe Restify do
           [{
              "name": "John Smith",
              "url": "http://localhost/base/users/john.smith",
-             "blurb_url": "http://localhost/base/users/john.smith/blurb"
+             "blurb_url": "http://localhost/base/users/john.smith/blurb",
+             "languages": ["de", "en"]
            },
            {
              "name": "Jane Smith",
@@ -61,7 +62,8 @@ describe Restify do
             {
               "name": "John Smith",
               "url": "http://localhost/base/users/john.smith",
-              "blurb_url": "http://localhost/base/users/john.smith/blurb"
+              "blurb_url": "http://localhost/base/users/john.smith/blurb",
+              "languages": ["de", "en"]
             }
           EOF
       end
