@@ -86,7 +86,7 @@ module Restify
               end
             elsif !retried
               EventMachine.next_tick { call request, writer }
-            end
+            else
               begin
                 raise RuntimeError.new \
                   "(#{req.response_header.status}) #{req.error}"
