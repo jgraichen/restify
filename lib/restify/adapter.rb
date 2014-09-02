@@ -20,26 +20,35 @@ module Restify
         attr_reader :origin
 
         def initialize(origin)
-          @origin = origin
+          @origin   = origin
+          @pipeline = true
         end
 
         def requests
           @requests ||= []
         end
 
-        def call(request, writer)
-          requests << [request, writer]
-          process_next if requests.size == 1
+        def call(request, writer, retried = false)
+          if requests.empty?
+            requests << [request, writer, retried]
+            process_next
+          else
+            requests << [request, writer, retried]
+          end
         end
 
         def connection
           @connection ||= EventMachine::HttpRequest.new(origin)
         end
 
+        def pipeline?
+          @pipeline
+        end
+
         def process_next
           return if requests.empty?
 
-          request, writer = requests.first
+          request, writer, retried = pipeline? ? requests.shift : requests.first
           req = connection.send request.method.downcase,
                                 keepalive: true,
                                 redirects: 3,
@@ -49,7 +58,7 @@ module Restify
                                 head: request.headers
 
           req.callback do
-            requests.shift
+            requests.shift unless pipeline?
 
             writer.fulfill Response.new(
               request,
@@ -67,14 +76,23 @@ module Restify
           end
 
           req.errback do
-            requests.shift
+            requests.shift unless pipeline?
             @connection = nil
 
-            begin
-              raise RuntimeError.new \
-                "(#{req.response_header.status}) #{req.error}"
-            rescue => e
-              writer.reject e
+            if pipeline?
+              EventMachine.next_tick do
+                @pipeline = false
+                call request, writer
+              end
+            elsif !retried
+              EventMachine.next_tick { call request, writer }
+            end
+              begin
+                raise RuntimeError.new \
+                  "(#{req.response_header.status}) #{req.error}"
+              rescue => e
+                writer.reject e
+              end
             end
           end
         end
