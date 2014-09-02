@@ -35,7 +35,11 @@ module Restify
     # such a thing otherwise it returns nil.
     #
     def errors
-      response.decoded_body['errors'] || response.decoded_body[:errors]
+      if response.decoded_body
+        response.decoded_body['errors'] || response.decoded_body[:errors]
+      else
+        response.body
+      end
     end
   end
 

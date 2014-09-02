@@ -20,8 +20,7 @@ module Restify
         attr_reader :origin
 
         def initialize(origin)
-          @origin   = origin
-          @pipeline = true
+          @origin = origin
         end
 
         def requests
@@ -37,14 +36,10 @@ module Restify
           @connection ||= EventMachine::HttpRequest.new(origin)
         end
 
-        def pipeline?
-          @pipeline
-        end
-
         def process_next
           return if requests.empty?
 
-          request, writer = pipeline? ? requests.shift : requests.first
+          request, writer = requests.first
           req = connection.send request.method.downcase,
                                 keepalive: true,
                                 redirects: 3,
@@ -53,11 +48,8 @@ module Restify
                                 body: request.body,
                                 head: request.headers
 
-          # puts "REQUEST: #{request} #{pipeline? ? 'w/' : 'w/o'} pipelining"
-
           req.callback do
-            # puts "SUCCESS: #{request}"
-            requests.shift unless pipeline?
+            requests.shift
 
             writer.fulfill Response.new(
               request,
@@ -75,21 +67,14 @@ module Restify
           end
 
           req.errback do
-            # puts "ERROR: #{request}"
+            requests.shift
             @connection = nil
 
-            if pipeline?
-              EventMachine.next_tick do
-                @pipeline = false
-                call request, writer
-              end
-            else
-              begin
-                raise RuntimeError.new \
-                  "(#{req.response_header.status}) #{req.error}"
-              rescue => e
-                writer.reject e
-              end
+            begin
+              raise RuntimeError.new \
+                "(#{req.response_header.status}) #{req.error}"
+            rescue => e
+              writer.reject e
             end
           end
         end
