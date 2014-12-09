@@ -49,13 +49,19 @@ module Restify
           return if requests.empty?
 
           request, writer, retried = pipeline? ? requests.shift : requests.first
-          req = connection.send request.method.downcase,
-                                keepalive: true,
-                                redirects: 3,
-                                path: request.uri.normalized_path,
-                                query: request.uri.normalized_query,
-                                body: request.body,
-                                head: request.headers
+          begin
+            req = connection.send request.method.downcase,
+                                  keepalive: true,
+                                  redirects: 3,
+                                  path: request.uri.normalized_path,
+                                  query: request.uri.normalized_query,
+                                  body: request.body,
+                                  head: request.headers
+          rescue => err
+            writer.reject err
+            requests.shift unless pipeline?
+            return
+          end
 
           req.callback do
             requests.shift unless pipeline?
