@@ -13,13 +13,13 @@ module Restify
 
     # Link metadata like "rel" if specified.
     #
-    # @return [HashWithIndifferentAccess<String, String>] Metadata.
+    # @return [Hash<String, String>] Metadata.
     #
     attr_reader :metadata
 
     def initialize(uri, metadata = {})
       @uri      = uri
-      @metadata = HashWithIndifferentAccess.new(metadata)
+      @metadata = metadata
     end
 
     class << self

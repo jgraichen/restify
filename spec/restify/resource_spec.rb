@@ -2,14 +2,15 @@ require 'spec_helper'
 
 describe Restify::Resource do
   let(:client) { double 'client' }
-  let(:relations) { {} }
-  let(:attributes) { {} }
-  let(:res)    { described_class.new(client, relations, attributes) }
+  let(:data) { {} }
+  let(:res)    { described_class.new(client, data) }
 
   describe '#rel?' do
-    before do
-      res.relations['users']   = true
-      res.relations[:projects] = true
+    let(:data) do
+      {
+        'users_url' => 'http://example.org/users',
+        'projects_url' => 'http://example.org/projects',
+      }
     end
 
     it 'should match relations' do
@@ -34,30 +35,30 @@ describe Restify::Resource do
   end
 
   describe '#rel' do
-    let(:users) { double 'users rel' }
-    let(:projects) { double 'projects rel' }
-    before do
-      res.relations['users']   = users
-      res.relations[:projects] = projects
+    let(:data) do
+      {
+        'users_url' => 'http://example.org/users',
+        'projects_url' => 'http://example.org/projects',
+      }
     end
 
     it 'should return relation' do
-      expect(res.rel(:users)).to eq users
-      expect(res.rel('users')).to eq users
-      expect(res.rel(:projects)).to eq projects
-      expect(res.rel('projects')).to eq projects
+      expect(res.rel(:users)).to eq 'http://example.org/users'
+      expect(res.rel('users')).to eq 'http://example.org/users'
+      expect(res.rel(:projects)).to eq 'http://example.org/projects'
+      expect(res.rel('projects')).to eq 'http://example.org/projects'
       expect { res.rel(:fuu) }.to raise_error KeyError
 
-      expect(res.relation(:users)).to eq users
-      expect(res.relation('users')).to eq users
-      expect(res.relation(:projects)).to eq projects
-      expect(res.relation('projects')).to eq projects
+      expect(res.relation(:users)).to eq 'http://example.org/users'
+      expect(res.relation('users')).to eq 'http://example.org/users'
+      expect(res.relation(:projects)).to eq 'http://example.org/projects'
+      expect(res.relation('projects')).to eq 'http://example.org/projects'
       expect { res.relation(:fuu) }.to raise_error KeyError
     end
   end
 
   describe '#key?' do
-    let(:attributes) { {a: 0, 'b' => 1, 0 => 2} }
+    let(:data) { {a: 0, 'b' => 1, 0 => 2} }
 
     it 'should test for key inclusion' do
       expect(res.key?(:a)).to eq true
@@ -81,7 +82,7 @@ describe Restify::Resource do
   end
 
   describe '#each' do
-    let(:attributes) { {a: 0, b: 1} }
+    let(:data) { {a: 0, b: 1} }
 
     it 'should yield' do
       expect{|cb| res.each(&cb) }.to yield_control.twice
@@ -95,18 +96,30 @@ describe Restify::Resource do
   end
 
   describe '#[]' do
-    let(:attributes) { {a: 0, b: 1} }
+    let(:data) { {a: 0, b: 1} }
 
-    it 'should return attributes' do
+    it 'should return data' do
       expect(res[:a]).to eq 0
       expect(res[:b]).to eq 1
     end
   end
 
-  describe '#[]=' do
-    let(:attributes) { {a: 0, b: 1} }
+  describe '<getter>' do
+    let(:data) { {a: 0, b: 1} }
 
-    it 'should return attributes' do
+    it 'should return data' do
+      expect(res).to respond_to :a
+      expect(res).to respond_to :b
+
+      expect(res.a).to eq 0
+      expect(res.b).to eq 1
+    end
+  end
+
+  describe '#[]=' do
+    let(:data) { {a: 0, b: 1} }
+
+    it 'should return data' do
       res[:a] = 5
       res[:c] = 15
 

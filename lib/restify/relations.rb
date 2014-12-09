@@ -8,7 +8,7 @@ module Restify
     # @return [Boolean] True if resource has relation, false otherwise.
     #
     def rel?(name)
-      relations.key? name
+      relations.key? name.to_s
     end
     alias_method :relation?, :rel?
     alias_method :has_rel?, :rel?
@@ -20,16 +20,16 @@ module Restify
     # @return [Relation] Relation.
     #
     def rel(name)
-      relations.fetch name
+      relations.fetch name.to_s
     end
     alias_method :relation, :rel
 
     # Hash of all known relations.
     #
-    # @return [HashWithIndifferentAccess<String, Relation>] Relations.
+    # @return [Hash<String, Relation>] Relations.
     #
     def relations
-      @relations ||= HashWithIndifferentAccess.new
+      @relations ||= Hash.new
     end
   end
 end

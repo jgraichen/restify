@@ -30,13 +30,17 @@ module Restify
       request :delete, params.merge(data: data)
     end
 
+    def ==(other)
+      super || (other.is_a?(String) && @template.pattern == other)
+    end
+
     private
 
     attr_reader :client, :template
 
     def request(method, opts = {})
       keys   = template.variables - Client::RESERVED_KEYS
-      params = opts.except!(keys)
+      params = Hash[keys.map{|key| [key, opts.delete(:key)]}]
       uri    = template.expand(params)
 
       client.request method, uri, opts

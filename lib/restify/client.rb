@@ -90,9 +90,9 @@ module Restify
 
     def handle_success(response)
       if response.decoded_body.is_a?(Array)
-        Collection.create(self, response.decoded_body, response)
+        Collection.new(self, response.decoded_body, response)
       else
-        Resource.create(self, response.decoded_body, response)
+        Resource.new(self, response.decoded_body, response)
       end
     end
 
