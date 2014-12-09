@@ -1,8 +1,10 @@
 module Restify
   #
-  class Resource < Hashie::Mash
+  class Resource < Hashie::Hash
     include Result
     include Relations
+    include Hashie::Extensions::IndifferentAccess
+    include Hashie::Extensions::MethodReader
 
     # Return content Media-Type.
     #
@@ -40,9 +42,9 @@ module Restify
     def ==(other)
       case other
         when Resource
-          @data == other.data && relations == other.relations
+          super && relations == other.relations
         when Hash
-          @data == other
+          super Hash[other.map{|k,v| [convert_key(k), v] }]
         else
           super
       end

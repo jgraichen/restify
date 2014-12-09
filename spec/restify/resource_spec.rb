@@ -116,6 +116,35 @@ describe Restify::Resource do
     end
   end
 
+  describe '#==' do
+    let(:data) { {a: 0, b: 1} }
+
+    it 'should eq hash' do
+      expect(res).to eq a: 0, b: 1
+      expect(res).to be_eq a: 0, b: 1
+
+      expect(res).to eq 'a' => 0, 'b' => 1
+      expect(res).to be_eq 'a' => 0, 'b' => 1
+    end
+  end
+
+  describe '#include?' do
+    let(:data) { {a: 0, b: 1} }
+
+    it 'should include partial hash' do
+      expect(res).to include a: 0
+      expect(res).to include b: 1
+
+      expect(res).to include 'a' => 0
+      expect(res).to include 'b' => 1
+
+      expect(res).to_not include a: 1
+      expect(res).to_not include c: 0
+      expect(res).to_not include 'a' => 1
+      expect(res).to_not include 'c' => 0
+    end
+  end
+
   describe '#[]=' do
     let(:data) { {a: 0, b: 1} }
 
