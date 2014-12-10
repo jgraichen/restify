@@ -6,12 +6,6 @@ module Restify
     include Hashie::Extensions::IndifferentAccess
     include Hashie::Extensions::MethodReader
 
-    # Return content Media-Type.
-    #
-    # @return [MediaType] Resource media type.
-    #
-    attr_reader :media_type
-
     #
     def initialize(client, data = {}, response = nil)
       @client   = client
