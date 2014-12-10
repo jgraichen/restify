@@ -40,10 +40,23 @@ module Restify
 
     def request(method, opts = {})
       keys   = template.variables - Client::RESERVED_KEYS
-      params = Hash[keys.map{|key| [key, opts.delete(:key)]}]
+      params = extract_params(opts, keys)
       uri    = template.expand(params)
 
       client.request method, uri, opts
+    end
+
+    def extract_params(opts, keys)
+      params = {}
+      keys.each do |key|
+        if opts.key?(key)
+          params[key] = opts.delete(key)
+        elsif opts.key?(key.to_sym)
+          params[key] = opts.delete(key.to_sym)
+        end
+      end
+
+      params
     end
   end
 end

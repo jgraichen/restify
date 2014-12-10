@@ -57,7 +57,7 @@ module Restify
     #
     # Keys that should not be extracted from options
     # to expand URI templates.
-    RESERVED_KEYS = [:data]
+    RESERVED_KEYS = %w(data)
 
     # @api private
     #
