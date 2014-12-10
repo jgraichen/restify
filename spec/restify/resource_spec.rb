@@ -121,10 +121,7 @@ describe Restify::Resource do
 
     it 'should eq hash' do
       expect(res).to eq a: 0, b: 1
-      expect(res).to be_eq a: 0, b: 1
-
       expect(res).to eq 'a' => 0, 'b' => 1
-      expect(res).to be_eq 'a' => 0, 'b' => 1
     end
   end
 
