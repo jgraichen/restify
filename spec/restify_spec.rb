@@ -148,7 +148,7 @@ describe Restify do
         expect(created_user.code).to eq 201
 
         expect(created_user).to have_key :name
-        expect(created_user[:name]).to eq 'John Smith'
+        expect(created_user.name).to eq 'John Smith'
 
         # Let's follow the "Location" header.
         followed_resource = created_user.follow.value
@@ -157,7 +157,7 @@ describe Restify do
         expect(followed_resource.code).to eq 200
 
         expect(followed_resource).to have_key :name
-        expect(followed_resource[:name]).to eq 'John Smith'
+        expect(followed_resource.name).to eq 'John Smith'
 
         # Now we will fetch a list of all users.
         users = users_relation.get.value
