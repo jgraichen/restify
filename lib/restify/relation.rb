@@ -14,6 +14,10 @@ module Restify
       request :get, params
     end
 
+    def delete(params = {})
+      request :delete, params
+    end
+
     def post(data = {}, params = {})
       request :post, params.merge(data: data)
     end
@@ -24,10 +28,6 @@ module Restify
 
     def patch(data = {}, params = {})
       request :patch, params.merge(data: data)
-    end
-
-    def delete(data = {}, params = {})
-      request :delete, params.merge(data: data)
     end
 
     def ==(other)

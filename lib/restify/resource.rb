@@ -31,7 +31,7 @@ module Restify
       end
     end
 
-    # Compare with other {Resource}s or {Hash}s.
+    # Compare with other {Resource}s or hashes.
     #
     def ==(other)
       case other
