@@ -57,7 +57,7 @@ module Restify
                                   query: request.uri.normalized_query,
                                   body: request.body,
                                   head: request.headers
-          rescue => err
+          rescue Exception => err
             writer.reject err
             requests.shift unless pipeline?
             return
