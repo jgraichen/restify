@@ -19,11 +19,11 @@ and can decode and encode
 
 * [JSON](https://github.com/intridea/multi_json)
 
-## Restify is still pre-alpha!
+## Restify is still under development
 
-* It does not cover all HTTP methods (not even all basic ones)
-* It is build on pre-alpha obligation library.
-* It has to less tests.
+* It is build on experimental obligation library.
+* It's missing a extensive test suite
+* It's not used in high-volume production environments but for remote API usage in testing and CI.
 
 Planned features:
 
@@ -51,7 +51,7 @@ The `value` call resolves the returned `Obligation` (like a Future object) by bl
 Get a relation described by the root resource. Restify supports Link headers as well as JSON encoded relations (`*_url` fields).
 
 ```ruby
-repositories = gh.rel(:repository)
+repositories = client.rel(:repository)
 ```
 
 Send a GET request for a specific repository using given parameters. They will be used to expand the URI template behind the `repositories` relation.
