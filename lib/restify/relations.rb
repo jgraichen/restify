@@ -23,13 +23,5 @@ module Restify
       relations.fetch name
     end
     alias_method :relation, :rel
-
-    # Hash of all known relations.
-    #
-    # @return [Hash<String, Relation>] Relations.
-    #
-    def relations
-      @relations ||= Hashie::Mash.new
-    end
   end
 end

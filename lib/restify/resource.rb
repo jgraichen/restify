@@ -1,17 +1,14 @@
 module Restify
   #
   class Resource < Hashie::Hash
-    include Result
+    include Contextual
     include Relations
     include Hashie::Extensions::IndifferentAccess
     include Hashie::Extensions::MethodReader
 
     #
-    def initialize(client, data = {}, response = nil)
-      @client   = client
-      @response = response
-
-      relations.merge! @response.relations(client) if @response
+    def initialize(context, data = {})
+      @context = context
 
       data.each_pair do |key, value|
         self[key.to_s] = convert_value(value)
@@ -25,8 +22,8 @@ module Restify
             next
         end
 
-        unless relations.key?(name) || value.nil? || value.to_s.empty?
-          relations[name] = Relation.new(client, value.to_s)
+        unless @context.relation?(name) || value.nil? || value.to_s.empty?
+          @context.add_relation name, value.to_s
         end
       end
     end
@@ -53,12 +50,7 @@ module Restify
     # @private
     #
     def convert_value(value)
-      case value
-        when Hash
-          self.new client, value
-        else
-          value
-      end
+      @context.inherit_value(value)
     end
   end
 end

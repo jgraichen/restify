@@ -64,21 +64,22 @@ module Restify
     #
     attr_reader :request
 
+    # Last effective URI.
+    #
+    # @return [Addressable::URI] Last effective URI.
+    #
+    attr_reader :uri
+
     # @api private
     #
-    def initialize(request, code, headers, body)
+    def initialize(request, uri, code, headers, body)
       @request = request
+      @uri     = uri
       @code    = code
       @status  = STATUS_CODE_TO_SYMBOL[code]
       @headers = headers
       @body    = body
       @message = Rack::Utils::HTTP_STATUS_CODES[code]
-    end
-
-    # Return URL of this response.
-    #
-    def url
-      request.uri
     end
 
     # Return list of links from the Link header.
@@ -98,20 +99,6 @@ module Restify
           []
         end
       end
-    end
-
-    # Return list of relations extracted from links.
-    #
-    # @return [Array<Relation>] Relations.
-    #
-    def relations(client)
-      relations = {}
-      links.each do |link|
-        if (rel = link.metadata['rel'])
-          relations[rel] = Relation.new(client, link.uri)
-        end
-      end
-      relations
     end
 
     # Return decoded body according to content type.

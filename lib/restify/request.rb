@@ -25,7 +25,9 @@ module Restify
     end
 
     def body
-      @body ||= MultiJson.dump(data)
+      @body ||= begin
+        MultiJson.dump(data) unless data.nil?
+      end
     end
 
     def headers

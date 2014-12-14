@@ -5,9 +5,9 @@ module Restify
   #
   class Link
     #
-    # URI of the link interpreted as a RFC6570 template.
+    # Extract URI string.
     #
-    # @return [Addressable::Template] URI template.
+    # @return [String] URI string.
     #
     attr_reader :uri
 
@@ -56,7 +56,7 @@ module Restify
 
       def parse_link(scanner)
         if (m = scanner.scan(REGEXP_URI))
-          uri    = Addressable::Template.new(m.strip[1..-2])
+          uri    = m.strip[1..-2]
           params = parse_params(scanner)
           new uri, params
         else

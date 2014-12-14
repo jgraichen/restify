@@ -1,9 +1,10 @@
 require 'spec_helper'
 
 describe Restify::Resource do
-  let(:client) { double 'client' }
   let(:data) { {} }
-  let(:res)    { described_class.new(client, data) }
+  let(:http) { double 'http' }
+  let(:context) { Restify::Context.new 'http://example.org', http }
+  let(:res) { described_class.new(context, data) }
 
   describe '#rel?' do
     let(:data) do

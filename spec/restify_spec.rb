@@ -144,17 +144,17 @@ describe Restify do
 
         # The server returns a 201 Created response with the created
         # resource.
-        expect(created_user.status).to eq :created
-        expect(created_user.code).to eq 201
+        expect(created_user.response.status).to eq :created
+        expect(created_user.response.code).to eq 201
 
         expect(created_user).to have_key :name
         expect(created_user.name).to eq 'John Smith'
 
         # Let's follow the "Location" header.
-        followed_resource = created_user.follow.value
+        followed_resource = created_user.follow.get.value
 
-        expect(followed_resource.status).to eq :ok
-        expect(followed_resource.code).to eq 200
+        expect(followed_resource.response.status).to eq :ok
+        expect(followed_resource.response.code).to eq 200
 
         expect(followed_resource).to have_key :name
         expect(followed_resource.name).to eq 'John Smith'

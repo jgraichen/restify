@@ -68,6 +68,7 @@ module Restify
 
             writer.fulfill Response.new(
               request,
+              req.last_effective_url,
               req.response_header.status,
               req.response_header,
               req.response

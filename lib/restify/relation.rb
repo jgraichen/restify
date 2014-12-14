@@ -1,62 +1,47 @@
 module Restify
   #
   class Relation
-    def initialize(client, uri_template)
-      @client   = client
-      @template = if uri_template.is_a?(Addressable::Template)
-                    uri_template
-                  else
-                    Addressable::Template.new(uri_template)
-                  end
+    def initialize(context, template)
+      @context  = context
+      @source   = template.to_s
+      @template = Addressable::Template.new \
+        context.uri.join(template.to_s).to_s
     end
 
     def get(params = {})
-      request :get, params
+      request :get, nil, params
     end
 
     def delete(params = {})
-      request :delete, params
+      request :delete, nil, params
     end
 
     def post(data = {}, params = {})
-      request :post, params.merge(data: data)
+      request :post, data, params
     end
 
     def put(data = {}, params = {})
-      request :put, params.merge(data: data)
+      request :put, data, params
     end
 
     def patch(data = {}, params = {})
-      request :patch, params.merge(data: data)
+      request :patch, data, params
     end
 
     def ==(other)
-      super || (other.is_a?(String) && @template.pattern == other)
+      super ||
+        (other.is_a?(String) && @template.pattern == other) ||
+        (other.is_a?(String) && @source == other)
     end
 
     private
 
     attr_reader :client, :template
 
-    def request(method, opts = {})
-      keys   = template.variables - Client::RESERVED_KEYS
-      params = extract_params(opts, keys)
-      uri    = template.expand(params)
+    def request(method, data, params)
+      uri = template.expand params
 
-      client.request method, uri, opts
-    end
-
-    def extract_params(opts, keys)
-      params = {}
-      keys.each do |key|
-        if opts.key?(key)
-          params[key] = opts.delete(key)
-        elsif opts.key?(key.to_sym)
-          params[key] = opts.delete(key.to_sym)
-        end
-      end
-
-      params
+      @context.request method, uri, data
     end
   end
 end

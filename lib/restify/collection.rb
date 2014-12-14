@@ -1,23 +1,15 @@
 module Restify
   #
   class Collection < Array
-    include Result
+    include Contextual
     include Relations
 
-    def initialize(client, data = [], response = nil)
+    def initialize(context, data = [])
+      @context = context
+
       super data
 
-      map! do |item|
-        case item
-          when Hash
-            Resource.new client, item
-          else
-            item
-        end
-      end
-
-      @client    = client
-      @relations = response ? response.relations(client) : nil
+      map! {|item| @context.inherit_value(item) }
     end
   end
 end
