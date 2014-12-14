@@ -1,12 +1,17 @@
 require 'spec_helper'
 
 describe Restify::Relation do
-  let(:client) { double 'client' }
-  let(:pattern) { 'http://test.host/resource/{id}' }
-  let(:relation) { described_class.new client, pattern }
+  let(:context) { double 'context' }
+  let(:source) { '/resource/{id}' }
+  let(:pattern) { "http://test.host/#{source}" }
+  let(:relation) { described_class.new context, source, pattern }
   subject { relation }
 
   describe '#==' do
+    it 'should equal source' do
+      expect(subject).to eq source
+    end
+
     it 'should equal pattern' do
       expect(subject).to eq pattern
     end

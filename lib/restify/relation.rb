@@ -1,11 +1,10 @@
 module Restify
   #
   class Relation
-    def initialize(context, template)
+    def initialize(context, source, pattern)
       @context  = context
-      @source   = template.to_s
-      @template = Addressable::Template.new \
-        context.uri.join(template.to_s).to_s
+      @source   = source
+      @template = to_template(pattern)
     end
 
     def get(params = {})
@@ -42,6 +41,14 @@ module Restify
       uri = template.expand params
 
       @context.request method, uri, data
+    end
+
+    def to_template(pattern)
+      if pattern.is_a?(Addressable::Template)
+        pattern
+      else
+        Addressable::Template.new pattern
+      end
     end
   end
 end

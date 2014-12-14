@@ -31,16 +31,25 @@ module Restify
       @relations ||= load_relations
     end
 
+    def expand(uri)
+      case uri
+        when Addressable::Template
+          Addressable::Template.new self.uri.join(uri.pattern).to_s
+        else
+          self.uri.join uri
+      end
+    end
+
     def follow
       if follow_location
-        Relation.new self, follow_location.to_s
+        new_relation follow_location
       else
         raise RuntimeError.new 'Nothing to follow'
       end
     end
 
     def request(method, uri, data = nil, opts = {})
-      request = @http.request(method, self.uri.join(uri.to_s), data, opts)
+      request = @http.request(method, expand(uri), data, opts)
       request.then do |response|
         if response.success?
           inherit(uri: response.uri, response: response)
@@ -55,8 +64,12 @@ module Restify
       inherit.new_value value
     end
 
+    def new_relation(uri)
+      Relation.new(self, uri.to_s, expand(uri))
+    end
+
     def add_relation(name, uri)
-      relations[name] = Relation.new(self, uri.to_s)
+      @relations[name] = new_relation(uri)
     end
 
     def inherit(opts = {})
@@ -88,7 +101,7 @@ module Restify
     def load_relations
       response_links.each_with_object(Hashie::Mash.new) do |link, relations|
         if (rel = link.metadata['rel'])
-          relations[rel] = Relation.new(self, link.uri.to_s)
+          relations[rel] = new_relation link.uri
         end
       end
     end
