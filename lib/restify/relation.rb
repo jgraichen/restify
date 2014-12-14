@@ -33,14 +33,23 @@ module Restify
         (other.is_a?(String) && @source == other)
     end
 
+    def expand(params)
+      @template.expand extracted params
+    end
+
     private
 
-    attr_reader :client, :template
-
     def request(method, data, params)
-      uri = template.expand params
+      @context.request method, expand(params), data
+    end
 
-      @context.request method, uri, data
+    def extracted(params)
+      @template.variables.each_with_object({}) do |var, hash|
+        if (value = params.delete(var) { params.delete(var.to_sym) { nil }})
+          value = value.to_param if value.respond_to?(:to_param)
+          hash[var] = value
+        end
+      end
     end
 
     def to_template(pattern)
