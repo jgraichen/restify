@@ -51,12 +51,12 @@ module Restify
           request, writer, retried = pipeline? ? requests.shift : requests.first
           begin
             req = connection.send request.method.downcase,
-                                  keepalive: true,
-                                  redirects: 3,
-                                  path: request.uri.normalized_path,
-                                  query: request.uri.normalized_query,
-                                  body: request.body,
-                                  head: request.headers
+              keepalive: true,
+              redirects: 3,
+              path: request.uri.normalized_path,
+              query: request.uri.normalized_query,
+              body: request.body,
+              head: request.headers
           rescue Exception => err
             writer.reject err
             requests.shift unless pipeline?

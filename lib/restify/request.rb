@@ -20,7 +20,7 @@ module Restify
 
     def initialize(opts = {})
       @method = opts.fetch(:method, :get)
-      @uri    = opts.fetch(:uri) { fail ArgumentError, ':uri required.' }
+      @uri    = opts.fetch(:uri) { raise ArgumentError.new ':uri required.' }
       @data   = opts.fetch(:data, nil)
     end
 

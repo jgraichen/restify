@@ -1,7 +1,6 @@
 require 'restify/adapter'
 
 module Restify
-
   # @api private
   #
   class HTTP
@@ -19,7 +18,7 @@ module Restify
     # resource or fail with a response error depending on
     # response from server.
     #
-    def request(method, uri, data = nil, opts = {})
+    def request(method, uri, data = nil, _opts = {})
       request = Request.new method: method, uri: uri, data: data
 
       @adapter.call(request)

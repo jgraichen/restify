@@ -9,7 +9,7 @@ module Restify
     #   @return [Hashie::Mash] Relations.
     #   @see Context#relations
     #
-    delegate :relations => :@context
+    delegate relations: :@context
 
     # @!method response
     #
@@ -18,7 +18,7 @@ module Restify
     #   @return [Response] Response object.
     #   @see Context#response
     #
-    delegate :response => :@context
+    delegate response: :@context
 
     # @!method follow
     #
@@ -27,6 +27,6 @@ module Restify
     #   @return [Relation] Relation to follow resource.
     #   @see Context#follow
     #
-    delegate :follow => :@context
+    delegate follow: :@context
   end
 end

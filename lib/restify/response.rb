@@ -109,10 +109,8 @@ module Restify
     def decoded_body
       @decoded_body ||= begin
         case headers['Content-Type']
-        when /\Aapplication\/json($|;)/
-          MultiJson.load body
-        else
-          nil
+          when /\Aapplication\/json($|;)/
+            MultiJson.load body
         end
       end
     end
@@ -123,7 +121,7 @@ module Restify
     # @return [Boolean] True if status code is 2XX otherwise false.
     #
     def success?
-      (200...300) === code
+      (200...300).include? code
     end
   end
 end

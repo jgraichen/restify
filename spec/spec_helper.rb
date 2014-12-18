@@ -12,7 +12,7 @@ require 'restify'
 
 require 'rspec/collection_matchers'
 
-Dir[File.expand_path('spec/support/**/*.rb')].each { |f| require f }
+Dir[File.expand_path('spec/support/**/*.rb')].each {|f| require f }
 
 RSpec.configure do |config|
   config.order = 'random'

@@ -15,7 +15,7 @@ module Restify
 
         name = case key.to_s.downcase
           when /\A(\w+)_url\z/
-            $1
+            Regexp.last_match[1]
           when 'url'
             'self'
           else
@@ -35,7 +35,7 @@ module Restify
         when Resource
           super && relations == other.relations
         when Hash
-          super Hash[other.map{|k,v| [convert_key(k), v] }]
+          super Hash[other.map {|k, v| [convert_key(k), v] }]
         else
           super
       end

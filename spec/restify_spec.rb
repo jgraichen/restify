@@ -41,7 +41,7 @@ describe Restify do
       stub_request(:post, 'http://localhost/base/users')
         .with(body: {})
         .to_return do
-          <<-EOF.gsub(/^ {12}/, '')
+        <<-EOF.gsub(/^ {12}/, '')
             HTTP/1.1 422 Unprocessable Entity
             Content-Type: application/json
             Transfer-Encoding: chunked
@@ -53,7 +53,7 @@ describe Restify do
       stub_request(:post, 'http://localhost/base/users')
         .with(body: {name: 'John Smith'})
         .to_return do
-          <<-EOF.gsub(/^ {12}/, '')
+        <<-EOF.gsub(/^ {12}/, '')
             HTTP/1.1 201 Created
             Content-Type: application/json
             Location: http://localhost/base/users/john.smith
@@ -69,7 +69,8 @@ describe Restify do
       end
 
       stub_request(:get, 'http://localhost/base/users/john.smith')
-        .to_return do <<-EOF.gsub(/^ {10}/, '')
+        .to_return do
+        <<-EOF.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
           Content-Type: application/json
           Link: <http://localhost/base/users/john.smith>; rel="self"
@@ -83,7 +84,8 @@ describe Restify do
       end
 
       stub_request(:get, 'http://localhost/base/users/john.smith/blurb')
-        .to_return do <<-EOF.gsub(/^ {10}/, '')
+        .to_return do
+        <<-EOF.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
           Content-Type: application/json
           Link: <http://localhost/base/users/john.smith>; rel="user"

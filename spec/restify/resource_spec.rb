@@ -10,7 +10,7 @@ describe Restify::Resource do
     let(:data) do
       {
         'users_url' => 'http://example.org/users',
-        'projects_url' => 'http://example.org/projects',
+        'projects_url' => 'http://example.org/projects'
       }
     end
 
@@ -39,7 +39,7 @@ describe Restify::Resource do
     let(:data) do
       {
         'users_url' => 'http://example.org/users',
-        'projects_url' => 'http://example.org/projects',
+        'projects_url' => 'http://example.org/projects'
       }
     end
 
@@ -86,8 +86,8 @@ describe Restify::Resource do
     let(:data) { {a: 0, b: 1} }
 
     it 'should yield' do
-      expect{|cb| res.each(&cb) }.to yield_control.twice
-      expect{|cb| res.each(&cb) }.to yield_successive_args ['a', 0], ['b', 1]
+      expect {|cb| res.each(&cb) }.to yield_control.twice
+      expect {|cb| res.each(&cb) }.to yield_successive_args ['a', 0], ['b', 1]
     end
 
     it 'should return enumerator' do

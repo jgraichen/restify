@@ -45,7 +45,7 @@ module Restify
 
     def extracted(params)
       @template.variables.each_with_object({}) do |var, hash|
-        if (value = params.delete(var) { params.delete(var.to_sym) { nil }})
+        if (value = params.delete(var) { params.delete(var.to_sym) { nil } })
           value = value.to_param if value.respond_to?(:to_param)
           hash[var] = value
         end

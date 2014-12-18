@@ -21,7 +21,7 @@ module Restify
     #
     attr_reader :uri
 
-    def initialize(uri, http, response = nil, opts = {})
+    def initialize(uri, http, response = nil, _opts = {})
       @uri = uri.is_a?(URI) ? uri : URI.parse(uri.to_s)
       @http = http
       @response = response
@@ -93,9 +93,9 @@ module Restify
     private
 
     def follow_location
-      if @response
-        @response.headers['LOCATION'] || @response.headers['CONTENT-LOCATION']
-      end
+      return unless @response
+
+      @response.headers['LOCATION'] || @response.headers['CONTENT-LOCATION']
     end
 
     def load_relations

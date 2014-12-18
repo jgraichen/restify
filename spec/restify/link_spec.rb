@@ -5,7 +5,7 @@ describe Restify::Link do
     describe '#parse' do
       it 'should parse link with quotes' do
         links = described_class
-          .parse('<http://example.org/search{?query}>; rel="search"')
+                .parse('<http://example.org/search{?query}>; rel="search"')
 
         expect(links).to have(1).item
         expect(links[0].uri).to eq 'http://example.org/search{?query}'
@@ -14,7 +14,7 @@ describe Restify::Link do
 
       it 'should parse link without quotes' do
         links = described_class
-          .parse('<http://example.org/search{?query}>; rel=search')
+                .parse('<http://example.org/search{?query}>; rel=search')
 
         expect(links).to have(1).item
         expect(links[0].uri).to eq 'http://example.org/search{?query}'
@@ -23,7 +23,7 @@ describe Restify::Link do
 
       it 'should parse multiple links' do
         links = described_class
-          .parse('<p://h.tld/p>; rel=abc, <p://h.tld/b>; a=b; c="d"')
+                .parse('<p://h.tld/p>; rel=abc, <p://h.tld/b>; a=b; c="d"')
 
         expect(links).to have(2).item
         expect(links[0].uri).to eq 'p://h.tld/p'

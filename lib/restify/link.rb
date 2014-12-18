@@ -35,8 +35,8 @@ module Restify
           return parse_links(scanner)
         end
 
-        fail ArgumentError,
-             "Invalid token at #{scanner.pos}: '#{scanner.rest}'"
+        raise ArgumentError.new \
+          "Invalid token at #{scanner.pos}: '#{scanner.rest}'"
       end
 
       private
