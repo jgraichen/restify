@@ -1,7 +1,6 @@
 AllCops:
   Include:
-    - '**/*.gemspec'
-    - '**/Rakefile'
+    - '**/*.rb'
 
 Style/AlignParameters:
   EnforcedStyle: with_fixed_indentation
@@ -36,6 +35,5 @@ Style/CaseIndentation:
 Style/ClassAndModuleChildren:
   Enabled: false
 
-Metrics/LineLength:
-  Exclude:
-    - '**/*.gemspec'
+Style/TrivialAccessors:
+  AllowPredicates: true
