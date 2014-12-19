@@ -35,5 +35,11 @@ describe Restify::Relation do
 
       it { expect(subject.to_s).to eq 'http://test.host/resource/42' }
     end
+
+    context 'with additional parameters' do
+      let(:params) { {id: '5', abc: 'cde'} }
+
+      it { expect(subject.to_s).to eq 'http://test.host/resource/5?abc=cde' }
+    end
   end
 end

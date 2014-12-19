@@ -34,7 +34,10 @@ module Restify
     end
 
     def expand(params)
-      @template.expand extracted params
+      variables = extract! params
+      uri = @template.expand variables
+      uri.query_values = params if params.any?
+      uri
     end
 
     private
@@ -43,7 +46,7 @@ module Restify
       @context.request method, expand(params), data
     end
 
-    def extracted(params)
+    def extract!(params)
       @template.variables.each_with_object({}) do |var, hash|
         if (value = params.delete(var) { params.delete(var.to_sym) { nil } })
           value = value.to_param if value.respond_to?(:to_param)
