@@ -24,12 +24,13 @@ describe Restify::Relation do
 
     it { is_expected.to be_a Addressable::URI }
 
-    context 'with #to_param object' do
-      class ParamObject
-        def to_param
-          42
-        end
+    class ParamObject
+      def to_param
+        42
       end
+    end
+
+    context 'with #to_param object' do
 
       let(:params) { {id: ParamObject.new} }
 
@@ -40,6 +41,12 @@ describe Restify::Relation do
       let(:params) { {id: '5', abc: 'cde'} }
 
       it { expect(subject.to_s).to eq 'http://test.host/resource/5?abc=cde' }
+    end
+
+    context 'with additional #to_param parameter' do
+      let(:params) { {id: '5', abc: ParamObject.new} }
+
+      it { expect(subject.to_s).to eq 'http://test.host/resource/5?abc=42' }
     end
   end
 end
