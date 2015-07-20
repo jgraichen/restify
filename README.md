@@ -85,7 +85,7 @@ See commented example in main spec [`spec/restify_spec.rb`](https://github.com/j
 
 ## License
 
-Copyright (C) 2014 Jan Graichen
+Copyright (C) 2014-2015 Jan Graichen
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
