@@ -38,7 +38,7 @@ module Restify
       variables = extract! params
 
       uri = @template.expand variables
-      uri.query_values = params if params.any?
+      uri.query_values = (uri.query_values || {}).merge params if params.any?
       uri
     end
 

@@ -37,6 +37,13 @@ describe Restify::Relation do
       it { expect(subject.to_s).to eq 'http://test.host/resource/42' }
     end
 
+    context 'with unknown additional query parameter' do
+      let(:source) { '/resource{?a,b}' }
+      let(:params) { {a: 1, b: 2, c: 3} }
+
+      it { expect(subject.to_s).to eq 'http://test.host/resource?a=1&b=2&c=3' }
+    end
+
     context 'with additional parameters' do
       let(:params) { {id: '5', abc: 'cde'} }
 
