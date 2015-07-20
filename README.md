@@ -22,8 +22,6 @@ and can decode and encode
 ## Restify is still under development
 
 * It is build on experimental obligation library.
-* It's missing a extensive test suite
-* It's not used in high-volume production environments but for remote API usage in testing and CI.
 
 Planned features:
 
