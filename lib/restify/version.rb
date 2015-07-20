@@ -2,7 +2,7 @@ module Restify
   module VERSION
     MAJOR = 0
     MINOR = 3
-    PATCH = 1
+    PATCH = 2
     STAGE = nil
     STRING = [MAJOR, MINOR, PATCH, STAGE].reject(&:nil?).join('.').freeze
 
