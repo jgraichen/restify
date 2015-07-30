@@ -203,16 +203,16 @@ describe Restify do
             expect(user).to have_relation :self
             expect(user).to have_relation :blurb
 
-            user.rel(:blurb).get.then do |blurb|
-              expect(blurb).to have_key :title
-              expect(blurb).to have_key :image
+            user.rel(:blurb).get
+          end.then do |blurb|
+            expect(blurb).to have_key :title
+            expect(blurb).to have_key :image
 
-              expect(blurb[:title]).to eq 'Prof. Dr. John Smith'
-              expect(blurb[:image]).to eq 'http://example.org/avatar.png'
+            expect(blurb[:title]).to eq 'Prof. Dr. John Smith'
+            expect(blurb[:image]).to eq 'http://example.org/avatar.png'
 
-              EventMachine.stop
-              @done = true
-            end
+            EventMachine.stop
+            @done = true
           end
         end
 
