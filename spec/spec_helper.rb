@@ -10,6 +10,7 @@ end
 
 require 'restify'
 
+require 'eventmachine'
 require 'rspec/collection_matchers'
 
 Dir[File.expand_path('spec/support/**/*.rb')].each {|f| require f }

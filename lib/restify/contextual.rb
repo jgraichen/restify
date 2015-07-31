@@ -1,3 +1,5 @@
+require 'forwardable'
+
 module Restify
   module Contextual
     extend Forwardable

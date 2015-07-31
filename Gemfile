@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'hashie', github: 'intridea/hashie'
+gem 'hashie'
 
 group :test do
   gem 'rspec', '~> 3.0'
