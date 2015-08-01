@@ -1,4 +1,4 @@
-require 'restify/adapter/celluloid'
+require 'restify/adapter/em'
 
 module Restify
   # @api private
@@ -26,7 +26,7 @@ module Restify
 
     class << self
       def adapter
-        @adapter ||= Restify::Adapter::Celluloid.new
+        @adapter ||= Restify::Adapter::EM.new
       end
     end
   end
