@@ -2,6 +2,7 @@ sudo: false
 language: ruby
 cache: bundler
 rvm:
+- '2.2'
 - '2.1'
 - '2.0'
 - 1.9.3
@@ -18,4 +19,4 @@ deploy:
   gem: restify
   on:
     branch: master
-    rvm: '2.1'
+    rvm: '2.2'
