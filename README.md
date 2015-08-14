@@ -6,12 +6,12 @@ Restify scans Link headers and returned resource for links and relations to othe
 
 Restify can be used to consume hypermedia REST APIs (like GitHubs), to build a site-specific library or to use within your own backend services.
 
-Restify is build upon
+Restify is build upon the following libraries:
 
 * [obligation](https://github.com/jgraichen/obligation)
 * [addressable](https://github.com/sporkmonger/addressable)
 
-provided HTTP adapters for
+It provides HTTP adapters to use with:
 
 * [em-http-request](https://github.com/igrigorik/em-http-request)
 * [celluloid-io](https://github.com/celluloid/celluloid-io) / [http](https://github.com/httprb/http) (experimental)
@@ -19,9 +19,13 @@ provided HTTP adapters for
 
 They are mostly run in a background thread and may not survive mid-application forks.
 
-and can decode and encode
+Included processors can handle:
 
-* [JSON](https://github.com/intridea/multi_json)
+* Plain JSON with GitHub-Style relations
+
+(Beside HTTP Link header that's always supported)
+
+Restify required Ruby 2.0+.
 
 ## Restify is still under development
 
