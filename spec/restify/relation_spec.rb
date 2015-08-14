@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Restify::Relation do
-  let(:context)  { Restify::Context.new('http://test.host/', nil) }
+  let(:context)  { Restify::Context.new('http://test.host/') }
   let(:pattern)  { '/resource/{id}' }
   let(:relation) { described_class.new context, pattern }
   subject { relation }

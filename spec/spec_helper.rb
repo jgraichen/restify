@@ -10,6 +10,20 @@ end
 
 require 'restify'
 
+case ENV['ADAPTER'].downcase
+  when 'em-http-request'
+    require 'restify/adapter/em'
+    Restify.adapter = Restify::Adapter::EM.new
+  when 'typhoeus'
+    require 'restify/adapter/typhoeus'
+    Restify.adapter = Restify::Adapter::Typhoeus.new
+  when 'celluloid'
+    require 'restify/adapter/celluloid'
+    Restify.adapter = Restify::Adapter::Celluloid.new
+  else
+    raise "Invalid adapter: #{ENV['ADAPTER']}"
+end
+
 require 'eventmachine'
 require 'rspec/collection_matchers'
 

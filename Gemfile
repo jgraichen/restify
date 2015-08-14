@@ -4,7 +4,9 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'hashie'
+gem 'typhoeus'
+gem 'http'
+gem 'celluloid-io'
 
 group :test do
   gem 'rspec', '~> 3.0'

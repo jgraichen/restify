@@ -7,7 +7,6 @@ require 'addressable/template'
 
 #
 module Restify
-  require 'restify/http'
   require 'restify/error'
 
   require 'restify/context'
@@ -27,11 +26,18 @@ module Restify
 
   class << self
     def new(uri, opts = {})
-      Context.new(uri, http).request(:GET, uri)
+      Context.new(uri).request(:GET, uri)
     end
 
-    def http
-      @http ||= HTTP.new
+    def adapter
+      @adapter ||= begin
+        require 'restify/adapter/em'
+        Restify::Adapter::EM.new
+      end
+    end
+
+    def adapter=(adapter)
+      @adapter = adapter
     end
   end
 end

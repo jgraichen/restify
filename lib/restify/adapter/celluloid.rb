@@ -16,12 +16,14 @@ module Restify
             body: request.body,
             socket_class: ::Celluloid::IO::TCPSocket
 
-        writer.fulfill Response.new \
-          request,
-          response.uri,
-          response.status.code,
-          response.headers.to_h,
-          response.body.to_s
+        uri     = response.uri
+        status  = response.status.code
+        body    = response.body.to_s
+        headers = response.headers.to_h.each_with_object({}) do |header, hash|
+          hash[header[0].upcase.tr('-', '_')] = header[1]
+        end
+
+        writer.fulfill Response.new request, uri, status, headers, body
       end
 
       def call(request)

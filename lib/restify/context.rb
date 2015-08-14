@@ -12,9 +12,8 @@ module Restify
     #
     attr_reader :uri
 
-    def initialize(uri, http)
+    def initialize(uri)
       @uri  = uri.is_a?(Addressable::URI) ? uri : Addressable::URI.parse(uri.to_s)
-      @http = http
     end
 
     def join(uri)
@@ -22,7 +21,7 @@ module Restify
     end
 
     def process(response)
-      context   = Context.new response.uri, @http
+      context   = Context.new response.uri
       processor = Restify::PROCESSORS.find { |p| p.accept? response }
       processor ||= Restify::Processors::Base
 
@@ -30,8 +29,9 @@ module Restify
     end
 
     def request(method, uri, data = nil, opts = {})
-      request = @http.request(method, join(uri), data, opts)
-      request.then do |response|
+      request = Request.new method: method, uri: join(uri), data: data
+
+      Restify.adapter.call(request).then do |response|
         if response.success?
           process response
         else

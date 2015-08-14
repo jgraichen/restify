@@ -8,6 +8,10 @@ rvm:
 - 1.9.3
 - jruby
 - rbx-2
+env:
+- ADAPTER=em-http-request
+- ADAPTER=typhoeus
+- ADAPTER=celluloid
 matrix:
   allow_failures:
   - rvm: jruby

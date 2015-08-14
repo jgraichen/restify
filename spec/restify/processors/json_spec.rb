@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Restify::Processors::Json do
-  let(:context)  { Restify::Context.new('http://test.host/', nil) }
+  let(:context)  { Restify::Context.new('http://test.host/') }
   let(:response) { double 'response' }
 
   before do
