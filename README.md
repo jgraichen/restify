@@ -14,6 +14,10 @@ Restify is build upon
 provided HTTP adapters for
 
 * [em-http-request](https://github.com/igrigorik/em-http-request)
+* [celluloid-io](https://github.com/celluloid/celluloid-io) / [http](https://github.com/httprb/http) (experimental)
+* [typhoeus](https://github.com/typhoeus/typhoeus) (not widely tested)
+
+They are mostly run in a background thread and may not survive mid-application forks.
 
 and can decode and encode
 
