@@ -1,4 +1,5 @@
 require 'delegate'
+require 'forwardable'
 
 module Restify
   #
