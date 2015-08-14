@@ -33,12 +33,10 @@ Restify requires Ruby 2.0+.
 
 Planned features:
 
-* API versions via header/URI
+* API versions via header
 * Content-Type and Language negotiation
-* Encode and decode MessagePack
-* ZeroMQ FLP backend
+* Processors for MessagePack, JSON-HAL, etc.
 * Eventmachine integration (see obligation library)
-* Alternative HTTP backends
 
 ## Installation
 
