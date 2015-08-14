@@ -3,7 +3,6 @@ $LOAD_PATH << File.expand_path('../../../obligation/lib', __FILE__)
 
 require 'restify'
 require 'pry'
-require 'pry-nav'
 
 gh   = Restify.new('https://api.github.com').value
 repo = gh.rel(:repository).get(owner: 'jgraichen', repo: 'restify').value

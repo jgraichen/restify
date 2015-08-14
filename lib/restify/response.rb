@@ -1,4 +1,5 @@
 require 'rack/utils'
+require 'json'
 
 module Restify
   #

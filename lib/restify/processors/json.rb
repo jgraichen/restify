@@ -1,3 +1,5 @@
+require 'json'
+
 module Restify
   #
   module Processors
@@ -9,7 +11,7 @@ module Restify
     class Json < Base
 
       def load
-        parse JSON.load(body), root: true
+        parse ::JSON.load(body), root: true
       end
 
       private
