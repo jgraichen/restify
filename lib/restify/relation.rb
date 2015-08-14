@@ -1,10 +1,9 @@
 module Restify
   #
   class Relation
-    def initialize(context, source, pattern)
+    def initialize(context, template)
       @context  = context
-      @source   = source
-      @template = to_template(pattern)
+      @template = Addressable::Template.new template
     end
 
     def get(params = {})
@@ -28,9 +27,7 @@ module Restify
     end
 
     def ==(other)
-      super ||
-        (other.is_a?(String) && @template.pattern == other) ||
-        (other.is_a?(String) && @source == other)
+      super || (other.is_a?(String) && @template.pattern == other)
     end
 
     def expand(params)
@@ -39,7 +36,8 @@ module Restify
 
       uri = @template.expand variables
       uri.query_values = (uri.query_values || {}).merge params if params.any?
-      uri
+
+      @context.join uri
     end
 
     private

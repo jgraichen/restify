@@ -19,14 +19,14 @@ module Restify
     attr_reader :data
 
     def initialize(opts = {})
-      @method = opts.fetch(:method, :get)
+      @method = opts.fetch(:method, :get).downcase
       @uri    = opts.fetch(:uri) { raise ArgumentError.new ':uri required.' }
       @data   = opts.fetch(:data, nil)
     end
 
     def body
       @body ||= begin
-        MultiJson.dump(data) unless data.nil?
+        JSON.dump(data) unless data.nil?
       end
     end
 

@@ -20,11 +20,8 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'obligation', '~> 0.1'
   spec.add_runtime_dependency 'addressable', '~> 2.3'
-  spec.add_runtime_dependency 'http', '~> 0.8.12'
-  spec.add_runtime_dependency 'celluloid-io', '~> 0.16.2'
   spec.add_runtime_dependency 'em-http-request'
   spec.add_runtime_dependency 'hashie', '~> 3.3'
-  spec.add_runtime_dependency 'multi_json'
   spec.add_runtime_dependency 'rack'
 
   spec.add_development_dependency 'bundler', '~> 1.5'

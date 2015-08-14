@@ -2,7 +2,6 @@ require 'restify/version'
 
 require 'hashie'
 require 'obligation'
-require 'multi_json'
 require 'addressable/uri'
 require 'addressable/template'
 
@@ -10,11 +9,8 @@ require 'addressable/template'
 module Restify
   require 'restify/http'
   require 'restify/error'
-  require 'restify/relations'
 
   require 'restify/context'
-  require 'restify/contextual'
-  require 'restify/collection'
   require 'restify/resource'
   require 'restify/relation'
 
@@ -22,9 +18,16 @@ module Restify
   require 'restify/request'
   require 'restify/response'
 
+  module Processors
+    require 'restify/processors/base'
+    require 'restify/processors/json'
+  end
+
+  PROCESSORS = [Processors::Json]
+
   class << self
     def new(uri, opts = {})
-      Context.new(uri, http, nil, opts).request(:GET, uri)
+      Context.new(uri, http).request(:GET, uri)
     end
 
     def http

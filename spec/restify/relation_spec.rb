@@ -1,17 +1,12 @@
 require 'spec_helper'
 
 describe Restify::Relation do
-  let(:context) { double 'context' }
-  let(:source) { '/resource/{id}' }
-  let(:pattern) { "http://test.host#{source}" }
-  let(:relation) { described_class.new context, source, pattern }
+  let(:context)  { Restify::Context.new('http://test.host/', nil) }
+  let(:pattern)  { '/resource/{id}' }
+  let(:relation) { described_class.new context, pattern }
   subject { relation }
 
   describe '#==' do
-    it 'should equal source' do
-      expect(subject).to eq source
-    end
-
     it 'should equal pattern' do
       expect(subject).to eq pattern
     end
@@ -38,7 +33,7 @@ describe Restify::Relation do
     end
 
     context 'with unknown additional query parameter' do
-      let(:source) { '/resource{?a,b}' }
+      let(:pattern) { '/resource{?a,b}' }
       let(:params) { {a: 1, b: 2, c: 3} }
 
       it { expect(subject.to_s).to eq 'http://test.host/resource?a=1&b=2&c=3' }

@@ -77,7 +77,7 @@ module Restify
       @uri     = uri
       @code    = code
       @status  = STATUS_CODE_TO_SYMBOL[code]
-      @headers = headers
+      @headers = convert_headers(headers)
       @body    = body
       @message = Rack::Utils::HTTP_STATUS_CODES[code]
     end
@@ -88,9 +88,9 @@ module Restify
     #
     def links
       @links ||= begin
-        if headers['Link']
+        if headers['LINK']
           begin
-            Link.parse(headers['Link'])
+            Link.parse(headers['LINK'])
           rescue ArgumentError => e
             warn e
             []
@@ -101,18 +101,12 @@ module Restify
       end
     end
 
-    # Return decoded body according to content type.
-    # Will return `nil` if content cannot be decoded.
+    # Return content type header from response headers.
     #
-    # @return [Array, Hash, NilClass] Decoded response body.
+    # @return [String] Content type header.
     #
-    def decoded_body
-      @decoded_body ||= begin
-        case headers['Content-Type']
-          when /\Aapplication\/json($|;)/
-            MultiJson.load body
-        end
-      end
+    def content_type
+      headers['CONTENT-TYPE']
     end
 
     # Check if response is successful e.g. the status code
@@ -122,6 +116,29 @@ module Restify
     #
     def success?
       (200...300).include? code
+    end
+
+    # @api private
+    def decoded_body
+      @decoded_body ||= begin
+        case content_type
+          when /\Aapplication\/json($|;)/
+            JSON.load body
+        end
+      end
+    end
+
+    # @api private
+    def follow_location
+      headers['LOCATION'] || headers['CONENT-LOCATION']
+    end
+
+    private
+
+    def convert_headers(headers)
+      headers.each_with_object({}) do |pair, hash|
+        hash[pair[0].upcase] = pair[1]
+      end
     end
   end
 end

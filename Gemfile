@@ -16,4 +16,6 @@ end
 group :development do
   gem 'yard'
   gem 'redcarpet', platform: :ruby
+  gem 'pry'
+  gem 'pry-byebug'
 end

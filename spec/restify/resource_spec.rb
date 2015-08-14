@@ -1,158 +1,91 @@
 require 'spec_helper'
 
 describe Restify::Resource do
-  let(:data) { {} }
-  let(:http) { double 'http' }
-  let(:context) { Restify::Context.new 'http://example.org', http }
-  let(:res) { described_class.new(context, data) }
+  let(:data)      { {} }
+  let(:relations) { {} }
+  let(:context)   { double 'context' }
+  let(:response)  { double 'response' }
+  let(:resource)  { described_class.new(context, response: response, data: data, relations: relations) }
+  subject { resource }
 
-  describe '#rel?' do
-    let(:data) do
+  before do
+    allow(context).to receive(:relation?).and_return(false)
+    allow(context).to receive(:relation).and_raise(KeyError)
+  end
+
+  context 'relations' do
+    let(:relations) do
       {
-        'users_url' => 'http://example.org/users',
-        'projects_url' => 'http://example.org/projects'
+        'users' => 'http://example.org/users',
+        'projects' => 'http://example.org/projects'
       }
     end
 
-    it 'should match relations' do
-      expect(res.rel?(:users)).to eq true
-      expect(res.rel?('users')).to eq true
-      expect(res.rel?(:projects)).to eq true
-      expect(res.rel?('projects')).to eq true
-      expect(res.rel?('fuu')).to eq false
+    describe '#relation?' do
+      it 'should match relations' do
+        expect(subject.relation?(:users)).to eq true
+        expect(subject.relation?('users')).to eq true
+        expect(subject.relation?(:projects)).to eq true
+        expect(subject.relation?('projects')).to eq true
+        expect(subject.relation?('fuu')).to eq false
 
-      expect(res).to have_rel :users
-      expect(res).to have_rel :projects
+        expect(subject).to have_relation :users
+        expect(subject).to have_relation :projects
 
-      expect(res.relation?(:users)).to eq true
-      expect(res.relation?('users')).to eq true
-      expect(res.relation?(:projects)).to eq true
-      expect(res.relation?('projects')).to eq true
-      expect(res.relation?('fuu')).to eq false
+        expect(subject.rel?(:users)).to eq true
+        expect(subject.rel?('users')).to eq true
+        expect(subject.rel?(:projects)).to eq true
+        expect(subject.rel?('projects')).to eq true
+        expect(subject.rel?('fuu')).to eq false
 
-      expect(res).to have_relation :users
-      expect(res).to have_relation :projects
+        expect(subject).to have_rel :users
+        expect(subject).to have_rel :projects
+      end
+    end
+
+    describe '#relation' do
+      it 'should return relation' do
+        expect(subject.rel(:users)).to be_a Restify::Relation
+
+        expect(subject.rel(:users)).to eq 'http://example.org/users'
+        expect(subject.rel('users')).to eq 'http://example.org/users'
+        expect(subject.rel(:projects)).to eq 'http://example.org/projects'
+        expect(subject.rel('projects')).to eq 'http://example.org/projects'
+        expect { subject.rel(:fuu) }.to raise_error KeyError
+
+        expect(subject.relation(:users)).to eq 'http://example.org/users'
+        expect(subject.relation('users')).to eq 'http://example.org/users'
+        expect(subject.relation(:projects)).to eq 'http://example.org/projects'
+        expect(subject.relation('projects')).to eq 'http://example.org/projects'
+        expect { subject.relation(:fuu) }.to raise_error KeyError
+      end
+    end
+
+    context '#follow' do
+      let(:relations) { {_restify_follow: 'http://localhost/10'} }
+
+      it 'returns follow relation' do
+        expect(subject.follow).to be_a Restify::Relation
+        expect(subject.follow).to eq 'http://localhost/10'
+      end
     end
   end
 
-  describe '#rel' do
-    let(:data) do
-      {
-        'users_url' => 'http://example.org/users',
-        'projects_url' => 'http://example.org/projects'
-      }
+  context 'data' do
+    let(:data) { double 'data' }
+
+    it 'should delegate methods (I)' do
+      expect(data).to receive(:some_method).and_return(42)
+
+      expect(subject).to respond_to :some_method
+      expect(subject.some_method).to eq 42
     end
 
-    it 'should return relation' do
-      expect(res.rel(:users)).to eq 'http://example.org/users'
-      expect(res.rel('users')).to eq 'http://example.org/users'
-      expect(res.rel(:projects)).to eq 'http://example.org/projects'
-      expect(res.rel('projects')).to eq 'http://example.org/projects'
-      expect { res.rel(:fuu) }.to raise_error KeyError
+    it 'should delegate methods (II)' do
+      expect(data).to receive(:[]).with(1).and_return(2)
 
-      expect(res.relation(:users)).to eq 'http://example.org/users'
-      expect(res.relation('users')).to eq 'http://example.org/users'
-      expect(res.relation(:projects)).to eq 'http://example.org/projects'
-      expect(res.relation('projects')).to eq 'http://example.org/projects'
-      expect { res.relation(:fuu) }.to raise_error KeyError
-    end
-  end
-
-  describe '#key?' do
-    let(:data) { {a: 0, 'b' => 1, 0 => 2} }
-
-    it 'should test for key inclusion' do
-      expect(res.key?(:a)).to eq true
-      expect(res.key?(:b)).to eq true
-      expect(res.key?('a')).to eq true
-      expect(res.key?('b')).to eq true
-      expect(res.key?(0)).to eq true
-
-      expect(res.key?(:c)).to eq false
-      expect(res.key?('d')).to eq false
-
-      expect(res).to have_key :a
-      expect(res).to have_key :b
-      expect(res).to have_key 'a'
-      expect(res).to have_key 'b'
-      expect(res).to have_key 0
-
-      expect(res).to_not have_key :c
-      expect(res).to_not have_key 'd'
-    end
-  end
-
-  describe '#each' do
-    let(:data) { {a: 0, b: 1} }
-
-    it 'should yield' do
-      expect {|cb| res.each(&cb) }.to yield_control.twice
-      expect {|cb| res.each(&cb) }.to yield_successive_args ['a', 0], ['b', 1]
-    end
-
-    it 'should return enumerator' do
-      expect(res.each).to be_a Enumerator
-      expect(res.each.to_a).to eq [['a', 0], ['b', 1]]
-    end
-  end
-
-  describe '#[]' do
-    let(:data) { {a: 0, b: 1} }
-
-    it 'should return data' do
-      expect(res[:a]).to eq 0
-      expect(res[:b]).to eq 1
-    end
-  end
-
-  describe '<getter>' do
-    let(:data) { {a: 0, b: 1} }
-
-    it 'should return data' do
-      expect(res).to respond_to :a
-      expect(res).to respond_to :b
-
-      expect(res.a).to eq 0
-      expect(res.b).to eq 1
-    end
-  end
-
-  describe '#==' do
-    let(:data) { {a: 0, b: 1} }
-
-    it 'should eq hash' do
-      expect(res).to eq a: 0, b: 1
-      expect(res).to eq 'a' => 0, 'b' => 1
-    end
-  end
-
-  describe '#include?' do
-    let(:data) { {a: 0, b: 1} }
-
-    it 'should include partial hash' do
-      expect(res).to include a: 0
-      expect(res).to include b: 1
-
-      expect(res).to include 'a' => 0
-      expect(res).to include 'b' => 1
-
-      expect(res).to_not include a: 1
-      expect(res).to_not include c: 0
-      expect(res).to_not include 'a' => 1
-      expect(res).to_not include 'c' => 0
-    end
-  end
-
-  describe '#[]=' do
-    let(:data) { {a: 0, b: 1} }
-
-    it 'should return data' do
-      res[:a] = 5
-      res[:c] = 15
-
-      expect(res[:a]).to eq 5
-      expect(res[:b]).to eq 1
-      expect(res[:c]).to eq 15
+      expect(subject).to respond_to :[]
+      expect(subject[1]).to eq 2
     end
   end
 end
