@@ -25,7 +25,7 @@ Included processors can handle:
 
 (Beside HTTP Link header that's always supported)
 
-Restify required Ruby 2.0+.
+Restify requires Ruby 2.0+.
 
 ## Restify is still under development
 
