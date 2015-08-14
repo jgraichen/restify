@@ -106,7 +106,7 @@ module Restify
     # @return [String] Content type header.
     #
     def content_type
-      headers['CONTENT-TYPE']
+      headers['CONTENT_TYPE']
     end
 
     # Check if response is successful e.g. the status code
@@ -130,7 +130,7 @@ module Restify
 
     # @api private
     def follow_location
-      headers['LOCATION'] || headers['CONENT-LOCATION']
+      headers['LOCATION'] || headers['CONENT_LOCATION']
     end
 
     private

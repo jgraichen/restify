@@ -36,7 +36,7 @@ module Restify
     #
     def errors
       if response.decoded_body
-        response.decoded_body['errors'] || response.decoded_body[:errors]
+        response.decoded_body['errors'] || response.decoded_body[:errors] || response.decoded_body
       else
         response.body
       end

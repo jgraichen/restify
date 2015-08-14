@@ -125,7 +125,7 @@ module Restify
           begin
             EventMachine.run {}
           rescue => e
-            puts "Resitfy::Adapter::EM -> #{e}\n#{e.backtrace.join("\n")}"
+            puts "#{self.class} -> #{e}\n#{e.backtrace.join("\n")}"
             raise e
           end
         end unless EventMachine.reactor_running?
