@@ -26,7 +26,7 @@ module Restify
 
   class << self
     def new(uri, opts = {})
-      Context.new(uri).request(:GET, uri)
+      Relation.new Context.new(uri), uri
     end
 
     def adapter

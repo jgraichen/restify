@@ -100,7 +100,7 @@ describe Restify do
     end
 
     let(:c) do
-      Restify.new('http://localhost/base').value
+      Restify.new('http://localhost/base').get.value
     end
 
     context 'within threads' do
