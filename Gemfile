@@ -4,9 +4,10 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'typhoeus'
 gem 'http'
+gem 'typhoeus'
 gem 'celluloid-io'
+gem 'em-http-request'
 
 group :test do
   gem 'rspec', '~> 3.0'
