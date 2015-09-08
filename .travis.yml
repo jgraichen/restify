@@ -2,6 +2,8 @@ sudo: false
 language: ruby
 cache: bundler
 bundler_args: --without development
+before_script:
+- export JRUBY_OPTS="--2.0"
 rvm:
 - '2.2'
 - '2.1'
@@ -13,9 +15,11 @@ env:
 - ADAPTER=typhoeus
 - ADAPTER=celluloid
 matrix:
-  allow_failures:
+  exclude:
   - rvm: jruby
-  - rvm: rbx-2
+    env: ADAPTER=em-http-request
+  - rvm: jruby
+    env: ADAPTER=typhoeus
 deploy:
   provider: rubygems
   api_key:
