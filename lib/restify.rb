@@ -31,8 +31,8 @@ module Restify
 
     def adapter
       @adapter ||= begin
-        require 'restify/adapter/em'
-        Restify::Adapter::EM.new
+        require 'restify/adapter/typhoeus'
+        Restify::Adapter::Typhoeus.new
       end
     end
 
