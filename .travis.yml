@@ -20,11 +20,3 @@ matrix:
     env: ADAPTER=em-http-request
   - rvm: jruby
     env: ADAPTER=typhoeus
-deploy:
-  provider: rubygems
-  api_key:
-    secure: fAr3oAAHOmg4Kb0lOPnvBIHkTLnatQRf5nQbSWq1yhsJPPDufD1QSNFgKHWXviWM5pU+vja++mquzNu8Xkqc0eIJ4fk+z+5JDqL85WnWgBaZsw64jbDO9umoUBqwrFnFDM192WrCeY3Mc2s5KjGoLgS+D0LzcRC4FOeJXsustRE=
-  gem: restify
-  on:
-    branch: master
-    rvm: '2.2'
