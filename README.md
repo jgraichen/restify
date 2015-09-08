@@ -15,7 +15,7 @@ It provides HTTP adapters to use with:
 
 * [em-http-request](https://github.com/igrigorik/em-http-request)
 * [celluloid-io](https://github.com/celluloid/celluloid-io) / [http](https://github.com/httprb/http) (experimental)
-* [typhoeus](https://github.com/typhoeus/typhoeus) (not widely tested)
+* [typhoeus](https://github.com/typhoeus/typhoeus) (new default)
 
 They are mostly run in a background thread and may not survive mid-application forks.
 
@@ -44,21 +44,55 @@ Add it to your Gemfile or install it manually: `$ gem install restify`
 
 ## Usage
 
-Create new Restify object (actually returns '/' resource):
+Create new Restify object. It essentially means to request some start-resource usually the "root" resource:
 
 ```ruby
-client = Restify.new('http://api.github.com').value
+client = Restify.new('https://api.github.com').get.value
+# => {"current_user_url"=>"https://api.github.com/user",
+#     "current_user_authorizations_html_url"=>"https://github.com/settings/connections/applications{/client_id}",
+# ...
+#     "repository_url"=>"https://api.github.com/repos/{owner}/{repo}",
+# ...
 ```
 
-The `value` call resolves the returned `Obligation` (like a Future object) by blocking the thread until the resource is there.
+We are essentially requesting `'http://api.github.com'` via HTTP `get`. `get` is returning an `Obligation`, similar to Java's `Future`. The `value` call resolves the returned `Obligation` by blocking the thread until the resource is actually there.
 
-Get a relation described by the root resource. Restify supports Link headers as well as JSON encoded relations (`*_url` fields).
+As we can see GitHub returns us a field `repository_url` with a URI template. Restify automatically scans for `*_url` fields in the JSON response and exposes these as relations. It additionally scans the HTTP Header field `Link` for relations like pagination.
+
+We can now use the relations to navigate from resource to resource like a browser from one web page to another page.
 
 ```ruby
 repositories = client.rel(:repository)
+# => #<Restify::Relation:0x00000005548968 @context=#<Restify::Context:0x007f6024066ae0 @uri=#<Addressable::URI:0x29d8684 URI:https://api.github.com>>, @template=#<Addressable::Template:0x2aa44a0 PATTERN:https://api.github.com/repos/{owner}/{repo}>>
 ```
 
-Send a GET request for a specific repository using given parameters. They will be used to expand the URI template behind the `repositories` relation.
+This gets us the relation named `repository` that we can request now. The usual HTTP methods are available on a relation:
+
+```ruby
+    def get(params = {})
+      request :get, nil, params
+    end
+
+    def delete(params = {})
+      request :delete, nil, params
+    end
+
+    def post(data = {}, params = {})
+      request :post, data, params
+    end
+
+    def put(data = {}, params = {})
+      request :put, data, params
+    end
+
+    def patch(data = {}, params = {})
+      request :patch, data, params
+    end
+```
+
+URL templates can define some parameters such as `{owner}` or `{repo}`. They will be expanded from the `params` given to the HTTP method method.
+
+Now send a GET request with some parameters to request a specific repository:
 
 ```ruby
 repo = repositories.get(owner: 'jgraichen', repo: 'restify').value
