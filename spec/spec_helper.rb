@@ -17,9 +17,6 @@ case ENV['ADAPTER'].to_s.downcase
   when 'typhoeus'
     require 'restify/adapter/typhoeus'
     Restify.adapter = Restify::Adapter::Typhoeus.new
-  when 'celluloid'
-    require 'restify/adapter/celluloid'
-    Restify.adapter = Restify::Adapter::Celluloid.new
   else
     raise "Invalid adapter: #{ENV['ADAPTER']}"
 end if ENV['ADAPTER']

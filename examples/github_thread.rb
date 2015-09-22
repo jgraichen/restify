@@ -3,7 +3,7 @@ $LOAD_PATH << File.expand_path('../../lib', __FILE__)
 require 'restify'
 require 'pry'
 
-gh   = Restify.new('https://api.github.com').value
+gh   = Restify.new('https://api.github.com').get.value
 repo = gh.rel(:repository).get(owner: 'jgraichen', repo: 'restify').value
 cmt  = repo.rel(:commits).get.value.first
 

@@ -8,15 +8,7 @@ rvm:
 - '2.2'
 - '2.1'
 - '2.0'
-- jruby
 - rbx-2
 env:
 - ADAPTER=em-http-request
 - ADAPTER=typhoeus
-- ADAPTER=celluloid
-matrix:
-  exclude:
-  - rvm: jruby
-    env: ADAPTER=em-http-request
-  - rvm: jruby
-    env: ADAPTER=typhoeus
