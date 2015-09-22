@@ -1,7 +1,7 @@
 module Restify
   #
   class Promise < Concurrent::IVar
-    def initialize(*dependencies, &task)
+    def initialize(*dependencies, **opts, &task)
       @task         = task || proc { |*args| args }
       @dependencies = dependencies.flatten
 
@@ -82,11 +82,15 @@ module Restify
       end
 
       def fulfill(value)
-        @promise.send :complete, true, value, nil
+        call true, value, nil
       end
 
       def reject(reason)
-        @promise.send :complete, false, nil, reason
+        call false, nil, reason
+      end
+
+      def call(success, value, reason)
+        @promise.send :complete, !!success, value, reason
       end
     end
   end

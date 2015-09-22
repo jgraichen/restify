@@ -21,14 +21,6 @@ module Restify
       self.uri.join uri
     end
 
-    def process(response)
-      context   = Context.new response.uri, @opts
-      processor = Restify::PROCESSORS.find { |p| p.accept? response }
-      processor ||= Restify::Processors::Base
-
-      processor.new(context, response).resource
-    end
-
     def request(method, uri, data = nil, opts = {})
       request = Request.new \
         method: method,
@@ -37,23 +29,37 @@ module Restify
         headers: @opts.fetch(:headers, {})
 
       Restify.adapter.call(request).then do |response|
-        if response.success?
-          process response
-        else
-          Context.raise_response_error(response)
+        Promise.create do |complete|
+          complete.call response.success?, process(response), error(response)
         end
       end
     end
 
+    private
+
+    def process(response)
+      context   = Context.new response.uri, @opts
+      processor = Restify::PROCESSORS.find { |p| p.accept? response }
+      processor ||= Restify::Processors::Base
+
+      processor.new(context, response).resource
+    end
+
+    def error(response)
+      self.class.response_error(response)
+    end
+
     class << self
-      def raise_response_error(response)
+      def response_error(response)
         case response.code
+          when 100...400
+            nil
           when 400...500
-            raise ClientError.new(response)
+            ClientError.new(response)
           when 500...600
-            raise ServerError.new(response)
+            ServerError.new(response)
           else
-            raise RuntimeError.new "Unknown response code: #{response.code}"
+            RuntimeError.new "Unknown response code: #{response.code}"
         end
       end
     end
