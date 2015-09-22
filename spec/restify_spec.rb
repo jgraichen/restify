@@ -187,37 +187,5 @@ describe Restify do
         expect(blurb[:image]).to eq 'http://example.org/avatar.png'
       end
     end
-
-    context 'within eventmachine' do
-      it 'should consume the API' do
-        skip
-
-        EventMachine.run do
-          users_promise = c.rel(:users).get
-          users_promise.then do |users|
-            expect(users).to have(2).items
-
-            user = users.first
-            expect(user).to have_key :name
-            expect(user[:name]).to eq 'John Smith'
-            expect(user).to have_relation :self
-            expect(user).to have_relation :blurb
-
-            user.rel(:blurb).get
-          end.then do |blurb|
-            expect(blurb).to have_key :title
-            expect(blurb).to have_key :image
-
-            expect(blurb[:title]).to eq 'Prof. Dr. John Smith'
-            expect(blurb[:image]).to eq 'http://example.org/avatar.png'
-
-            EventMachine.stop
-            @done = true
-          end
-        end
-
-        expect(@done).to be true
-      end
-    end
   end
 end

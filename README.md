@@ -8,16 +8,15 @@ Restify can be used to consume hypermedia REST APIs (like GitHubs), to build a s
 
 Restify is build upon the following libraries:
 
-* [obligation](https://github.com/jgraichen/obligation)
 * [addressable](https://github.com/sporkmonger/addressable)
+* [typhoeus](https://github.com/typhoeus/typhoeus)
 
-It provides HTTP adapters to use with:
+It has optional HTTP adapters using:
 
 * [em-http-request](https://github.com/igrigorik/em-http-request)
 * [celluloid-io](https://github.com/celluloid/celluloid-io) / [http](https://github.com/httprb/http) (experimental)
-* [typhoeus](https://github.com/typhoeus/typhoeus) (new default)
 
-They are mostly run in a background thread and may not survive mid-application forks.
+The HTTP adapters are mostly run in a background thread and may not survive mid-application forks.
 
 Included processors can handle:
 
@@ -55,7 +54,7 @@ client = Restify.new('https://api.github.com').get.value
 # ...
 ```
 
-We are essentially requesting `'http://api.github.com'` via HTTP `get`. `get` is returning an `Obligation`, similar to Java's `Future`. The `value` call resolves the returned `Obligation` by blocking the thread until the resource is actually there.
+We are essentially requesting `'http://api.github.com'` via HTTP `get`. `get` is returning an `Promise`, similar to Java's `Future`. The `value` call resolves the returned `Promise` by blocking the thread until the resource is actually there. `value!` will additionally raise errors instead of returning `nil`. You can chain handlers using the `then` method. This allows you to be build a dependency chain that will be executed when the last promise is needed.
 
 As we can see GitHub returns us a field `repository_url` with a URI template. Restify automatically scans for `*_url` fields in the JSON response and exposes these as relations. It additionally scans the HTTP Header field `Link` for relations like pagination.
 
