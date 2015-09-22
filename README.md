@@ -14,7 +14,6 @@ Restify is build upon the following libraries:
 It has optional HTTP adapters using:
 
 * [em-http-request](https://github.com/igrigorik/em-http-request)
-* [celluloid-io](https://github.com/celluloid/celluloid-io) / [http](https://github.com/httprb/http) (experimental)
 
 The HTTP adapters are mostly run in a background thread and may not survive mid-application forks.
 
