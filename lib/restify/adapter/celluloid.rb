@@ -27,7 +27,7 @@ module Restify
       end
 
       def call(request)
-        Obligation.create do |writer|
+        Promise.create do |writer|
           async.process request, writer
         end
       end

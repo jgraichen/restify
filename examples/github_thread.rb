@@ -1,5 +1,4 @@
 $LOAD_PATH << File.expand_path('../../lib', __FILE__)
-$LOAD_PATH << File.expand_path('../../../obligation/lib', __FILE__)
 
 require 'restify'
 require 'pry'

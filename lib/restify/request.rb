@@ -18,22 +18,22 @@ module Restify
     #
     attr_reader :data
 
+    # Request headers
+    #
+    attr_reader :headers
+
     def initialize(opts = {})
-      @method = opts.fetch(:method, :get).downcase
-      @uri    = opts.fetch(:uri) { raise ArgumentError.new ':uri required.' }
-      @data   = opts.fetch(:data, nil)
+      @method  = opts.fetch(:method, :get).downcase
+      @uri     = opts.fetch(:uri) { raise ArgumentError.new ':uri required.' }
+      @data    = opts.fetch(:data, nil)
+      @headers = opts.fetch(:headers, {}).merge \
+        'Content-Type' => 'application/json'
     end
 
     def body
       @body ||= begin
         JSON.dump(data) unless data.nil?
       end
-    end
-
-    def headers
-      {
-        'Content-Type' => 'application/json'
-      }
     end
   end
 end

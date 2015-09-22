@@ -1,13 +1,14 @@
 require 'restify/version'
 
 require 'hashie'
-require 'obligation'
+require 'concurrent'
 require 'addressable/uri'
 require 'addressable/template'
 
 #
 module Restify
   require 'restify/error'
+  require 'restify/promise'
 
   require 'restify/context'
   require 'restify/resource'
@@ -26,7 +27,7 @@ module Restify
 
   class << self
     def new(uri, opts = {})
-      Relation.new Context.new(uri), uri
+      Relation.new Context.new(uri, opts), uri
     end
 
     def adapter

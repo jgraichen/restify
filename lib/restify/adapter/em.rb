@@ -106,7 +106,7 @@ module Restify
       end
 
       def call(request)
-        Obligation.create do |writer|
+        Promise.create do |writer|
           next_tick do
             Connection.open(request.uri).call(request, writer)
           end

@@ -117,22 +117,22 @@ describe Restify do
         expect(users_relation).to be_a Restify::Relation
 
         # Let's create a user first.
-        # This method returns instantly and returns an `Obligation`.
-        # This `Obligation` represents the future value.
+        # This method returns instantly and returns a `Promise`.
+        # This `Promise` represents the future value.
         # We can pass parameters to a request. They will be used
         # to expand the URI template behind the relation. Additional
         # fields will be encoding in e.g. JSON and send if not a GET
         # request.
         create_user_promise = users_relation.post
-        expect(create_user_promise).to be_a Obligation
+        expect(create_user_promise).to be_a Restify::Promise
 
         # We can do other things while the request is processed in
         # the background. When we need the response with can call
         # {#value} on the promise that will block the thread until
         # the result is here.
-        begin
-          create_user_promise.value
-        rescue Restify::ClientError => e
+        expect { create_user_promise.value! }.to \
+          raise_error(Restify::ClientError) do |e|
+
           # Because we forgot to send a "name" the server complains
           # with an error code that will lead to a raised error.
 
