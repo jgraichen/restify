@@ -4,9 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'http'
 gem 'typhoeus'
-gem 'celluloid-io'
 gem 'em-http-request'
 
 group :test do
