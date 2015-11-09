@@ -49,6 +49,14 @@ module Restify
 
     alias_method :rel, :relation
 
+    # @!method data
+    #
+    #   Return response data. Usually a hash or array.
+    #
+    #   @return [Object] Response data.
+    #
+    attr_reader :data
+
     # @!method response
     #
     #   Return response if available.

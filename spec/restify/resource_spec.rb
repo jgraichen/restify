@@ -87,5 +87,11 @@ describe Restify::Resource do
       expect(subject).to respond_to :[]
       expect(subject[1]).to eq 2
     end
+
+    describe '#data' do
+      it 'should return data' do
+        expect(subject.data).to equal data
+      end
+    end
   end
 end
