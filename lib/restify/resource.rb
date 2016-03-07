@@ -68,12 +68,24 @@ module Restify
 
     # Follow a LOCATION or CONTEXT-LOCATION header.
     #
-    # @return [Relation] Relation to follow resource.
-    # @raise RuntimeError If nothing to follow.
+    # @return [Relation] Relation to follow resource or nil.
     #
     def follow
       if relation? :_restify_follow
         relation :_restify_follow
+      else
+        nil
+      end
+    end
+
+    # Follow a LOCATION or CONTEXT-LOCATION header.
+    #
+    # @return [Relation] Relation to follow resource.
+    # @raise RuntimeError If nothing to follow.
+    #
+    def follow!
+      if (rel = follow)
+        rel
       else
         raise RuntimeError.new 'Nothing to follow'
       end

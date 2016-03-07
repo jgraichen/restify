@@ -61,12 +61,39 @@ describe Restify::Resource do
       end
     end
 
-    context '#follow' do
+    describe '#follow' do
       let(:relations) { {_restify_follow: 'http://localhost/10'} }
 
       it 'returns follow relation' do
         expect(subject.follow).to be_a Restify::Relation
         expect(subject.follow).to eq 'http://localhost/10'
+      end
+
+      context 'when nil' do
+        let(:relations) { {} }
+
+        it 'returns nil' do
+          expect(subject.follow).to be nil
+        end
+      end
+    end
+
+    context '#follow!' do
+      let(:relations) { {_restify_follow: 'http://localhost/10'} }
+
+      it 'returns follow relation' do
+        expect(subject.follow!).to be_a Restify::Relation
+        expect(subject.follow!).to eq 'http://localhost/10'
+      end
+
+      context 'when nil' do
+        let(:relations) { {} }
+
+        it 'raise runtime error' do
+          expect { subject.follow! }.to raise_error RuntimeError do |err|
+            expect(err.message).to eq 'Nothing to follow'
+          end
+        end
       end
     end
   end
