@@ -6,6 +6,10 @@ module Restify
       @template = Addressable::Template.new template
     end
 
+    def request(method, data, params)
+      @context.request method, expand(params), data
+    end
+
     def get(params = {})
       request :get, nil, params
     end
@@ -41,10 +45,6 @@ module Restify
     end
 
     private
-
-    def request(method, data, params)
-      @context.request method, expand(params), data
-    end
 
     def convert(params)
       params.each_pair.each_with_object({}) do |param, hash|
