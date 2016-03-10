@@ -34,7 +34,6 @@ Planned features:
 * API versions via header
 * Content-Type and Language negotiation
 * Processors for MessagePack, JSON-HAL, etc.
-* Eventmachine integration (see obligation library)
 
 ## Installation
 
