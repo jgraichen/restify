@@ -40,7 +40,7 @@ module Restify
       processor.new(context, response).resource
     end
 
-    def request(method, uri, data = nil, **kwargs)
+    def request(method, uri, data = nil, opts = {})
       request = Request.new \
         method: method,
         uri: join(uri),
