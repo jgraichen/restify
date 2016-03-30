@@ -45,7 +45,7 @@ module Restify
         method: method,
         uri: join(uri),
         data: data,
-        headers: @opts.fetch(:headers, {})
+        headers: options.fetch(:headers, {})
 
       Restify.adapter.call(request).then do |response|
         if response.success?
