@@ -9,8 +9,10 @@ rvm:
 - '2.2'
 - '2.1'
 - rbx-2
-- rbx-3
 - jruby
+matrix:
+  allow_failures:
+    - rvm: jruby
 env:
 - ADAPTER=em-http-request
 - ADAPTER=typhoeus
