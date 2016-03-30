@@ -9,6 +9,8 @@ require 'addressable/template'
 module Restify
   require 'restify/error'
   require 'restify/promise'
+  require 'restify/registry'
+  require 'restify/global'
 
   require 'restify/context'
   require 'restify/resource'
@@ -25,20 +27,5 @@ module Restify
 
   PROCESSORS = [Processors::Json]
 
-  class << self
-    def new(uri, opts = {})
-      Relation.new Context.new(uri, opts), uri
-    end
-
-    def adapter
-      @adapter ||= begin
-        require 'restify/adapter/em'
-        Restify::Adapter::EM.new
-      end
-    end
-
-    def adapter=(adapter)
-      @adapter = adapter
-    end
-  end
+  extend Global
 end

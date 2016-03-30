@@ -12,24 +12,35 @@ module Restify
     #
     attr_reader :uri
 
-    def initialize(uri, opts = {})
-      @uri  = uri.is_a?(Addressable::URI) ? uri : Addressable::URI.parse(uri.to_s)
-      @opts = opts
+    # Options passed to this context.
+    #
+    # @return [Hash] Options.
+    #
+    attr_reader :options
+
+    def initialize(uri, **options)
+      @uri     = uri.is_a?(Addressable::URI) ? uri : Addressable::URI.parse(uri.to_s)
+      @options = options
     end
 
     def join(uri)
       self.uri.join uri
     end
 
+    def inherit(uri, **options)
+      uri = self.uri unless uri
+      Context.new uri, @options.merge(options)
+    end
+
     def process(response)
-      context   = Context.new response.uri, @opts
+      context   = inherit response.uri
       processor = Restify::PROCESSORS.find { |p| p.accept? response }
       processor ||= Restify::Processors::Base
 
       processor.new(context, response).resource
     end
 
-    def request(method, uri, data = nil, opts = {})
+    def request(method, uri, data = nil, **opts)
       request = Request.new \
         method: method,
         uri: join(uri),

@@ -1,13 +1,26 @@
 module Restify
   #
   class Relation
+
+    # Relation context
+    #
+    # @return [Restify::Context] Context
+    #
+    attr_reader :context
+
+    # Relation URI template
+    #
+    # @return [Addressable::Template] URI template
+    #
+    attr_reader :template
+
     def initialize(context, template)
       @context  = context
       @template = Addressable::Template.new template
     end
 
     def request(method, data, params)
-      @context.request method, expand(params), data
+      context.request method, expand(params), data
     end
 
     def get(params = {})
@@ -31,17 +44,25 @@ module Restify
     end
 
     def ==(other)
-      super || (other.is_a?(String) && @template.pattern == other)
+      super || (other.is_a?(String) && template.pattern == other)
     end
 
     def expand(params)
       params    = convert params
       variables = extract! params
 
-      uri = @template.expand variables
+      uri = template.expand variables
       uri.query_values = (uri.query_values || {}).merge params if params.any?
 
-      @context.join uri
+      context.join uri
+    end
+
+    def pattern
+      template.pattern
+    end
+
+    def to_s
+      pattern
     end
 
     private
