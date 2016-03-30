@@ -62,10 +62,28 @@ module Restify
     # @!visibility private
     def eval_dependency(dependency)
       if dependency.is_a? Concurrent::IVar
-        eval_dependency dependency.value!
+        eval_dependency eval_dependency_value dependency
       else
         dependency
       end
+    end
+
+    def eval_dependency_value(dependency)
+      if dependency.complete?
+        return dependency.value!
+      end
+
+      if EM.reactor_thread?
+        fiber = Fiber.current
+
+        dependency.add_observer {
+          fiber.resume
+        }
+
+        Fiber.yield
+      end
+
+      dependency.value!
     end
 
     class << self

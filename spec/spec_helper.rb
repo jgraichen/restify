@@ -22,6 +22,7 @@ case ENV['ADAPTER'].to_s.downcase
 end if ENV['ADAPTER']
 
 require 'rspec/collection_matchers'
+require 'em-synchrony'
 
 Dir[File.expand_path('spec/support/**/*.rb')].each {|f| require f }
 

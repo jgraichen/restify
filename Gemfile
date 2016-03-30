@@ -6,6 +6,7 @@ gemspec
 gem 'rake'
 gem 'typhoeus'
 gem 'em-http-request'
+gem 'em-synchrony'
 
 group :test do
   gem 'rspec', '~> 3.0'
