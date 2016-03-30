@@ -8,9 +8,9 @@ rvm:
 - '2.3.0'
 - '2.2'
 - '2.1'
-- '2.0'
 - rbx-2
 - rbx-3
+- jruby
 env:
 - ADAPTER=em-http-request
 - ADAPTER=typhoeus
