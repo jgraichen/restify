@@ -20,10 +20,10 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'concurrent-ruby', '~> 0.9.0'
   spec.add_runtime_dependency 'addressable', '~> 2.3'
-  spec.add_runtime_dependency 'typhoeus'
-  spec.add_runtime_dependency 'net-http-persistent'
   spec.add_runtime_dependency 'hashie', '~> 3.3'
   spec.add_runtime_dependency 'rack'
+  spec.add_runtime_dependency 'eventmachine', '>= 1.2'
+  spec.add_runtime_dependency 'em-http-request', '~> 1.1.3'
 
   spec.add_development_dependency 'bundler', '~> 1.5'
 
