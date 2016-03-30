@@ -18,18 +18,18 @@ module Restify
     #
     attr_reader :options
 
-    def initialize(uri, **options)
+    def initialize(uri, **kwargs)
       @uri     = uri.is_a?(Addressable::URI) ? uri : Addressable::URI.parse(uri.to_s)
-      @options = options
+      @options = kwargs
     end
 
     def join(uri)
       self.uri.join uri
     end
 
-    def inherit(uri, **options)
+    def inherit(uri, **kwargs)
       uri = self.uri unless uri
-      Context.new uri, @options.merge(options)
+      Context.new uri, kwargs.merge(options)
     end
 
     def process(response)
@@ -40,7 +40,7 @@ module Restify
       processor.new(context, response).resource
     end
 
-    def request(method, uri, data = nil, **opts)
+    def request(method, uri, data = nil, **kwargs)
       request = Request.new \
         method: method,
         uri: join(uri),
