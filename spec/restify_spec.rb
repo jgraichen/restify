@@ -190,7 +190,7 @@ describe Restify do
 
     context 'within EM-synchrony' do
       it 'should consume the API' do
-        pending 'Seems to be impossible to detect EM scheduled fibers from within'
+        skip 'Seems to be impossible to detect EM scheduled fibers from within'
 
         EM.synchrony do
           root = Restify.new('http://localhost/base').get.value!
