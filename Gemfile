@@ -21,6 +21,6 @@ group :development do
 end
 
 group :development, :test do
-  gem 'pry'
-  gem 'pry-byebug'
+  gem 'pry', platforms: :mri
+  gem 'pry-byebug', platforms: :mri
 end
