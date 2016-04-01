@@ -47,13 +47,19 @@ module Restify
         data: data,
         headers: options.fetch(:headers, {})
 
-      Restify.adapter.call(request).then do |response|
+      adapter.call(request).then do |response|
         if response.success?
           process response
         else
           Context.raise_response_error(response)
         end
       end
+    end
+
+    private
+
+    def adapter
+      options[:adapter] || Restify.adapter
     end
 
     class << self
