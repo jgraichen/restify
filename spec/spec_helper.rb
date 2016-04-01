@@ -21,6 +21,7 @@ case ENV['ADAPTER'].to_s.downcase
     raise "Invalid adapter: #{ENV['ADAPTER']}"
 end if ENV['ADAPTER']
 
+require 'webmock/rspec'
 require 'rspec/collection_matchers'
 require 'em-synchrony'
 

@@ -2,88 +2,66 @@ module Restify
   #
   class Promise < Concurrent::IVar
     def initialize(*dependencies, &task)
-      @task         = task || proc { |*args| args }
+      @task         = task
       @dependencies = dependencies.flatten
 
       super(&nil)
     end
 
     def wait(timeout = nil)
-      if @dependencies.any? && pending?
-        execute
-      end
+      execute if pending?
 
-      super
+      # if defined?(EventMachine)
+      #   if incomplete?
+      #     fiber = Fiber.current
+
+      #     self.add_observer do
+      #       EventMachine.next_tick { fiber.resume }
+      #     end
+
+      #     Fiber.yield
+      #   else
+      #     self
+      #   end
+      # else
+        super
+      # end
     end
 
     def then(&block)
       Promise.new([self], &block)
     end
 
-    def execute
-      synchronize { ns_execute }
+    def execute(timeout = nil)
+      synchronize { ns_execute timeout }
     end
 
     protected
 
     # @!visibility private
-    def ns_execute
-      return unless pending?
-
-      executor = Concurrent::SafeTaskExecutor.new \
-        method(:eval_dependencies), rescue_exception: true
-      success, value, reason = executor.execute(@dependencies)
-
-      if success
-        ns_execute_task(*value)
-      else
-        complete false, nil, reason
-      end
-    end
-
-    # @!visibility private
-    def ns_execute_task(*args)
+    def ns_execute(timeout)
       if compare_and_set_state(:processing, :pending)
-        success, value, reason = Concurrent::SafeTaskExecutor.new(@task, rescue_exception: true).execute(*args)
+        return unless @task || @dependencies.any?
 
-        while success && value.is_a?(Concurrent::IVar)
-          success, value, reason = value.wait, value.value, value.reason
-        end
+        executor = Concurrent::SafeTaskExecutor.new \
+          method(:ns_exec), rescue_exception: true
+
+        success, value, reason = executor.execute
 
         complete success, value, reason
       end
     end
 
     # @!visibility private
-    def eval_dependencies(dependencies)
-      dependencies.map(&method(:eval_dependency))
-    end
+    def ns_exec
+      args  = @dependencies.any? ? @dependencies.map(&:value!) : []
+      value = @task ? @task.call(*args) : args
 
-    # @!visibility private
-    def eval_dependency(dependency)
-      if dependency.is_a? Concurrent::IVar
-        eval_dependency eval_dependency_value dependency
-      else
-        dependency
-      end
-    end
-
-    def eval_dependency_value(dependency)
-      if dependency.complete?
-        return dependency.value!
+      while value.is_a? Restify::Promise
+        value = value.value!
       end
 
-      if EM.reactor_thread?
-        fiber = Fiber.current
-
-        dependency.add_observer {
-          fiber.resume
-        }
-
-        Fiber.yield
-      end
-
-      dependency.value!
+      value
     end
 
     class << self
