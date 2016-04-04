@@ -6,9 +6,10 @@ module Restify
     #
     class Typhoeus
 
-      def initialize
-        @queue = Queue.new
-        @hydra = ::Typhoeus::Hydra.new
+      def initialize(**options)
+        @queue   = Queue.new
+        @hydra   = ::Typhoeus::Hydra.new
+        @options = options
 
         Thread.new do
           begin
@@ -27,8 +28,17 @@ module Restify
         end
       end
 
+      def sync?
+        @options.fetch :sync, false
+      end
+
       def queue(request, writer)
-        @queue.push [request, writer]
+        if sync?
+          @hydra.queue convert request, writer
+          @hydra.run
+        else
+          @queue.push [request, writer]
+        end
       end
 
       def call(request)
