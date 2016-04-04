@@ -17,3 +17,4 @@ matrix:
 env:
 - ADAPTER=em-http-request
 - ADAPTER=typhoeus
+- ADAPTER=typhoeus-sync
