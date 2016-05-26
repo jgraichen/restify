@@ -1,11 +1,8 @@
 require 'typhoeus'
 
 module Restify
-  #
   module Adapter
-    #
-    class Typhoeus
-
+    class Typhoeus < Base
       def initialize(**options)
         @queue   = Queue.new
         @hydra   = ::Typhoeus::Hydra.new
@@ -41,10 +38,8 @@ module Restify
         end
       end
 
-      def call(request)
-        Promise.create do |writer|
-          queue request, writer
-        end
+      def call_native(request, writer)
+        queue request, writer
       end
 
       private

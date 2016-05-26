@@ -2,10 +2,8 @@ require 'eventmachine'
 require 'em-http-request'
 
 module Restify
-  #
   module Adapter
-    #
-    class EM
+    class EM < Base
       class Connection
         class << self
           def open(uri)
@@ -105,11 +103,9 @@ module Restify
         end
       end
 
-      def call(request)
-        Promise.create do |writer|
-          next_tick do
-            Connection.open(request.uri).call(request, writer)
-          end
+      def call_native(request, writer)
+        next_tick do
+          Connection.open(request.uri).call(request, writer)
         end
       end
 

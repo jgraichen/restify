@@ -20,6 +20,10 @@ module Restify
   require 'restify/request'
   require 'restify/response'
 
+  module Adapter
+    require 'restify/adapter/base'
+  end
+
   module Processors
     require 'restify/processors/base'
     require 'restify/processors/json'
