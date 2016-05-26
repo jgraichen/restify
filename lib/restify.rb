@@ -12,6 +12,7 @@ module Restify
   require 'restify/registry'
   require 'restify/global'
 
+  require 'restify/cache'
   require 'restify/context'
   require 'restify/resource'
   require 'restify/relation'

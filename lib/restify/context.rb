@@ -47,7 +47,8 @@ module Restify
         data: data,
         headers: options.fetch(:headers, {})
 
-      adapter.call(request).then do |response|
+      ret = cache.call(request) {|request| adapter.call(request) }
+      ret.then do |response|
         if response.success?
           process response
         else
@@ -60,6 +61,10 @@ module Restify
 
     def adapter
       options[:adapter] || Restify.adapter
+    end
+
+    def cache
+      options[:cache] || Restify.cache
     end
 
     class << self

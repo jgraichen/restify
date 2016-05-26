@@ -19,6 +19,17 @@ module Restify
       @adapter = adapter
     end
 
+    def cache
+      @cache ||= begin
+        require 'active_support/cache'
+        Restify::Cache.new store: ActiveSupport::Cache::MemoryStore.new
+      end
+    end
+
+    def cache=(cache)
+      @cache = cache
+    end
+
     private
 
     def resolve_context(uri, **opts)
