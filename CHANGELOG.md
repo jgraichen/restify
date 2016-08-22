@@ -1,7 +1,8 @@
 # Changelog
 
-## Next
+## 1.0.0
 
+* Experimental cache API doing nothing for now
 * Use `~> 1.0` of `concurrent-ruby`
 
 ## 0.5.0
