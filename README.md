@@ -8,12 +8,13 @@ Restify can be used to consume hypermedia REST APIs (like GitHubs), to build a s
 
 Restify is build upon the following libraries:
 
+* [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby)
 * [addressable](https://github.com/sporkmonger/addressable)
-* [typhoeus](https://github.com/typhoeus/typhoeus)
+* [em-http-request](https://github.com/igrigorik/em-http-request)
 
 It has optional HTTP adapters using:
 
-* [em-http-request](https://github.com/igrigorik/em-http-request)
+* [typhoeus](https://github.com/typhoeus/typhoeus)
 
 The HTTP adapters are mostly run in a background thread and may not survive mid-application forks.
 
