@@ -3,30 +3,23 @@ require 'typhoeus'
 module Restify
   module Adapter
     class Typhoeus < Base
-      def initialize(**options)
+      attr_reader :sync
+
+      DEFAULT_HEADERS = {
+        'Expect' => '',
+        'Transfer-Encoding' => ''
+      }.freeze
+
+      def initialize(sync: false, **options)
         @queue   = Queue.new
-        @hydra   = ::Typhoeus::Hydra.new
-        @options = options
+        @sync    = sync
+        @hydra   = ::Typhoeus::Hydra.new(pipelining: true, **options)
 
-        Thread.new do
-          begin
-            loop do
-              while (req = convert(*@queue.pop))
-                @hydra.queue req
-
-                if @queue.size == 0
-                  @hydra.run
-                end
-              end
-            end
-          rescue Exception => e
-            puts "#{self.class}: #{e.message}"
-          end
-        end
+        start unless sync?
       end
 
       def sync?
-        @options.fetch :sync, false
+        @sync
       end
 
       def queue(request, writer)
@@ -48,26 +41,47 @@ module Restify
         req = ::Typhoeus::Request.new \
           request.uri,
           method: request.method,
-          headers: request.headers,
+          headers: DEFAULT_HEADERS.merge(request.headers),
           body: request.body
 
-        req.on_complete do |response|
-          uri    = request.uri
-          status = response.code
-          body   = response.body
+        req.on_complete {|response| handle(response, writer, request) }
+        req
+      end
 
-          headers = response.headers.each_with_object({}) do |header, hash|
-            hash[header[0].upcase.tr('-', '_')] = header[1]
-          end
+      def handle(native_response, writer, request)
+        writer.fulfill convert_back(native_response, request)
 
-          writer.fulfill Response.new request, uri, status, headers, body
+        @hydra.queue convert(*@queue.pop(true)) while !@queue.empty?
+      end
 
-          while @queue.size > 0
-            @hydra.queue convert(*@queue.pop(true))
+      def convert_back(response, request)
+        uri     = request.uri
+        status  = response.code
+        body    = response.body
+        headers = convert_headers(response.headers)
+
+        ::Restify::Response.new(request, uri, status, headers, body)
+      end
+
+      def convert_headers(headers)
+        headers.each_with_object({}) do |header, memo|
+          memo[header[0].upcase.tr('-', '_')] = header[1]
+        end
+      end
+
+      def start
+        Thread.new do
+          loop do
+            begin
+              while (req = convert(*@queue.pop))
+                @hydra.queue req
+                @hydra.run if @queue.empty?
+              end
+            rescue StandardError => e
+              puts "#{self.class}: #{e.message}"
+            end
           end
         end
-
-        req
       end
     end
   end
