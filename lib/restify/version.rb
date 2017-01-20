@@ -2,8 +2,8 @@ module Restify
   module VERSION
     MAJOR = 1
     MINOR = 0
-    PATCH = 0
-    STAGE = nil
+    PATCH = 1
+    STAGE = :beta1
     STRING = [MAJOR, MINOR, PATCH, STAGE].reject(&:nil?).join('.').freeze
 
     def self.to_s

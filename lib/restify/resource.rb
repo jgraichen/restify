@@ -1,24 +1,17 @@
 require 'delegate'
-require 'forwardable'
 
 module Restify
   #
-  class Resource < Delegator
-    extend Forwardable
+  class Resource < SimpleDelegator
 
     # @api private
     #
     def initialize(context, response: nil, data: nil, relations: {})
-      @data      = data
+      super(data)
+
       @context   = context
       @response  = response
       @relations = relations
-    end
-
-    # @api private
-    #
-    def __getobj__
-      @data
     end
 
     # Check if resource has a relation with given name.
@@ -55,7 +48,7 @@ module Restify
     #
     #   @return [Object] Response data.
     #
-    attr_reader :data
+    alias data __getobj__
 
     # @!method response
     #
@@ -104,7 +97,7 @@ module Restify
     # @api private
     def inspect
       text = {
-        "@data" => @data,
+        "@data" => data,
         "@relations" => @relations
       }.map {|k,v | k + '=' + v.inspect }.join(' ')
 
