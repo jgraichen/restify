@@ -13,6 +13,7 @@ group :test do
   gem 'rspec-collection_matchers'
   gem 'webmock'
   gem 'coveralls'
+  gem 'timecop'
 end
 
 group :development do

@@ -5,6 +5,9 @@ require 'concurrent'
 require 'addressable/uri'
 require 'addressable/template'
 
+require 'active_support'
+require 'active_support/core_ext/module/delegation'
+
 #
 module Restify
   require 'restify/error'

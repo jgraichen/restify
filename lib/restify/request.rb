@@ -1,6 +1,10 @@
 module Restify
   #
   class Request
+    require 'restify/request/cacheable'
+
+    include Cacheable
+
     #
     # HTTP method.
     #

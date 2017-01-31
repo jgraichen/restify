@@ -70,6 +70,10 @@ module Restify
         yield Writer.new(promise)
         promise
       end
+
+      def fulfilled(value)
+        create {|w| w.fulfill(value) }
+      end
     end
 
     class Writer

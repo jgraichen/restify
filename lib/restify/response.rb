@@ -11,6 +11,10 @@ module Restify
   # according its content type.
   #
   class Response
+    require 'restify/response/cacheable'
+
+    prepend Cacheable
+
     #
     # Map of status symbols to codes. From Rack::Utils.
     #
@@ -117,6 +121,14 @@ module Restify
     #
     def success?
       (200...300).include? code
+    end
+
+    # Return response date if present.
+    #
+    # @return [Time|nil] Time of Date header or nil if not set.
+    #
+    def date
+      @date ||= Time.httpdate(headers['DATE']) if headers['DATE']
     end
 
     # @api private
