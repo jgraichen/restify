@@ -7,6 +7,7 @@ require 'addressable/template'
 
 #
 module Restify
+  require 'restify/instrumentation'
   require 'restify/error'
   require 'restify/promise'
   require 'restify/registry'

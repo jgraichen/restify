@@ -44,12 +44,24 @@ module Restify
           headers: DEFAULT_HEADERS.merge(request.headers),
           body: request.body
 
+        ::Restify::Instrumentation.call('restify.adapter.start', {
+          adapter: self,
+          request: request
+        })
+
         req.on_complete {|response| handle(response, writer, request) }
         req
       end
 
       def handle(native_response, writer, request)
-        writer.fulfill convert_back(native_response, request)
+        response = convert_back(native_response, request)
+
+        ::Restify::Instrumentation.call('restify.adapter.finish', {
+          adapter: self,
+          response: response
+        })
+
+        writer.fulfill(response)
 
         @hydra.queue convert(*@queue.pop(true)) while !@queue.empty?
       end
