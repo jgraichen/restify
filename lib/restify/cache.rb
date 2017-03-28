@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Restify
   class Cache
     def initialize(store)
@@ -9,15 +10,15 @@ module Restify
         return response
       end
 
-      yield(request).then do |response|
-        cache(response)
-        response
+      yield(request).then do |new_response|
+        cache(new_response)
+        new_response
       end
     end
 
     private
 
-    def match(request)
+    def match(_request)
       false
     end
 

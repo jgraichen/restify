@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'restify/version'
 
 require 'hashie'
@@ -31,7 +32,7 @@ module Restify
     require 'restify/processors/json'
   end
 
-  PROCESSORS = [Processors::Json]
+  PROCESSORS = [Processors::Json].freeze
 
   extend Global
 end

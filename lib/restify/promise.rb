@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Restify
   #
   class Promise < Concurrent::IVar
@@ -10,22 +11,7 @@ module Restify
 
     def wait(timeout = nil)
       execute if pending?
-
-      # if defined?(EventMachine)
-      #   if incomplete?
-      #     fiber = Fiber.current
-
-      #     self.add_observer do
-      #       EventMachine.next_tick { fiber.resume }
-      #     end
-
-      #     Fiber.yield
-      #   else
-      #     self
-      #   end
-      # else
-        super
-      # end
+      super
     end
 
     def then(&block)
@@ -39,17 +25,16 @@ module Restify
     protected
 
     # @!visibility private
-    def ns_execute(timeout)
-      if compare_and_set_state(:processing, :pending)
-        return unless @task || @dependencies.any?
+    def ns_execute(_timeout)
+      return unless compare_and_set_state(:processing, :pending)
+      return unless @task || @dependencies.any?
 
-        executor = Concurrent::SafeTaskExecutor.new \
-          method(:ns_exec), rescue_exception: true
+      executor = Concurrent::SafeTaskExecutor.new \
+        method(:ns_exec), rescue_exception: true
 
-        success, value, reason = executor.execute
+      success, value, reason = executor.execute
 
-        complete success, value, reason
-      end
+      complete success, value, reason
     end
 
     # @!visibility private
@@ -57,9 +42,7 @@ module Restify
       args  = @dependencies.any? ? @dependencies.map(&:value!) : []
       value = @task ? @task.call(*args) : args
 
-      while value.is_a? Restify::Promise
-        value = value.value!
-      end
+      value = value.value! while value.is_a? Restify::Promise
 
       value
     end

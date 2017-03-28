@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rspec'
 require 'webmock/rspec'
 
@@ -10,19 +11,21 @@ end
 
 require 'restify'
 
-case ENV['ADAPTER'].to_s.downcase
-  when 'em-http-request'
-    require 'restify/adapter/em'
-    Restify.adapter = Restify::Adapter::EM.new
-  when 'typhoeus'
-    require 'restify/adapter/typhoeus'
-    Restify.adapter = Restify::Adapter::Typhoeus.new
-  when 'typhoeus-sync'
-    require 'restify/adapter/typhoeus'
-    Restify.adapter = Restify::Adapter::Typhoeus.new sync: true
-  else
-    raise "Invalid adapter: #{ENV['ADAPTER']}"
-end if ENV['ADAPTER']
+if ENV['ADAPTER']
+  case ENV['ADAPTER'].to_s.downcase
+    when 'em-http-request'
+      require 'restify/adapter/em'
+      Restify.adapter = Restify::Adapter::EM.new
+    when 'typhoeus'
+      require 'restify/adapter/typhoeus'
+      Restify.adapter = Restify::Adapter::Typhoeus.new
+    when 'typhoeus-sync'
+      require 'restify/adapter/typhoeus'
+      Restify.adapter = Restify::Adapter::Typhoeus.new sync: true
+    else
+      raise "Invalid adapter: #{ENV['ADAPTER']}"
+  end
+end
 
 require 'webmock/rspec'
 require 'rspec/collection_matchers'

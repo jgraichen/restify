@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rack/utils'
 require 'json'
 
@@ -87,6 +88,7 @@ module Restify
     #
     # @return [Array<Link>] Links.
     #
+    # rubocop:disable Metrics/MethodLength
     def links
       @links ||= begin
         if headers['LINK']
@@ -116,15 +118,15 @@ module Restify
     # @return [Boolean] True if status code is 2XX otherwise false.
     #
     def success?
-      (200...300).include? code
+      (200...300).cover? code
     end
 
     # @api private
     def decoded_body
       @decoded_body ||= begin
         case content_type
-          when /\Aapplication\/json($|;)/
-            JSON.load body
+          when %r{\Aapplication/json($|;)}
+            ::JSON.parse(body)
         end
       end
     end

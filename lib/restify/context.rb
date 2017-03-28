@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Restify
   # A resource context.
   #
@@ -19,7 +20,12 @@ module Restify
     attr_reader :options
 
     def initialize(uri, **kwargs)
-      @uri     = uri.is_a?(Addressable::URI) ? uri : Addressable::URI.parse(uri.to_s)
+      @uri = if uri.is_a?(Addressable::URI)
+               uri
+             else
+               @uri = Addressable::URI.parse(uri.to_s)
+             end
+
       @options = kwargs
     end
 
@@ -34,20 +40,21 @@ module Restify
 
     def process(response)
       context   = inherit response.uri
-      processor = Restify::PROCESSORS.find { |p| p.accept? response }
+      processor = Restify::PROCESSORS.find {|p| p.accept? response }
       processor ||= Restify::Processors::Base
 
       processor.new(context, response).resource
     end
 
-    def request(method, uri, data = nil, opts = {})
+    # rubocop:disable Metrics/MethodLength
+    def request(method, uri, data = nil, _opts = {})
       request = Request.new \
         method: method,
         uri: join(uri),
         data: data,
         headers: options.fetch(:headers, {})
 
-      ret = cache.call(request) {|request| adapter.call(request) }
+      ret = cache.call(request) {|req| adapter.call(req) }
       ret.then do |response|
         if response.success?
           process response
@@ -75,7 +82,7 @@ module Restify
           when 500...600
             raise ServerError.new(response)
           else
-            raise RuntimeError.new "Unknown response code: #{response.code}"
+            raise "Unknown response code: #{response.code}"
         end
       end
     end

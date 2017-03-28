@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'eventmachine'
 require 'em-http-request'
 
@@ -26,6 +27,7 @@ module Restify
           @requests ||= []
         end
 
+        # rubocop:disable Style/IdenticalConditionalBranches
         def call(request, writer, retried = false)
           if requests.empty?
             requests << [request, writer, retried]
@@ -43,6 +45,10 @@ module Restify
           @pipeline
         end
 
+        # rubocop:disable Metrics/AbcSize
+        # rubocop:disable Metrics/CyclomaticComplexity
+        # rubocop:disable Metrics/MethodLength
+        # rubocop:disable Metrics/PerceivedComplexity
         def process_next
           return if requests.empty?
 
@@ -56,10 +62,10 @@ module Restify
               body: request.body,
               head: request.headers
 
-            ::Restify::Instrumentation.call('restify.adapter.start', {
-              adapter: self,
-              request: request
-            })
+            ::Restify::Instrumentation.call 'restify.adapter.start',
+              adapter: self, request: request
+
+          # rubocop:disable Lint/RescueException
           rescue Exception => err
             writer.reject err
             requests.shift unless pipeline?
@@ -77,10 +83,8 @@ module Restify
               req.response
             )
 
-            ::Restify::Instrumentation.call('restify.adapter.finish', {
-              adapter: self,
-              response: response
-            })
+            ::Restify::Instrumentation.call 'restify.adapter.finish',
+              adapter: self, response: response
 
             writer.fulfill response
 
@@ -105,8 +109,7 @@ module Restify
               EventMachine.next_tick { call request, writer }
             else
               begin
-                raise RuntimeError.new \
-                  "(#{req.response_header.status}) #{req.error}"
+                raise "(#{req.response_header.status}) #{req.error}"
               rescue => e
                 writer.reject e
               end
@@ -129,6 +132,8 @@ module Restify
       end
 
       def ensure_running
+        return if EventMachine.reactor_running?
+
         Thread.new do
           begin
             EventMachine.run {}
@@ -136,7 +141,7 @@ module Restify
             puts "#{self.class} -> #{e}\n#{e.backtrace.join("\n")}"
             raise e
           end
-        end unless EventMachine.reactor_running?
+        end
       end
     end
   end

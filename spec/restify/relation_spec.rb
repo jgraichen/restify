@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Restify::Relation do
@@ -26,7 +27,6 @@ describe Restify::Relation do
     end
 
     context 'with #to_param object' do
-
       let(:params) { {id: ParamObject.new} }
 
       it { expect(subject.to_s).to eq 'http://test.host/resource/42' }

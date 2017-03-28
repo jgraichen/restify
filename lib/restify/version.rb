@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Restify
   module VERSION
     MAJOR = 1

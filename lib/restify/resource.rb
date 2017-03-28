@@ -1,9 +1,9 @@
+# frozen_string_literal: true
 require 'delegate'
 
 module Restify
   #
   class Resource < SimpleDelegator
-
     # @api private
     #
     def initialize(context, response: nil, data: nil, relations: {})
@@ -23,9 +23,9 @@ module Restify
       @relations.key?(name) || @relations.key?(name.to_s)
     end
 
-    alias_method :rel?, :relation?
-    alias_method :has_rel?, :relation?
-    alias_method :has_relation?, :relation?
+    alias rel? relation?
+    alias has_rel? relation?
+    alias has_relation? relation?
 
     # Return relation with given name.
     #
@@ -40,7 +40,7 @@ module Restify
       end
     end
 
-    alias_method :rel, :relation
+    alias rel relation
 
     # @!method data
     #
@@ -64,11 +64,7 @@ module Restify
     # @return [Relation] Relation to follow resource or nil.
     #
     def follow
-      if relation? :_restify_follow
-        relation :_restify_follow
-      else
-        nil
-      end
+      relation :_restify_follow if relation? :_restify_follow
     end
 
     # Follow a LOCATION or CONTEXT-LOCATION header.
@@ -76,11 +72,12 @@ module Restify
     # @return [Relation] Relation to follow resource.
     # @raise RuntimeError If nothing to follow.
     #
+    # rubocop:disable Style/GuardClause
     def follow!
       if (rel = follow)
         rel
       else
-        raise RuntimeError.new 'Nothing to follow'
+        raise 'Nothing to follow'
       end
     end
 
@@ -97,9 +94,9 @@ module Restify
     # @api private
     def inspect
       text = {
-        "@data" => data,
-        "@relations" => @relations
-      }.map {|k,v | k + '=' + v.inspect }.join(' ')
+        '@data' => data,
+        '@relations' => @relations
+      }.map {|k, v| k + '=' + v.inspect }.join(' ')
 
       "#<#{self.class} #{text}>"
     end

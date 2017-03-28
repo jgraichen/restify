@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Restify::Processors::Json do
@@ -31,7 +32,8 @@ describe Restify::Processors::Json do
 
     context 'parsing' do
       context 'single object' do
-        let(:body) do <<-JSON
+        let(:body) do
+          <<-JSON
             {"key": "value"}
           JSON
         end
@@ -42,7 +44,8 @@ describe Restify::Processors::Json do
       end
 
       context 'object with relation fields' do
-        let(:body) do <<-JSON
+        let(:body) do
+          <<-JSON
             {"key": "value", "search_url": "https://google.com{?q}"}
           JSON
         end
@@ -57,7 +60,8 @@ describe Restify::Processors::Json do
       end
 
       context 'object with implicit self relation' do
-        let(:body) do <<-JSON
+        let(:body) do
+          <<-JSON
             {"key": "value", "url": "/self"}
           JSON
         end
@@ -66,18 +70,20 @@ describe Restify::Processors::Json do
       end
 
       context 'single array' do
-        let(:body) do <<-JSON
+        let(:body) do
+          <<-JSON
             [1, 2, null, "STR"]
           JSON
         end
 
         it { is_expected.to be_a Restify::Resource }
         it { expect(subject.response).to be response }
-        it { is_expected.to eq [1, 2, nil, "STR"] }
+        it { is_expected.to eq [1, 2, nil, 'STR'] }
       end
 
       context 'array with objects' do
-        let(:body) do <<-JSON
+        let(:body) do
+          <<-JSON
             [{"a":0}, {"b":1}]
           JSON
         end
@@ -86,7 +92,8 @@ describe Restify::Processors::Json do
       end
 
       context 'array with resources' do
-        let(:body) do <<-JSON
+        let(:body) do
+          <<-JSON
             [{"name": "John", "self_url": "/users/john"},
              {"name": "Jane", "self_url": "/users/jane"}]
           JSON
@@ -104,7 +111,8 @@ describe Restify::Processors::Json do
       end
 
       context 'nested objects' do
-        let(:body) do <<-JSON
+        let(:body) do
+          <<-JSON
             {"john": {"name": "John"},
              "jane": {"name": "Jane"}}
           JSON
@@ -123,18 +131,20 @@ describe Restify::Processors::Json do
       end
 
       context 'single value' do
-        let(:body) do <<-JSON
+        let(:body) do
+          <<-JSON
             "BLUB"
           JSON
         end
 
         it { is_expected.to be_a Restify::Resource }
         it { expect(subject.response).to be response }
-        it { is_expected.to eq "BLUB" }
+        it { is_expected.to eq 'BLUB' }
       end
 
       context 'with indifferent access' do
-        let(:body) do <<-JSON
+        let(:body) do
+          <<-JSON
             {"name": "John", "age": 24}
           JSON
         end
@@ -157,7 +167,8 @@ describe Restify::Processors::Json do
       end
 
       context 'with method getter access' do
-        let(:body) do <<-JSON
+        let(:body) do
+          <<-JSON
             {"name": "John", "age": 24}
           JSON
         end

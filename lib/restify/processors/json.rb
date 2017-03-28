@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'json'
 
 module Restify
@@ -9,13 +10,13 @@ module Restify
     # JSON fields matching *_url will be parsed as relations.
     #
     class Json < Base
-
       def load
         parse ::JSON.load(body), root: true
       end
 
       private
 
+      # rubocop:disable Metrics/MethodLength
       def parse(object, root: false)
         case object
           when Hash
@@ -27,9 +28,14 @@ module Restify
             end
 
             if root
-              Resource.new context, response: response, data: data, relations: relations
+              Resource.new context,
+                data: data,
+                response: response,
+                relations: relations
             else
-              Resource.new context, data: data, relations: relations
+              Resource.new context,
+                data: data,
+                relations: relations
             end
           when Array
             object.map(&method(:parse))
@@ -44,21 +50,23 @@ module Restify
 
       def parse_rels(pair, relations)
         name = case pair[0].to_s.downcase
-          when /\A(\w+)_url\z/
-            Regexp.last_match[1]
-          when 'url'
-            'self'
-          else
-            return
-        end
+                 when /\A(\w+)_url\z/
+                   Regexp.last_match[1]
+                 when 'url'
+                   'self'
+                 else
+                   return
+               end
 
-        return if relations.key?(name) || pair[1].nil? || pair[1].to_s =~ /\A\w*\z/
+        if relations.key?(name) || pair[1].nil? || pair[1].to_s =~ /\A\w*\z/
+          return
+        end
 
         relations[name] = pair[1].to_s
       end
 
       def json
-        @json ||= JSON.load response.body
+        @json ||= JSON.parse(response.body)
       end
 
       def with_indifferent_access(data)
@@ -67,19 +75,17 @@ module Restify
 
       class << self
         def accept?(response)
-          response.content_type =~ /\Aapplication\/json($|;)/
+          response.content_type =~ %r{\Aapplication/json($|;)}
         end
 
         def indifferent_access?
-          @@indifferent_access
+          @indifferent_access
         end
 
-        def indifferent_access=(value)
-          @@indifferent_access = value
-        end
-
-        @@indifferent_access = true
+        attr_writer :indifferent_access
       end
+
+      self.indifferent_access = true
     end
   end
 end

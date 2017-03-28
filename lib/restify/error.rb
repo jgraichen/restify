@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Restify
   #
   # A {ResponseError} is returned on a non-successful
@@ -36,7 +37,9 @@ module Restify
     #
     def errors
       if response.decoded_body
-        response.decoded_body['errors'] || response.decoded_body[:errors] || response.decoded_body
+        response.decoded_body['errors'] ||
+          response.decoded_body[:errors] ||
+          response.decoded_body
       else
         response.body
       end

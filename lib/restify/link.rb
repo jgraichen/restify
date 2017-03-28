@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Restify
   #
   # A {Link} represents a single entry from the Link header

@@ -1,6 +1,15 @@
 AllCops:
   Include:
     - '**/*.rb'
+  TargetRubyVersion: 2.4
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*_spec.rb'
+
+Metrics/LineLength:
+  Exclude:
+    - 'spec/**/*_spec.rb'
 
 Style/AlignParameters:
   EnforcedStyle: with_fixed_indentation
@@ -26,7 +35,7 @@ Style/SignalException:
   EnforcedStyle: only_raise
 
 Style/CaseIndentation:
-  IndentWhenRelativeTo: end
+  EnforcedStyle: end
   SupportedStyles:
     - case
     - end

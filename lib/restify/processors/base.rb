@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Restify
   #
   module Processors
@@ -35,9 +36,7 @@ module Restify
       #
       # Should be overridden in subclass.
       #
-      def load
-
-      end
+      def load; end
 
       # @!method body
       #
@@ -50,18 +49,17 @@ module Restify
           name  = link.metadata['rel']
           value = link.uri
 
-          if !name.empty? && !relations.key?(name)
-            relations[name] = value
-          end
+          relations[name] = value if !name.empty? && !relations.key?(name)
         end
 
-        if (location = @response.follow_location)
-          relations[:_restify_follow] = location
-        end
+        location = @response.follow_location
+        return unless location
+
+        relations[:_restify_follow] = location
       end
 
       class << self
-        def accept?(response)
+        def accept?(_response)
           false
         end
       end

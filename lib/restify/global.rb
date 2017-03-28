@@ -1,7 +1,6 @@
+# frozen_string_literal: true
 module Restify
   module Global
-    extend self
-
     def new(uri, **opts)
       context = resolve_context uri, **opts
 
