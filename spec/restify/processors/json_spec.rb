@@ -34,25 +34,25 @@ describe Restify::Processors::Json do
       context 'single object' do
         let(:body) do
           <<-JSON
-            {"key": "value"}
+            {"json": "value"}
           JSON
         end
 
         it { is_expected.to be_a Restify::Resource }
         it { expect(subject.response).to be response }
-        it { is_expected.to eq 'key' => 'value' }
+        it { is_expected.to eq 'json' => 'value' }
       end
 
       context 'object with relation fields' do
         let(:body) do
           <<-JSON
-            {"key": "value", "search_url": "https://google.com{?q}"}
+            {"json": "value", "search_url": "https://google.com{?q}"}
           JSON
         end
 
         it do
           is_expected.to eq \
-            'key' => 'value', 'search_url' => 'https://google.com{?q}'
+            'json' => 'value', 'search_url' => 'https://google.com{?q}'
         end
 
         it { is_expected.to have_relation :search }
@@ -62,7 +62,7 @@ describe Restify::Processors::Json do
       context 'object with implicit self relation' do
         let(:body) do
           <<-JSON
-            {"key": "value", "url": "/self"}
+            {"json": "value", "url": "/self"}
           JSON
         end
 
