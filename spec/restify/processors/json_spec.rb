@@ -30,7 +30,7 @@ describe Restify::Processors::Json do
     subject { described_class.new(context, response).resource }
     before { allow(response).to receive(:body).and_return(body) }
 
-    context 'parsing' do
+    describe 'parsing' do
       context 'single object' do
         let(:body) do
           <<-JSON
@@ -100,8 +100,7 @@ describe Restify::Processors::Json do
         end
 
         it 'parses objects as resources' do
-          expect(subject.map(&:class)).to eq \
-            [Restify::Resource, Restify::Resource]
+          expect(subject).to all(be_a(Restify::Resource))
         end
 
         it 'parses relations of resources' do
