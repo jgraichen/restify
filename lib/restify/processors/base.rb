@@ -36,7 +36,9 @@ module Restify
       #
       # Should be overridden in subclass.
       #
-      def load; end
+      def load
+        body
+      end
 
       # @!method body
       #
