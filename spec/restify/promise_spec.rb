@@ -75,6 +75,27 @@ describe Restify::Promise do
           expect(subject.value).to be nil
         end
       end
+
+      context 'when fulfilling the promise asynchronously' do
+        subject {
+          described_class.create do |writer|
+            Thread.new do
+              sleep 0.1
+              writer.fulfill 42
+            end
+          end
+        }
+
+        it 'returns a pending promise' do
+          expect(subject.fulfilled?).to be false
+          expect(subject.rejected?).to be false
+          expect(subject.pending?).to be true
+        end
+
+        it 'waits for the fulfillment value' do
+          expect(subject.value!).to eq 42
+        end
+      end
     end
   end
 
