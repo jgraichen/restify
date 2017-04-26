@@ -53,6 +53,18 @@ module Restify
         yield Writer.new(promise)
         promise
       end
+
+      def fulfilled(value)
+        create do |writer|
+          writer.fulfill value
+        end
+      end
+
+      def rejected(value)
+        create do |writer|
+          writer.reject value
+        end
+      end
     end
 
     class Writer
