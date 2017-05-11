@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'eventmachine'
 require 'em-http-request'
 
@@ -61,11 +62,6 @@ module Restify
               query: request.uri.normalized_query,
               body: request.body,
               head: request.headers
-
-            ::Restify::Instrumentation.call 'restify.adapter.start',
-              adapter: self, request: request
-
-          # rubocop:disable Lint/RescueException
           rescue Exception => err
             writer.reject err
             requests.shift unless pipeline?
@@ -75,18 +71,13 @@ module Restify
           req.callback do
             requests.shift unless pipeline?
 
-            response = Response.new(
+            writer.fulfill Response.new(
               request,
               req.last_effective_url,
               req.response_header.status,
               req.response_header,
               req.response
             )
-
-            ::Restify::Instrumentation.call 'restify.adapter.finish',
-              adapter: self, response: response
-
-            writer.fulfill response
 
             if req.response_header['CONNECTION'] == 'close'
               @connection = nil
