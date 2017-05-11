@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'json'
 
 module Restify
@@ -11,7 +12,7 @@ module Restify
     #
     class Json < Base
       def load
-        parse ::JSON.load(body), root: true
+        parse ::JSON.parse(body), root: true
       end
 
       private

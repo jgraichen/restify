@@ -1,4 +1,6 @@
 # coding: utf-8
+# frozen_string_literal: true
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'restify/version'
@@ -9,11 +11,13 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Jan Graichen']
   spec.email         = ['jg@altimos.de']
   spec.summary       = 'An experimental hypermedia REST client.'
-  spec.description   = 'An experimental hypermedia REST client that uses parallel, keep-alive and pipelined requests by default.'
+  spec.description   = 'An experimental hypermedia REST client that uses ' \
+                       'parallel, keep-alive and pipelined requests by default.'
   spec.homepage      = 'https://github.com/jgraichen/restify'
   spec.license       = 'LGPLv3'
 
-  spec.files         = Dir['**/*'].grep(%r{^((bin|lib|test|spec|features)/|.*\.gemspec|.*LICENSE.*|.*README.*|.*CHANGELOG.*)})
+  spec.files         = Dir['**/*'].grep(%r{^((bin|lib|test|spec|features)/|
+                        .*\.gemspec|.*LICENSE.*|.*README.*|.*CHANGELOG.*)}mi)
   spec.executables   = spec.files.grep(%r{^bin/}) {|f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Restify
   class Registry
     def initialize

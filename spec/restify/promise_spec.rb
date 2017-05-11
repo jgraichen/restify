@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Restify::Promise do
@@ -27,7 +28,7 @@ describe Restify::Promise do
       end
 
       it 'bubbles up the caught exception on #value!' do
-        expect{ subject.value! }.to raise_error(ArgumentError)
+        expect { subject.value! }.to raise_error(ArgumentError)
       end
 
       it 'swallows the exception on #value' do
@@ -37,12 +38,12 @@ describe Restify::Promise do
 
     describe '#create' do
       context 'when fulfilling the promise in the writer block' do
-        subject {
+        subject do
           described_class.create do |writer|
             # Calculate a value and fulfill the promise with it
             writer.fulfill 42
           end
-        }
+        end
 
         it 'returns a fulfilled promise' do
           expect(subject.fulfilled?).to be true
@@ -55,12 +56,12 @@ describe Restify::Promise do
       end
 
       context 'when rejecting the promise in the writer block' do
-        subject {
+        subject do
           described_class.create do |writer|
             # Calculate a value and fulfill the promise with it
             writer.reject ArgumentError
           end
-        }
+        end
 
         it 'returns a rejected promise' do
           expect(subject.fulfilled?).to be false
@@ -68,7 +69,7 @@ describe Restify::Promise do
         end
 
         it 'bubbles up the caught exception on #value!' do
-          expect{ subject.value! }.to raise_error(ArgumentError)
+          expect { subject.value! }.to raise_error(ArgumentError)
         end
 
         it 'swallows the exception on #value' do
@@ -77,14 +78,14 @@ describe Restify::Promise do
       end
 
       context 'when fulfilling the promise asynchronously' do
-        subject {
+        subject do
           described_class.create do |writer|
             Thread.new do
               sleep 0.1
               writer.fulfill 42
             end
           end
-        }
+        end
 
         it 'returns a pending promise' do
           expect(subject.fulfilled?).to be false
@@ -105,12 +106,12 @@ describe Restify::Promise do
     let(:task) { nil }
 
     context 'with a task' do
-      let(:task) {
+      let(:task) do
         proc {
           # Calculate the resulting value
           38 + 4
         }
-      }
+      end
 
       it 'is calculated using the task block' do
         expect(subject).to eq 42
@@ -118,13 +119,13 @@ describe Restify::Promise do
     end
 
     context 'with dependencies, but no task' do
-      let(:dependencies) {
+      let(:dependencies) do
         [
           Restify::Promise.fulfilled(1),
           Restify::Promise.fulfilled(2),
           Restify::Promise.fulfilled(3)
         ]
-      }
+      end
 
       it 'is an array of the dependencies\' results' do
         expect(subject).to eq [1, 2, 3]
@@ -132,13 +133,13 @@ describe Restify::Promise do
     end
 
     context 'with dependencies passed as an array, but no task' do
-      let(:dependencies) {
+      let(:dependencies) do
         [[
           Restify::Promise.fulfilled(1),
           Restify::Promise.fulfilled(2),
           Restify::Promise.fulfilled(3)
         ]]
-      }
+      end
 
       it 'is an array of the dependencies\' results' do
         expect(subject).to eq [1, 2, 3]
@@ -146,15 +147,15 @@ describe Restify::Promise do
     end
 
     context 'with dependencies and a task' do
-      let(:dependencies) {
+      let(:dependencies) do
         [
           Restify::Promise.fulfilled(5),
           Restify::Promise.fulfilled(12)
         ]
-      }
-      let(:task) {
-        proc { |dep1, dep2| dep1 + dep2 }
-      }
+      end
+      let(:task) do
+        proc {|dep1, dep2| dep1 + dep2 }
+      end
 
       it 'can use the dependencies to calculate the value' do
         expect(subject).to eq 17

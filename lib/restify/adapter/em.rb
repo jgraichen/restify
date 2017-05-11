@@ -62,7 +62,7 @@ module Restify
               query: request.uri.normalized_query,
               body: request.body,
               head: request.headers
-          rescue Exception => err
+          rescue Exception => err # rubocop:disable RescueException
             writer.reject err
             requests.shift unless pipeline?
             return

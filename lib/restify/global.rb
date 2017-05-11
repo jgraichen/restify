@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Restify
   module Global
     def new(uri, **opts)

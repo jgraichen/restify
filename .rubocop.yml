@@ -46,3 +46,8 @@ Style/ClassAndModuleChildren:
 
 Style/TrivialAccessors:
   AllowPredicates: true
+
+Style/FileName:
+  Exclude:
+    - Rakefile
+    - Gemfile
