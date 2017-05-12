@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0
+
+* Return response body if no processor matches (#7)
+* Add shortcuts for creating fulfilled / rejected promises (#6)
+
 ## 1.0.0
 
 * Experimental cache API doing nothing for now
