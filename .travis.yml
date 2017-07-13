@@ -15,3 +15,17 @@ env:
 - ADAPTER=em-http-request
 - ADAPTER=typhoeus
 - ADAPTER=typhoeus-sync
+
+jobs:
+  include:
+    - stage: Beta release
+      rvm: '2.4.1'
+      script: echo "Deploy to rubygems.org..."
+      deploy:
+        provider: rubygems
+        api_key:
+          secure: c1d0tzOyDmJmNXjq8fYKEJ6Y8NFtIaH1BUyhMO2ypJ/k3UyRi+7ZQBD7VxSI4SVq/iETqzvTlUAosUWd6ER/LETxa/hb5uWhASa/1pYy5n64URYzmnwzM/sPsbdOYlTVNAnEdYB7Ko9MGWdIBeD8dEB6iX32m+zaB9VRopL1IMw=
+        gem: restify
+        on:
+          branch: master
+          repo: jgraichen/restify
