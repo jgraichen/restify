@@ -38,7 +38,7 @@ RSpec.configure do |config|
   config.order = 'random'
 
   config.before(:each) do
-    Restify.logger.level = :debug
+    Restify.logger.level = Logger::DEBUG
   end
 
   config.after(:each) do
