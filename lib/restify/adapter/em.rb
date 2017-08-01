@@ -6,114 +6,201 @@ require 'em-http-request'
 module Restify
   module Adapter
     class EM < Base
-      class Connection
-        class << self
-          def open(uri)
-            connections[uri.origin] ||= new uri.origin
+      # rubocop:disable RedundantFreeze
+      LOG_PROGNAME = 'restify.adapter.em'.freeze
+
+      class Pool
+        def initialize(size: 32, per_host: 6, connect_timeout: 2, inactivity_timeout: 10)
+          @size = size
+          @per_host = per_host
+          @connect_timeout = connect_timeout
+          @inactivity_timeout = inactivity_timeout
+
+          @host = Hash.new {|h, k| h[k] = 0 }
+          @pool = []
+          @wait = []
+          @used = 0
+        end
+
+        def get(request, timeout: 2)
+          defer = Deferrable.new(request)
+          defer.timeout(timeout, :timeout)
+          defer.errback { @wait.delete(defer) }
+
+          checkout(defer)
+
+          defer
+        end
+
+        def release(conn)
+          @pool.unshift(conn) if @pool.size < @size
+          @used -= 1 if @used.positive?
+
+          Restify.logger.debug(LOG_PROGNAME) do
+            "[#{conn.uri}] Released to pool (#{@pool.size}/#{@used}/#{size})"
           end
 
-          def connections
-            @connections ||= {}
+          checkout(@wait.shift) if @wait.any? # checkout next waiting defer
+        end
+
+        alias << release
+
+        def remove(conn)
+          close(conn)
+
+          Restify.logger.debug(LOG_PROGNAME) do
+            "[#{conn.uri}] Removed from pool (#{@pool.size}/#{@used}/#{size})"
           end
+
+          checkout(@wait.shift) if @wait.any? # checkout next waiting defer
         end
 
-        attr_reader :origin
-
-        def initialize(origin)
-          @origin   = origin
-          @pipeline = true
+        def size
+          @pool.size + @used
         end
 
-        def requests
-          @requests ||= []
+        private
+
+        def close(conn)
+          @used -= 1 if @used.positive?
+          @host[conn.uri.to_s] -= 1
+
+          conn.close
         end
 
-        # rubocop:disable Style/IdenticalConditionalBranches
-        def call(request, writer, retried = false)
-          if requests.empty?
-            requests << [request, writer, retried]
-            process_next
+        # rubocop:disable AbcSize
+        # rubocop:disable MethodLength
+        def checkout(defer)
+          origin = defer.request.uri.origin
+          cindex = @pool.find_index {|conn| conn.uri == origin }
+
+          if cindex
+            @used += 1
+            conn = @pool.delete_at(cindex)
+
+            Restify.logger.debug(LOG_PROGNAME) do
+              "[#{origin}] Take connection from pool " \
+              "(#{@pool.size}/#{@used}/#{size})"
+            end
+
+            defer.succeed(conn)
+          elsif size < @size && @host[origin] < @per_host
+            @used += 1
+            conn = new(origin)
+
+            Restify.logger.debug(LOG_PROGNAME) do
+              "[#{origin}] Add new connection to pool " \
+              "(#{@pool.size}/#{@used}/#{size})"
+            end
+
+            defer.succeed(conn)
+          elsif @pool.any? && @host[origin] < @per_host
+            close(@pool.pop)
+
+            @used += 1
+
+            conn = new(origin)
+
+            Restify.logger.debug(LOG_PROGNAME) do
+              "[#{origin}] Replaced connection from pool " \
+              "(#{@pool.size}/#{@used}/#{size})"
+            end
+
+            defer.succeed(conn)
           else
-            requests << [request, writer, retried]
-          end
-        end
-
-        def connection
-          @connection ||= EventMachine::HttpRequest.new(origin)
-        end
-
-        def pipeline?
-          @pipeline
-        end
-
-        # rubocop:disable Metrics/AbcSize
-        # rubocop:disable Metrics/CyclomaticComplexity
-        # rubocop:disable Metrics/MethodLength
-        # rubocop:disable Metrics/PerceivedComplexity
-        def process_next
-          return if requests.empty?
-
-          request, writer, retried = pipeline? ? requests.shift : requests.first
-          begin
-            req = connection.send request.method.downcase,
-              keepalive: true,
-              redirects: 3,
-              path: request.uri.normalized_path,
-              query: request.uri.normalized_query,
-              body: request.body,
-              head: request.headers
-          rescue Exception => err # rubocop:disable RescueException
-            writer.reject err
-            requests.shift unless pipeline?
-            return
-          end
-
-          req.callback do
-            requests.shift unless pipeline?
-
-            writer.fulfill Response.new(
-              request,
-              req.last_effective_url,
-              req.response_header.status,
-              req.response_header,
-              req.response
-            )
-
-            if req.response_header['CONNECTION'] == 'close'
-              @connection = nil
-              @pipeline   = false
+            Restify.logger.debug(LOG_PROGNAME) do
+              "[#{origin}] Wait for free slot " \
+              "(#{@pool.size}/#{@used}/#{size})"
             end
 
-            process_next
+            @wait << defer
+          end
+        end
+        # rubocop:enable all
+
+        def new(origin)
+          Restify.logger.debug(LOG_PROGNAME) do
+            "Connect to '#{origin}' " \
+            "(#{@connect_timeout}/#{@inactivity_timeout})..."
           end
 
-          req.errback do
-            requests.shift unless pipeline?
-            @connection = nil
+          @host[origin] += 1
 
-            if pipeline?
-              EventMachine.next_tick do
-                @pipeline = false
-                call request, writer
-              end
-            elsif !retried
-              EventMachine.next_tick { call request, writer }
-            else
-              begin
-                raise "(#{req.response_header.status}) #{req.error}"
-              rescue => e
-                writer.reject e
-              end
-            end
+          EventMachine::HttpRequest.new origin,
+            connect_timeout: @connect_timeout,
+            inactivity_timeout: @inactivity_timeout
+        end
+
+        class Deferrable
+          include ::EventMachine::Deferrable
+
+          attr_reader :request
+          attr_reader :connection
+
+          def initialize(request)
+            @request = request
+          end
+
+          def succeed(connection)
+            @connection = connection
+            super
           end
         end
       end
 
+      def initialize(**kwargs)
+        @pool = Pool.new(**kwargs)
+      end
+
+      # rubocop:disable MethodLength
+      # rubocop:disable AbcSize
+      # rubocop:disable BlockLength
       def call_native(request, writer)
         next_tick do
-          Connection.open(request.uri).call(request, writer)
+          defer = @pool.get(request)
+
+          defer.errback do |error|
+            writer.reject(error)
+          end
+
+          defer.callback do |conn|
+            begin
+              req = conn.send request.method.downcase,
+                keepalive: true,
+                redirects: 3,
+                path: request.uri.normalized_path,
+                query: request.uri.normalized_query,
+                body: request.body,
+                head: request.headers
+
+              req.callback do
+                writer.fulfill Response.new(
+                  request,
+                  req.last_effective_url,
+                  req.response_header.status,
+                  req.response_header,
+                  req.response
+                )
+
+                if req.response_header['CONNECTION'] == 'close'
+                  @pool.remove(conn)
+                else
+                  @pool << conn
+                end
+              end
+
+              req.errback do
+                @pool.remove(conn)
+                writer.reject(req.error)
+              end
+            rescue Exception => ex # rubocop:disable RescueException
+              @pool.remove(conn)
+              writer.reject(ex)
+            end
+          end
         end
       end
+      # rubocop:enable all
 
       private
 
