@@ -30,6 +30,16 @@ module Restify
       @cache = cache
     end
 
+    def logger
+      @logger ||= ::Logger.new(STDOUT).tap do |logger|
+        logger.level = :info
+      end
+    end
+
+    def logger=(logger)
+      @logger = logger
+    end
+
     private
 
     def resolve_context(uri, **opts)

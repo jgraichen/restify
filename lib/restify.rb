@@ -34,6 +34,8 @@ module Restify
     require 'restify/processors/json'
   end
 
+  require 'restify/railtie' if defined?(Rails::Railtie)
+
   PROCESSORS = [Processors::Json].freeze
 
   extend Global

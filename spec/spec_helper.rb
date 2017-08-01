@@ -37,6 +37,10 @@ Dir[File.expand_path('spec/support/**/*.rb')].each {|f| require f }
 RSpec.configure do |config|
   config.order = 'random'
 
+  config.before(:each) do
+    Restify.logger.level = :debug
+  end
+
   config.after(:each) do
     EventMachine.stop if defined?(EventMachine) && EventMachine.reactor_running?
   end
