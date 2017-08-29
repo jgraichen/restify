@@ -134,7 +134,7 @@ module Restify
 
     # @api private
     def follow_location
-      headers['LOCATION'] || headers['CONENT_LOCATION']
+      headers['LOCATION'] || headers['CONTENT_LOCATION']
     end
 
     private
