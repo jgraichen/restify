@@ -68,55 +68,63 @@ module Restify
           conn.close
         end
 
-        # rubocop:disable AbcSize
-        # rubocop:disable MethodLength
         def checkout(defer)
           origin = defer.request.uri.origin
-          cindex = @pool.find_index {|conn| conn.uri == origin }
 
-          if cindex
-            @used += 1
-            conn = @pool.delete_at(cindex)
-
-            Restify.logger.debug(LOG_PROGNAME) do
-              "[#{origin}] Take connection from pool " \
-              "(#{@pool.size}/#{@used}/#{size})"
-            end
-
-            defer.succeed(conn)
-          elsif size < @size && @host[origin] < @per_host
-            @used += 1
-            conn = new(origin)
-
-            Restify.logger.debug(LOG_PROGNAME) do
-              "[#{origin}] Add new connection to pool " \
-              "(#{@pool.size}/#{@used}/#{size})"
-            end
-
-            defer.succeed(conn)
-          elsif @pool.any? && @host[origin] < @per_host
-            close(@pool.pop)
-
-            @used += 1
-
-            conn = new(origin)
-
-            Restify.logger.debug(LOG_PROGNAME) do
-              "[#{origin}] Replaced connection from pool " \
-              "(#{@pool.size}/#{@used}/#{size})"
-            end
-
-            defer.succeed(conn)
+          if (index = find_reusable_connection(origin))
+            defer.succeed reuse_connection(index, origin)
+          elsif can_build_new_connection?(origin)
+            defer.succeed new_connection(origin)
           else
-            Restify.logger.debug(LOG_PROGNAME) do
-              "[#{origin}] Wait for free slot " \
-              "(#{@pool.size}/#{@used}/#{size})"
-            end
-
-            @wait << defer
+            queue defer
           end
         end
-        # rubocop:enable all
+
+        def find_reusable_connection(origin)
+          @pool.find_index {|conn| conn.uri == origin }
+        end
+
+        def reuse_connection(index, origin)
+          @used += 1
+          @pool.delete_at(index).tap do
+            Restify.logger.debug(LOG_PROGNAME) do
+              "[#{origin}] Take connection from pool " \
+                "(#{@pool.size}/#{@used}/#{size})"
+            end
+          end
+        end
+
+        def new_connection(origin)
+          # If we have reached the limit, we have to throw away the oldest
+          # reusable connection in order to open a new one
+          pop if size >= @size
+
+          @used += 1
+          new(origin).tap do
+            Restify.logger.debug(LOG_PROGNAME) do
+              "[#{origin}] Add new connection to pool " \
+                "(#{@pool.size}/#{@used}/#{size})"
+            end
+          end
+        end
+
+        def pop
+          close(@pool.pop)
+
+          Restify.logger.debug(LOG_PROGNAME) do
+            "[#{origin}] Closed oldest connection in pool " \
+              "(#{@pool.size}/#{@used}/#{size})"
+          end
+        end
+
+        def queue(defer)
+          Restify.logger.debug(LOG_PROGNAME) do
+            "[#{origin}] Wait for free slot " \
+              "(#{@pool.size}/#{@used}/#{size})"
+          end
+
+          @wait << defer
+        end
 
         def new(origin)
           Restify.logger.debug(LOG_PROGNAME) do
@@ -129,6 +137,12 @@ module Restify
           EventMachine::HttpRequest.new origin,
             connect_timeout: @connect_timeout,
             inactivity_timeout: @inactivity_timeout
+        end
+
+        def can_build_new_connection?(origin)
+          return false if @host[origin] >= @per_host
+
+          size < @size || @pool.any?
         end
 
         class Deferrable
