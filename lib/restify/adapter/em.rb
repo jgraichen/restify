@@ -149,7 +149,6 @@ module Restify
           include ::EventMachine::Deferrable
 
           attr_reader :request
-          attr_reader :connection
 
           def initialize(request)
             @request = request
