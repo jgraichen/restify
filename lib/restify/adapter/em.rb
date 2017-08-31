@@ -17,15 +17,15 @@ module Restify
           @inactivity_timeout = inactivity_timeout
 
           @host = Hash.new {|h, k| h[k] = 0 }
-          @pool = []
-          @wait = []
+          @available = []
+          @queue = []
           @used = 0
         end
 
         def get(request, timeout: 2)
           defer = Deferrable.new(request)
           defer.timeout(timeout, :timeout)
-          defer.errback { @wait.delete(defer) }
+          defer.errback { @queue.delete(defer) }
 
           checkout(defer)
 
@@ -33,14 +33,14 @@ module Restify
         end
 
         def release(conn)
-          @pool.unshift(conn) if @pool.size < @size
+          @available.unshift(conn) if @available.size < @size
           @used -= 1 if @used.positive?
 
           Restify.logger.debug(LOG_PROGNAME) do
-            "[#{conn.uri}] Released to pool (#{@pool.size}/#{@used}/#{size})"
+            "[#{conn.uri}] Released to pool (#{@available.size}/#{@used}/#{size})"
           end
 
-          checkout(@wait.shift) if @wait.any? # checkout next waiting defer
+          checkout(@queue.shift) if @queue.any? # checkout next waiting defer
         end
 
         alias << release
@@ -49,14 +49,14 @@ module Restify
           close(conn)
 
           Restify.logger.debug(LOG_PROGNAME) do
-            "[#{conn.uri}] Removed from pool (#{@pool.size}/#{@used}/#{size})"
+            "[#{conn.uri}] Removed from pool (#{@available.size}/#{@used}/#{size})"
           end
 
-          checkout(@wait.shift) if @wait.any? # checkout next waiting defer
+          checkout(@queue.shift) if @queue.any? # checkout next waiting defer
         end
 
         def size
-          @pool.size + @used
+          @available.size + @used
         end
 
         private
@@ -81,15 +81,15 @@ module Restify
         end
 
         def find_reusable_connection(origin)
-          @pool.find_index {|conn| conn.uri == origin }
+          @available.find_index {|conn| conn.uri == origin }
         end
 
         def reuse_connection(index, origin)
           @used += 1
-          @pool.delete_at(index).tap do
+          @available.delete_at(index).tap do
             Restify.logger.debug(LOG_PROGNAME) do
               "[#{origin}] Take connection from pool " \
-                "(#{@pool.size}/#{@used}/#{size})"
+                "(#{@available.size}/#{@used}/#{size})"
             end
           end
         end
@@ -97,33 +97,33 @@ module Restify
         def new_connection(origin)
           # If we have reached the limit, we have to throw away the oldest
           # reusable connection in order to open a new one
-          pop if size >= @size
+          close_oldest if size >= @size
 
           @used += 1
           new(origin).tap do
             Restify.logger.debug(LOG_PROGNAME) do
               "[#{origin}] Add new connection to pool " \
-                "(#{@pool.size}/#{@used}/#{size})"
+                "(#{@available.size}/#{@used}/#{size})"
             end
           end
         end
 
-        def pop
-          close(@pool.pop)
+        def close_oldest
+          close(@available.pop)
 
           Restify.logger.debug(LOG_PROGNAME) do
             "[#{origin}] Closed oldest connection in pool " \
-              "(#{@pool.size}/#{@used}/#{size})"
+              "(#{@available.size}/#{@used}/#{size})"
           end
         end
 
         def queue(defer)
           Restify.logger.debug(LOG_PROGNAME) do
             "[#{origin}] Wait for free slot " \
-              "(#{@pool.size}/#{@used}/#{size})"
+              "(#{@available.size}/#{@used}/#{size})"
           end
 
-          @wait << defer
+          @queue << defer
         end
 
         def new(origin)
@@ -142,7 +142,7 @@ module Restify
         def can_build_new_connection?(origin)
           return false if @host[origin] >= @per_host
 
-          size < @size || @pool.any?
+          size < @size || @available.any?
         end
 
         class Deferrable
