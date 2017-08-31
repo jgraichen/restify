@@ -9,6 +9,12 @@ module Restify
       # rubocop:disable RedundantFreeze
       LOG_PROGNAME = 'restify.adapter.em'.freeze
 
+      # This class maintains a pool of connection objects, grouped by origin,
+      # and ensures limits for total parallel requests and per-origin requests.
+      #
+      # It does so by maintaining a list of already open, reusable connections.
+      # When any of them are checked out for usage, it counts the usages to
+      # prevent constraints being broken.
       class Pool
         def initialize(size: 32, per_host: 6, connect_timeout: 2, inactivity_timeout: 10)
           @size = size
@@ -22,6 +28,17 @@ module Restify
           @used = 0
         end
 
+        # Request a connection from the pool.
+        #
+        # Attempts to checkout a reusable connection from the pool (or create a
+        # new one). If any of the limits have been reached, the request will be
+        # put onto a queue until other connections are released.
+        #
+        # Returns a Deferrable that succeeds with a connection instance once a
+        # connection has been checked out (usually immediately).
+        #
+        # @return [Deferrable<Request>]
+        #
         def get(request, timeout: 2)
           defer = Deferrable.new(request)
           defer.timeout(timeout, :timeout)
@@ -32,6 +49,17 @@ module Restify
           defer
         end
 
+        # Return a connection to the pool.
+        #
+        # If there are requests in the queue (due to one of the limits having
+        # been reached), they will be given an attempt to use the released
+        # connection.
+        #
+        # If no requests are queued, the connection will be held for reuse by a
+        # subsequent request.
+        #
+        # @return [void]
+        #
         def release(conn)
           @available.unshift(conn) if @available.size < @size
           @used -= 1 if @used.positive?
@@ -55,6 +83,12 @@ module Restify
           checkout(@queue.shift) if @queue.any? # checkout next waiting defer
         end
 
+        # Determine the number of connections in the pool.
+        #
+        # This takes into account both reusable (idle) and used connections.
+        #
+        # @return [Integer]
+        #
         def size
           @available.size + @used
         end
