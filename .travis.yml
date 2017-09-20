@@ -2,43 +2,42 @@ sudo: false
 dist: trusty
 language: ruby
 cache: bundler
-bundler_args: --without development
+bundler_args: "--without development"
 before_install:
 - gem update --system
 - gem install bundler
 rvm:
-- '2.4.2'
-- '2.3.4'
-- '2.2.7'
+- 2.4.2
+- 2.3.4
+- 2.2.7
 env:
 - ADAPTER=em-http-request
 - ADAPTER=typhoeus
 - ADAPTER=typhoeus-sync
-
 jobs:
   include:
   - stage: Beta release
-    rvm: '2.4.2'
+    rvm: 2.4.2
     env: []
     script: skip
     install: skip
     deploy:
       provider: rubygems
       api_key:
-        secure: c1d0tzOyDmJmNXjq8fYKEJ6Y8NFtIaH1BUyhMO2ypJ/k3UyRi+7ZQBD7VxSI4SVq/iETqzvTlUAosUWd6ER/LETxa/hb5uWhASa/1pYy5n64URYzmnwzM/sPsbdOYlTVNAnEdYB7Ko9MGWdIBeD8dEB6iX32m+zaB9VRopL1IMw=
+        secure: B+xnOLyevbhS/h7zYDlGgSWBSsq9qsZ+OPBnzCF+QN8MJKhQUP3sIT0zX1bCG/pRwijiYirx1aO1wuQgp0vM0Lh58wzrEPGTTgBEvHkak5/4yFGQbLrN6gBGpBPxcF6oo0o8WJO8gYNb3zoqFQ2WUa99/PMT3Tg/+lcUF3aE0YM=
       gem: restify
       on:
         branch: master
         repo: jgraichen/restify
   - stage: Release
-    rvm: '2.4.2'
+    rvm: 2.4.2
     env: []
     script: skip
     install: skip
     deploy:
       provider: rubygems
       api_key:
-        secure: c1d0tzOyDmJmNXjq8fYKEJ6Y8NFtIaH1BUyhMO2ypJ/k3UyRi+7ZQBD7VxSI4SVq/iETqzvTlUAosUWd6ER/LETxa/hb5uWhASa/1pYy5n64URYzmnwzM/sPsbdOYlTVNAnEdYB7Ko9MGWdIBeD8dEB6iX32m+zaB9VRopL1IMw=
+        secure: B+xnOLyevbhS/h7zYDlGgSWBSsq9qsZ+OPBnzCF+QN8MJKhQUP3sIT0zX1bCG/pRwijiYirx1aO1wuQgp0vM0Lh58wzrEPGTTgBEvHkak5/4yFGQbLrN6gBGpBPxcF6oo0o8WJO8gYNb3zoqFQ2WUa99/PMT3Tg/+lcUF3aE0YM=
       gem: restify
       on:
         tags: true
