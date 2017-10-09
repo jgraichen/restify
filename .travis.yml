@@ -11,7 +11,8 @@ rvm:
 - '2.3.4'
 - '2.2.7'
 env:
-- ADAPTER=em-http-request
+- ADAPTER=em
+- ADAPTER=em-pooled
 - ADAPTER=typhoeus
 - ADAPTER=typhoeus-sync
 
