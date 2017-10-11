@@ -16,19 +16,6 @@ env:
 - ADAPTER=typhoeus-sync
 jobs:
   include:
-  - stage: Beta release
-    rvm: 2.4.2
-    env: []
-    script: skip
-    install: skip
-    deploy:
-      provider: rubygems
-      api_key:
-        secure: B+xnOLyevbhS/h7zYDlGgSWBSsq9qsZ+OPBnzCF+QN8MJKhQUP3sIT0zX1bCG/pRwijiYirx1aO1wuQgp0vM0Lh58wzrEPGTTgBEvHkak5/4yFGQbLrN6gBGpBPxcF6oo0o8WJO8gYNb3zoqFQ2WUa99/PMT3Tg/+lcUF3aE0YM=
-      gem: restify
-      on:
-        branch: master
-        repo: jgraichen/restify
   - stage: Release
     rvm: 2.4.2
     env: []
