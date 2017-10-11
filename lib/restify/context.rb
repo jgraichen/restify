@@ -53,7 +53,7 @@ module Restify
         method: method,
         uri: join(uri),
         data: data,
-        headers: options.fetch(:headers, {})
+        headers: headers
 
       ret = cache.call(request) {|req| adapter.call(req) }
       ret.then do |response|
@@ -65,6 +65,26 @@ module Restify
       end
     end
 
+    def encode_with(coder)
+      coder.map = marshal_dump
+    end
+
+    def init_with(coder)
+      marshal_load(coder.map)
+    end
+
+    def marshal_dump
+      {
+        uri: uri.to_s,
+        headers: headers
+      }
+    end
+
+    def marshal_load(dump)
+      initialize dump.delete(:uri), \
+        headers: dump.fetch(:headers)
+    end
+
     private
 
     def adapter
@@ -73,6 +93,10 @@ module Restify
 
     def cache
       options[:cache] || Restify.cache
+    end
+
+    def headers
+      options.fetch(:headers, {})
     end
 
     class << self
