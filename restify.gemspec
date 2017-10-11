@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'An experimental hypermedia REST client that uses ' \
                        'parallel, keep-alive and pipelined requests by default.'
   spec.homepage      = 'https://github.com/jgraichen/restify'
-  spec.license       = 'LGPLv3'
+  spec.license       = 'LGPL-3.0+'
 
   spec.files         = Dir['**/*'].grep(%r{^((bin|lib|test|spec|features)/|
                         .*\.gemspec|.*LICENSE.*|.*README.*|.*CHANGELOG.*)}mi)
