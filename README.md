@@ -26,12 +26,9 @@ Included processors can handle:
 
 Restify requires Ruby 2.0+.
 
-## Restify is still under development
+### Planned features
 
-* It is build on experimental obligation library.
-
-Planned features:
-
+* HTTP cache
 * API versions via header
 * Content-Type and Language negotiation
 * Processors for MessagePack, JSON-HAL, etc.
