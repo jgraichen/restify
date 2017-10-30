@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+
+* Add experimental PooledEM adapter (#10)
+* Improve marshalling of resources
+
 ## 1.1.0
 
 * Return response body if no processor matches (#7)
