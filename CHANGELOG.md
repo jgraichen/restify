@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+* Fix issue with Ruby 2.2 compatibility
+
 ## 1.2.0
 
 * Add experimental PooledEM adapter (#10)
