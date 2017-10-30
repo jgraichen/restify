@@ -62,7 +62,7 @@ module Restify
         #
         def release(conn)
           @available.unshift(conn) if @available.size < @size
-          @used -= 1 if @used.positive?
+          @used -= 1 if @used > 0
 
           Restify.logger.debug(LOG_PROGNAME) do
             "[#{conn.uri}] Released to pool (#{@available.size}/#{@used}/#{size})"
@@ -96,7 +96,7 @@ module Restify
         private
 
         def close(conn)
-          @used -= 1 if @used.positive?
+          @used -= 1 if @used > 0
           @host[conn.uri.to_s] -= 1
 
           conn.close
