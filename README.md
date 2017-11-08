@@ -1,6 +1,6 @@
 # Restify
 
-Restify is an experimental hypermedia REST client that uses parallel, keep-alive and pipelined requests by default.
+Restify is an experimental hypermedia REST client that does parallel, concurrent, keep-alive and pipelined requests by default.
 
 Restify scans Link headers and returned resource for links and relations to other resources, represented as RFC6570 URI Templates, and exposes those to the developer.
 
@@ -10,11 +10,11 @@ Restify is build upon the following libraries:
 
 * [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby)
 * [addressable](https://github.com/sporkmonger/addressable)
-* [em-http-request](https://github.com/igrigorik/em-http-request)
+* [typhoeus](https://github.com/typhoeus/typhoeus)
 
 It has optional HTTP adapters using:
 
-* [typhoeus](https://github.com/typhoeus/typhoeus)
+* [em-http-request](https://github.com/igrigorik/em-http-request)
 
 The HTTP adapters are mostly run in a background thread and may not survive mid-application forks.
 
