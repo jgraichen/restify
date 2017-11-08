@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+
+* Improve typhoeus adapter to better utilize concurrency
+* Default to new typhoeus adapter
+
 ## 1.2.1
 
 * Fix issue with Ruby 2.2 compatibility
