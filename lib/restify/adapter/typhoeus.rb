@@ -13,9 +13,9 @@ module Restify
       }.freeze
 
       def initialize(sync: false, **options)
-        @queue   = Queue.new
         @sync    = sync
         @hydra   = ::Typhoeus::Hydra.new(pipelining: true, **options)
+        @mutex   = Mutex.new
 
         start unless sync?
       end
@@ -24,17 +24,18 @@ module Restify
         @sync
       end
 
-      def queue(request, writer)
-        if sync?
-          @hydra.queue convert request, writer
-          @hydra.run
-        else
-          @queue.push [request, writer]
+      def call_native(request, writer)
+        @mutex.synchronize do
+          @hydra.queue convert(request, writer)
         end
+
+        sync? ? @hydra.run : start
       end
 
-      def call_native(request, writer)
-        queue request, writer
+      def queued?
+        @mutex.synchronize do
+          @hydra.queued_requests.any?
+        end
       end
 
       private
@@ -46,14 +47,11 @@ module Restify
           headers: DEFAULT_HEADERS.merge(request.headers),
           body: request.body
 
-        req.on_complete {|response| handle(response, writer, request) }
+        req.on_complete do |response|
+          writer.fulfill convert_back(response, request)
+        end
+
         req
-      end
-
-      def handle(native_response, writer, request)
-        writer.fulfill convert_back(native_response, request)
-
-        @hydra.queue convert(*@queue.pop(true)) until @queue.empty?
       end
 
       def convert_back(response, request)
@@ -71,15 +69,16 @@ module Restify
         end
       end
 
-      # rubocop:disable Metrics/MethodLength
       def start
-        Thread.new do
+        thread.run
+      end
+
+      def thread
+        @thread ||= Thread.new do
           loop do
             begin
-              while (req = convert(*@queue.pop))
-                @hydra.queue req
-                @hydra.run if @queue.empty?
-              end
+              Thread.stop unless queued?
+              @hydra.run
             rescue StandardError => e
               puts "#{self.class}: #{e.message}"
             end
