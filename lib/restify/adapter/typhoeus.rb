@@ -5,6 +5,9 @@ require 'typhoeus'
 module Restify
   module Adapter
     class Typhoeus < Base
+      # rubocop:disable RedundantFreeze
+      LOG_PROGNAME = 'restify.adapter.typhoeus'.freeze
+
       attr_reader :sync
 
       DEFAULT_HEADERS = {
@@ -78,8 +81,8 @@ module Restify
         @thread ||= Thread.new do
           loop do
             begin
-              Thread.stop unless queued?
               @hydra.run
+              Thread.stop unless queued?
             rescue StandardError => e
               puts "#{self.class}: #{e.message}"
             end
