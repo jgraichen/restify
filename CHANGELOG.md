@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.0
+
+* Fix possible concurrency issue with typhoeus adapter
+* Add timeout option to requests (only supported by typhoeus adapter)
+
 ## 1.3.1
 
 * Improve typhoeus adapters initial request queuing
