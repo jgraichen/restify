@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.1
+
+* Improve typhoeus adapters initial request queuing
+* Disable default pipelining
+
 ## 1.3.0
 
 * Improve typhoeus adapter to better utilize concurrency
