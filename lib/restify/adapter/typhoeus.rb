@@ -27,6 +27,7 @@ module Restify
       def call_native(request, writer)
         @mutex.synchronize do
           @hydra.queue convert(request, writer)
+          @hydra.dequeue_many
         end
 
         sync? ? @hydra.run : start
