@@ -1,6 +1,6 @@
 # Restify
 
-Restify is an experimental hypermedia REST client that does parallel, concurrent, keep-alive and pipelined requests by default.
+Restify is an experimental hypermedia REST client that does parallel, concurrent and keep-alive requests by default.
 
 Restify scans Link headers and returned resource for links and relations to other resources, represented as RFC6570 URI Templates, and exposes those to the developer.
 

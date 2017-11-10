@@ -14,7 +14,7 @@ module Restify
 
       def initialize(sync: false, **options)
         @sync    = sync
-        @hydra   = ::Typhoeus::Hydra.new(pipelining: true, **options)
+        @hydra   = ::Typhoeus::Hydra.new(**options)
         @mutex   = Mutex.new
 
         start unless sync?
