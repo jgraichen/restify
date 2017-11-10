@@ -2,6 +2,25 @@
 
 module Restify
   #
+
+  # A {Timeout} is raised when a request or promise times out.
+  #
+  class Timeout < StandardError
+    attr_reader :source
+
+    def initialize(source)
+      super "Operation with #{source.class} has timed out"
+
+      @source = source
+    end
+  end
+
+  # A {NetworkError} is raised on unusual network exceptions such as
+  # unresolvable hosts or disconnects.
+  #
+  class NetworkError < StandardError
+  end
+
   # A {ResponseError} is returned on a non-successful
   # response from server. Usually it will either be a
   # {ClientError} or a {ServerError}.

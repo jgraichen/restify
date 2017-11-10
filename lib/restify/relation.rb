@@ -20,28 +20,28 @@ module Restify
       @template = Addressable::Template.new template
     end
 
-    def request(method, data, params)
-      context.request method, expand(params), data
+    def request(method, data, params, opts = {})
+      context.request method, expand(params), **opts, data: data
     end
 
-    def get(params = {})
-      request :get, nil, params
+    def get(params = {}, opts = {})
+      request :get, nil, params, opts
     end
 
-    def delete(params = {})
-      request :delete, nil, params
+    def delete(params = {}, opts = {})
+      request :delete, nil, params, opts
     end
 
-    def post(data = {}, params = {})
-      request :post, data, params
+    def post(data = {}, params = {}, opts = {})
+      request :post, data, params, opts
     end
 
-    def put(data = {}, params = {})
-      request :put, data, params
+    def put(data = {}, params = {}, opts = {})
+      request :put, data, params, opts
     end
 
-    def patch(data = {}, params = {})
-      request :patch, data, params
+    def patch(data = {}, params = {}, opts = {})
+      request :patch, data, params, opts
     end
 
     def ==(other)

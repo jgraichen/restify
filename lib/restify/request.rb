@@ -24,10 +24,17 @@ module Restify
     #
     attr_reader :headers
 
+    # Request timeout in seconds
+    #
+    # Defaults to 300 seconds.
+    #
+    attr_reader :timeout
+
     def initialize(opts = {})
       @method  = opts.fetch(:method, :get).downcase
       @uri     = opts.fetch(:uri) { raise ArgumentError.new ':uri required.' }
       @data    = opts.fetch(:data, nil)
+      @timeout = opts.fetch(:timeout, 300)
       @headers = opts.fetch(:headers, {}).merge \
         'Content-Type' => 'application/json'
     end

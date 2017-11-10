@@ -49,10 +49,19 @@ module Restify
           request.uri,
           method: request.method,
           headers: DEFAULT_HEADERS.merge(request.headers),
-          body: request.body
+          body: request.body,
+          followlocation: true,
+          timeout: request.timeout,
+          connecttimeout: request.timeout
 
         req.on_complete do |response|
-          writer.fulfill convert_back(response, request)
+          if response.timed_out?
+            writer.reject Restify::Timeout.new request
+          elsif response.code == 0
+            writer.reject Restify::NetworkError.new response.return_message
+          else
+            writer.fulfill convert_back(response, request)
+          end
         end
 
         req
