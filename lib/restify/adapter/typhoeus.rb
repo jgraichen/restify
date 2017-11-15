@@ -77,7 +77,9 @@ module Restify
       end
 
       def convert_headers(headers)
-        headers.each_with_object({}) do |header, memo|
+        return {} unless headers.respond_to?(:each_pair)
+
+        headers.each_pair.each_with_object({}) do |header, memo|
           memo[header[0].upcase.tr('-', '_')] = header[1]
         end
       end
