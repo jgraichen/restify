@@ -15,6 +15,8 @@ module Restify
       # When any of them are checked out for usage, it counts the usages to
       # prevent constraints being broken.
       class Pool
+        include Logging
+
         def initialize(size: 32, per_host: 6, connect_timeout: 2, inactivity_timeout: 10)
           @size = size
           @per_host = per_host
