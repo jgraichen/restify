@@ -1,7 +1,8 @@
 # Changelog
 
-## 1.4.2
+## 1.4.3
 
+* Add advanced logging capabilities using logging gem
 * Improve compatibility with webmocks returning `nil` as headers
 
 ## 1.4.1
