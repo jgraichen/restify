@@ -41,7 +41,10 @@ RSpec.configure do |config|
   config.order = 'random'
 
   config.before(:each) do
-    Restify.logger.level = Logger::DEBUG
+    Ethon.logger = ::Logging.logger[Ethon] if defined?(Ethon)
+
+    ::Logging.logger.root.level = :debug
+    ::Logging.logger.root.add_appenders ::Logging.appenders.stdout
   end
 
   config.after(:each) do

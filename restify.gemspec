@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'hashie', '~> 3.3'
   spec.add_runtime_dependency 'rack'
   spec.add_runtime_dependency 'typhoeus', '~> 1.3'
+  spec.add_runtime_dependency 'logging', '~> 2.0'
 
   spec.add_development_dependency 'bundler', '~> 1.5'
 

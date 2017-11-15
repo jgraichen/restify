@@ -6,8 +6,7 @@ require 'em-http-request'
 module Restify
   module Adapter
     class PooledEM < Base
-      # rubocop:disable RedundantFreeze
-      LOG_PROGNAME = 'restify.adapter.pooled-em'.freeze
+      include Logging
 
       # This class maintains a pool of connection objects, grouped by origin,
       # and ensures limits for total parallel requests and per-origin requests.
@@ -64,7 +63,7 @@ module Restify
           @available.unshift(conn) if @available.size < @size
           @used -= 1 if @used > 0
 
-          Restify.logger.debug(LOG_PROGNAME) do
+          logger.debug do
             "[#{conn.uri}] Released to pool (#{@available.size}/#{@used}/#{size})"
           end
 
@@ -76,7 +75,7 @@ module Restify
         def remove(conn)
           close(conn)
 
-          Restify.logger.debug(LOG_PROGNAME) do
+          logger.debug do
             "[#{conn.uri}] Removed from pool (#{@available.size}/#{@used}/#{size})"
           end
 
@@ -121,7 +120,7 @@ module Restify
         def reuse_connection(index, origin)
           @used += 1
           @available.delete_at(index).tap do
-            Restify.logger.debug(LOG_PROGNAME) do
+            logger.debug do
               "[#{origin}] Take connection from pool " \
                 "(#{@available.size}/#{@used}/#{size})"
             end
@@ -135,7 +134,7 @@ module Restify
 
           @used += 1
           new(origin).tap do
-            Restify.logger.debug(LOG_PROGNAME) do
+            logger.debug do
               "[#{origin}] Add new connection to pool " \
                 "(#{@available.size}/#{@used}/#{size})"
             end
@@ -145,14 +144,14 @@ module Restify
         def close_oldest
           close(@available.pop)
 
-          Restify.logger.debug(LOG_PROGNAME) do
+          logger.debug do
             "[#{origin}] Closed oldest connection in pool " \
               "(#{@available.size}/#{@used}/#{size})"
           end
         end
 
         def queue(defer)
-          Restify.logger.debug(LOG_PROGNAME) do
+          logger.debug do
             "[#{origin}] Wait for free slot " \
               "(#{@available.size}/#{@used}/#{size})"
           end
@@ -161,7 +160,7 @@ module Restify
         end
 
         def new(origin)
-          Restify.logger.debug(LOG_PROGNAME) do
+          logger.debug do
             "Connect to '#{origin}' " \
             "(#{@connect_timeout}/#{@inactivity_timeout})..."
           end
@@ -263,7 +262,7 @@ module Restify
           begin
             EventMachine.run {}
           rescue => e
-            puts "#{self.class} -> #{e}\n#{e.backtrace.join("\n")}"
+            logger.error(e)
             raise e
           end
         end

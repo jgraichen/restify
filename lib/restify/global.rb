@@ -10,7 +10,6 @@ module Restify
 
     def adapter
       @adapter ||= begin
-        require 'restify/adapter/typhoeus'
         Restify::Adapter::Typhoeus.new
       end
     end
@@ -31,13 +30,11 @@ module Restify
     end
 
     def logger
-      @logger ||= ::Logger.new(STDOUT).tap do |logger|
-        logger.level = :info
-      end
+      ::Logging.logger[Restify]
     end
 
     def logger=(logger)
-      @logger = logger
+
     end
 
     private

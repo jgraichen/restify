@@ -44,5 +44,9 @@ module Restify
         JSON.dump(data) unless data.nil?
       end
     end
+
+    def to_s
+      "#<#{self.class} #{method.upcase} #{uri}>"
+    end
   end
 end

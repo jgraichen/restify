@@ -5,8 +5,7 @@ require 'typhoeus'
 module Restify
   module Adapter
     class Typhoeus < Base
-      # rubocop:disable RedundantFreeze
-      LOG_PROGNAME = 'restify.adapter.typhoeus'.freeze
+      include Logging
 
       attr_reader :sync
 
@@ -27,11 +26,12 @@ module Restify
 
       def call_native(request, writer)
         @mutex.synchronize do
+          logger.debug { "[#{request.object_id}] Queue request #{request}" }
           @hydra.queue convert(request, writer)
           @hydra.dequeue_many
         end
 
-        sync? ? @hydra.run : start
+        sync? ? @hydra.run : thread.run
       end
 
       def queued?
@@ -53,6 +53,8 @@ module Restify
           connecttimeout: request.timeout
 
         req.on_complete do |response|
+          logger.debug { "[#{request.object_id}] Completed: #{response.code}" }
+
           if response.timed_out?
             writer.reject Restify::Timeout.new request
           elsif response.code == 0
@@ -80,21 +82,30 @@ module Restify
         end
       end
 
-      def start
-        thread.run
+      def thread
+        if @thread.nil? || !@thread.status
+          # Recreate thread if nil or dead
+          @thread = Thread.new { _loop }
+        end
+
+        @thread
       end
 
-      def thread
-        @thread ||= Thread.new do
-          loop do
-            begin
-              @hydra.run
-              Thread.stop unless queued?
-            rescue StandardError => e
-              puts "#{self.class}: #{e.message}"
-            end
-          end
+      def _loop
+        loop { _run }
+      end
+
+      def _run
+        if queued?
+          logger.debug { 'Run hydra' }
+          @hydra.run
+          logger.debug { 'Hydra finished' }
+        else
+          logger.debug { 'Pause hydra thread' }
+          Thread.stop
         end
+      rescue StandardError => e
+        logger.error(e)
       end
     end
   end

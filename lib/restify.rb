@@ -12,6 +12,8 @@ require 'addressable/template'
 #
 module Restify
   require 'restify/error'
+  require 'restify/logging'
+
   require 'restify/promise'
   require 'restify/registry'
   require 'restify/global'
@@ -27,14 +29,13 @@ module Restify
 
   module Adapter
     require 'restify/adapter/base'
+    require 'restify/adapter/typhoeus'
   end
 
   module Processors
     require 'restify/processors/base'
     require 'restify/processors/json'
   end
-
-  require 'restify/railtie' if defined?(Rails::Railtie)
 
   PROCESSORS = [Processors::Json].freeze
 

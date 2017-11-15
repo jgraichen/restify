@@ -7,8 +7,6 @@ require 'base64'
 
 require 'pry'
 
-Restify.logger.level = :debug
-
 headers = {}
 
 if ENV['AUTH']
