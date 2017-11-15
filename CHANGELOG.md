@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1
+
+* Fix possible deadlock issues
+
 ## 1.4.0
 
 * Fix possible concurrency issue with typhoeus adapter
