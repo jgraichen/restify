@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.2
+
+* Improve compatibility with webmocks returning `nil` as headers
+
 ## 1.4.1
 
 * Fix possible deadlock issues
