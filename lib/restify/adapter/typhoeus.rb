@@ -36,7 +36,7 @@ module Restify
 
       def queued?
         @mutex.synchronize do
-          @hydra.queued_requests.any?
+          @hydra.queued_requests.any? || @hydra.multi.easy_handles.count > 0
         end
       end
 
