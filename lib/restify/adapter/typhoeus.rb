@@ -16,11 +16,9 @@ module Restify
       }.freeze
 
       def initialize(sync: false, **options)
-        @sync    = sync
-        @hydra   = ::Typhoeus::Hydra.new(**options)
-        @mutex   = Mutex.new
-
-        start unless sync?
+        @sync   = sync
+        @hydra  = ::Typhoeus::Hydra.new(**options)
+        @mutex  = Mutex.new
       end
 
       def sync?
