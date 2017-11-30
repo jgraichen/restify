@@ -18,6 +18,7 @@ module Restify
         @sync   = sync
         @hydra  = ::Typhoeus::Hydra.new(**options)
         @mutex  = Mutex.new
+        @thread
       end
 
       def sync?
@@ -43,7 +44,7 @@ module Restify
       private
 
       def convert(request, writer)
-        req = ::Typhoeus::Request.new \
+        ::Typhoeus::Request.new(
           request.uri,
           method: request.method,
           headers: DEFAULT_HEADERS.merge(request.headers),
@@ -51,20 +52,19 @@ module Restify
           followlocation: true,
           timeout: request.timeout,
           connecttimeout: request.timeout
+        ).tap do |req|
+          req.on_complete do |response|
+            logger.debug { "[#{request.object_id}] Completed: #{response.code}" }
 
-        req.on_complete do |response|
-          logger.debug { "[#{request.object_id}] Completed: #{response.code}" }
-
-          if response.timed_out?
-            writer.reject Restify::Timeout.new request
-          elsif response.code == 0
-            writer.reject Restify::NetworkError.new response.return_message
-          else
-            writer.fulfill convert_back(response, request)
+            if response.timed_out?
+              writer.reject Restify::Timeout.new request
+            elsif response.code == 0
+              writer.reject Restify::NetworkError.new response.return_message
+            else
+              writer.fulfill convert_back(response, request)
+            end
           end
         end
-
-        req
       end
 
       def convert_back(response, request)
