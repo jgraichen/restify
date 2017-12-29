@@ -7,9 +7,10 @@ before_install:
 - gem update --system
 - gem install bundler
 rvm:
-- 2.4.2
-- 2.3.4
-- 2.2.7
+- 2.5.0
+- 2.4.3
+- 2.3.6
+- 2.2.9
 env:
 - ADAPTER=em
 - ADAPTER=em-pooled
@@ -18,7 +19,7 @@ env:
 jobs:
   include:
   - stage: Release
-    rvm: 2.4.2
+    rvm: 2.5.0
     env: []
     script: skip
     install: skip
