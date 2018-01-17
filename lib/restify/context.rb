@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'restify/resource_parsing'
+
 module Restify
   # A resource context.
   #
@@ -8,6 +10,8 @@ module Restify
   # and follow links.
   #
   class Context
+    include ResourceParsing
+
     # Effective context URI.
     #
     # @return [Addressable::URI] Effective context URI.
