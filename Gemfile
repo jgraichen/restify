@@ -9,6 +9,7 @@ gem 'em-http-request'
 gem 'em-synchrony'
 gem 'rake'
 gem 'typhoeus'
+gem 'msgpack', '~> 1.0'
 
 group :test do
   gem 'coveralls'
