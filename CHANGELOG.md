@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.4
+
+* Fix race condition in typhoeus adapter
+* Add `#request` to `NetworkError` to ease debugging
+
 ## 1.4.3
 
 * Add advanced logging capabilities using logging gem
