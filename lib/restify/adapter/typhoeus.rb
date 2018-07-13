@@ -18,7 +18,7 @@ module Restify
         @sync   = sync
         @hydra  = ::Typhoeus::Hydra.new(**options)
         @mutex  = Mutex.new
-        @thread
+        @signal = ConditionVariable.new
       end
 
       def sync?
@@ -30,18 +30,25 @@ module Restify
           logger.debug { "[#{request.object_id}] Queue request #{request}" }
           @hydra.queue convert(request, writer)
           @hydra.dequeue_many
-        end
 
-        sync? ? @hydra.run : thread.run
+          if sync?
+            @hydra.run
+          else
+            thread.run
+            @signal.signal
+          end
+        end
       end
 
       def queued?
-        @mutex.synchronize do
-          @hydra.queued_requests.any? || @hydra.multi.easy_handles.count > 0
-        end
+        @mutex.synchronize { ns_queued? }
       end
 
       private
+
+      def ns_queued?
+        @hydra.queued_requests.any? || @hydra.multi.easy_handles.count > 0
+      end
 
       def convert(request, writer)
         ::Typhoeus::Request.new(
@@ -103,8 +110,11 @@ module Restify
           @hydra.run
           logger.debug { 'Hydra finished' }
         else
-          logger.debug { 'Pause hydra thread' }
-          Thread.stop
+          @mutex.synchronize do
+            return if ns_queued?
+            logger.debug { 'Pause hydra thread' }
+            @signal.wait(@mutex)
+          end
         end
       rescue StandardError => e
         logger.error(e)
