@@ -9,6 +9,11 @@ require 'pry'
 
 headers = {}
 
+if ENV['LOGGING']
+  ::Logging.logger.root.add_appenders Logging.appenders.stdout
+  ::Logging.logger.root.level = :debug
+end
+
 if ENV['AUTH']
   auth = Base64.encode64(ENV['AUTH']).gsub(/\s+/, '').strip
   headers['Authorization'] = "Basic #{auth}"
