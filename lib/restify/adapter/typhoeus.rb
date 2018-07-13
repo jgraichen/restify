@@ -59,7 +59,7 @@ module Restify
             if response.timed_out?
               writer.reject Restify::Timeout.new request
             elsif response.code == 0
-              writer.reject Restify::NetworkError.new response.return_message
+              writer.reject Restify::NetworkError.new request, response.return_message
             else
               writer.fulfill convert_back(response, request)
             end

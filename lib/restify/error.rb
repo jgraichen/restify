@@ -19,6 +19,12 @@ module Restify
   # unresolvable hosts or disconnects.
   #
   class NetworkError < StandardError
+    attr_reader :request
+    
+    def initialize(request, message)
+      @request = request
+      super("[#{request.uri}] #{message}")
+    end
   end
 
   # A {ResponseError} is returned on a non-successful
