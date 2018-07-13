@@ -8,6 +8,7 @@ gemspec
 gem 'em-http-request'
 gem 'em-synchrony'
 gem 'rake'
+gem 'rake-release'
 gem 'typhoeus'
 
 group :test do
