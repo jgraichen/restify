@@ -10,6 +10,7 @@ gem 'em-synchrony'
 gem 'rake'
 gem 'rake-release'
 gem 'typhoeus'
+gem 'msgpack', '~> 1.0'
 
 group :test do
   gem 'coveralls'

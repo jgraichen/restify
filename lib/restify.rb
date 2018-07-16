@@ -35,9 +35,10 @@ module Restify
   module Processors
     require 'restify/processors/base'
     require 'restify/processors/json'
+    require 'restify/processors/msgpack'
   end
 
-  PROCESSORS = [Processors::Json].freeze
+  PROCESSORS = [Processors::Json, Processors::Msgpack].freeze
 
   extend Global
 end
