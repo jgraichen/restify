@@ -2,6 +2,8 @@
 
 require 'typhoeus'
 
+::Ethon.logger = ::Logging.logger[Ethon]
+
 module Restify
   module Adapter
     class Typhoeus < Base
@@ -26,29 +28,25 @@ module Restify
       end
 
       def call_native(request, writer)
-        @mutex.synchronize do
-          logger.debug { "[#{request.object_id}] Queue request #{request}" }
-          @hydra.queue convert(request, writer)
-          @hydra.dequeue_many
+        req = convert(request, writer)
 
-          if sync?
-            @hydra.run
-          else
-            thread.run
-            @signal.signal
+        if sync?
+          req.run
+        else
+          @mutex.synchronize do
+            logger.debug { "[#{self.object_id}/#{Thread.current.object_id}] [#{request.object_id}] request:add method=#{request.method.upcase} url=#{request.uri}" }
+            @hydra.queue(req)
+            @hydra.dequeue_many
+
+            thread.run unless thread.status
           end
+
+          logger.debug { "[#{self.object_id}/#{Thread.current.object_id}] [#{request.object_id}] request:signal" }
+          @signal.signal
         end
       end
 
-      def queued?
-        @mutex.synchronize { ns_queued? }
-      end
-
       private
-
-      def ns_queued?
-        @hydra.queued_requests.any? || @hydra.multi.easy_handles.count > 0
-      end
 
       def convert(request, writer)
         ::Typhoeus::Request.new(
@@ -61,7 +59,7 @@ module Restify
           connecttimeout: request.timeout
         ).tap do |req|
           req.on_complete do |response|
-            logger.debug { "[#{request.object_id}] Completed: #{response.code}" }
+            logger.debug { "[#{self.object_id}/#{Thread.current.object_id}] [#{request.object_id}] request:complete status=#{response.code}" }
 
             if response.timed_out?
               writer.reject Restify::Timeout.new request
@@ -94,6 +92,7 @@ module Restify
       def thread
         if @thread.nil? || !@thread.status
           # Recreate thread if nil or dead
+          logger.debug { "[#{self.object_id}/#{Thread.current.object_id}] hydra:spawn" }
           @thread = Thread.new { _loop }
         end
 
@@ -101,20 +100,25 @@ module Restify
       end
 
       def _loop
+        Thread.current.name = 'Restify/Typhoeus Background'
         loop { _run }
       end
 
+      def _ongoing?
+        @hydra.queued_requests.any? || @hydra.multi.easy_handles.any?
+      end
+
       def _run
-        if queued?
-          logger.debug { 'Run hydra' }
-          @hydra.run
-          logger.debug { 'Hydra finished' }
-        else
-          @mutex.synchronize do
-            return if ns_queued?
-            logger.debug { 'Pause hydra thread' }
-            @signal.wait(@mutex)
-          end
+        logger.debug { "[#{self.object_id}/#{Process.pid}] hydra:run" }
+        @hydra.run while _ongoing?
+        logger.debug { "[#{self.object_id}/#{Thread.current.object_id}] hydra:completed" }
+
+        @mutex.synchronize do
+          return if _ongoing?
+
+          logger.debug { "[#{self.object_id}/#{Thread.current.object_id}] hydra:pause" }
+          @signal.wait(@mutex, 60)
+          logger.debug { "[#{self.object_id}/#{Thread.current.object_id}] hydra:resumed" }
         end
       rescue StandardError => e
         logger.error(e)
