@@ -1,7 +1,8 @@
 # Changelog
 
-## 1.5 (next)
+## 1.5.0
 
+* Tune typhoeus adapter to be more race-condition resilent
 * Add MessagePack processor enabled by default
 
 ## 1.4.4
