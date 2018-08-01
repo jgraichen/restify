@@ -16,6 +16,24 @@ describe Restify do
     end
   end
 
+  context 'with request headers configured for a single request' do
+    let(:context) { Restify.new('http://localhost/base') }
+
+    it 'sends the headers only for that request' do
+      root = context.get(
+        {},
+        headers: {'Accept' => 'application/msgpack, application/json'}
+      ).value!
+
+      root.rel(:self).get.value!
+
+      expect(request_stub).to have_been_requested.twice
+      expect(
+        request_stub.with(headers: {'Accept' => 'application/msgpack, application/json'})
+      ).to have_been_requested.once
+    end
+  end
+
   context 'with request headers configured for context' do
     let(:context) do
       Restify.new(
