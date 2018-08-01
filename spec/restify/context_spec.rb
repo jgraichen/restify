@@ -13,8 +13,8 @@ describe Restify::Context do
       describe '#uri' do
         subject { super().uri }
 
-        it { expect(subject).to be_a Addressable::URI }
-        it { expect(subject).to eq context.uri }
+        it { is_expected.to be_a Addressable::URI }
+        it { is_expected.to eq context.uri }
       end
 
       describe '#adapter' do
@@ -36,11 +36,11 @@ describe Restify::Context do
       end
 
       describe '#headers' do
-        let(:kwargs) { {headers: {'Accept': 'application/json'}} }
+        let(:kwargs) { {headers: {'Accept' => 'application/json'}} }
         subject { super().options[:headers] }
 
-        it do
-          expect(subject).to eq context.send :headers
+        it 'all headers are serialized' do
+          expect(subject).to eq({'Accept' => 'application/json'})
         end
       end
     end
