@@ -49,11 +49,12 @@ module Restify
 
     # rubocop:disable Metrics/MethodLength
     def request(method, uri, data: nil, **kwargs)
-      request = Request.new(**kwargs,
+      request = Request.new(
+        headers: headers,
+        **kwargs,
         method: method,
         uri: join(uri),
-        data: data,
-        headers: headers
+        data: data
       )
 
       ret = cache.call(request) {|req| adapter.call(req) }
