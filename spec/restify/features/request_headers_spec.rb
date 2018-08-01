@@ -67,5 +67,21 @@ describe Restify do
         request_stub.with(headers: {'Accept' => 'application/msgpack, application/json'})
       ).to have_been_requested.once
     end
+
+    it 'can add additional headers for single requests' do
+      root = context.get(
+        {},
+        headers: {'X-Custom' => 'foobar'}
+      ).value!
+
+      root.rel(:self).get.value!
+
+      expect(
+        request_stub.with(headers: {'Accept' => 'application/msgpack, application/json'})
+      ).to have_been_requested.twice
+      expect(
+        request_stub.with(headers: {'Accept' => 'application/msgpack, application/json', 'X-Custom' => 'foobar'})
+      ).to have_been_requested.once
+    end
   end
 end
