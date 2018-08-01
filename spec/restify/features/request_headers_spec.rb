@@ -51,5 +51,21 @@ describe Restify do
         request_stub.with(headers: {'Accept' => 'application/msgpack, application/json'})
       ).to have_been_requested.twice
     end
+
+    it 'can overwrite headers for single requests' do
+      root = context.get(
+        {},
+        headers: {'Accept' => 'application/xml'}
+      ).value!
+
+      root.rel(:self).get.value!
+
+      expect(
+        request_stub.with(headers: {'Accept' => 'application/xml'})
+      ).to have_been_requested.once
+      expect(
+        request_stub.with(headers: {'Accept' => 'application/msgpack, application/json'})
+      ).to have_been_requested.once
+    end
   end
 end
