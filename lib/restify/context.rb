@@ -48,9 +48,9 @@ module Restify
     end
 
     # rubocop:disable Metrics/MethodLength
-    def request(method, uri, data: nil, **kwargs)
+    def request(method, uri, data: nil, headers: {}, **kwargs)
       request = Request.new(
-        headers: headers,
+        headers: default_headers.merge(headers),
         **kwargs,
         method: method,
         uri: join(uri),
@@ -78,7 +78,7 @@ module Restify
     def marshal_dump
       {
         uri: uri.to_s,
-        headers: headers
+        headers: default_headers
       }
     end
 
@@ -97,7 +97,7 @@ module Restify
       options[:cache] || Restify.cache
     end
 
-    def headers
+    def default_headers
       options.fetch(:headers, {})
     end
 
