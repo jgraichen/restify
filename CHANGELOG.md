@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0 (unreleased)
+
+* Specify headers on restify clients and individual requests (#14)
+
 ## 1.5.0
 
 * Tune typhoeus adapter to be more race-condition resilent
