@@ -20,7 +20,8 @@ The HTTP adapters are mostly run in a background thread and may not survive mid-
 
 Included processors can handle:
 
-* Plain JSON with GitHub-Style relations
+* Plain JSON with GitHub-style relations
+* MessagePack with GitHub-style relations *(currently experimental)*
 
 (Beside HTTP Link header that's always supported)
 
@@ -31,7 +32,7 @@ Restify requires Ruby 2.0+.
 * HTTP cache
 * API versions via header
 * Content-Type and Language negotiation
-* Processors for MessagePack, JSON-HAL, etc.
+* Processors for JSON-HAL, etc.
 
 ## Installation
 
