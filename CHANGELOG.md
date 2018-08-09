@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.6.0 (unreleased)
+## 1.6.0
 
 * Specify headers on restify clients and individual requests (#14)
 
