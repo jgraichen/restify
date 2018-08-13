@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 describe Restify::Promise do
+  let(:promise) { described_class.new }
+
   describe 'factory methods' do
     describe '#fulfilled' do
       subject { described_class.fulfilled(fulfill_value) }
@@ -160,6 +162,24 @@ describe Restify::Promise do
       it 'can use the dependencies to calculate the value' do
         expect(subject).to eq 17
       end
+    end
+  end
+
+  describe '#wait' do
+    it 'can time out' do
+      expect { promise.wait(0.1) }.to raise_error ::Timeout::Error
+    end
+  end
+
+  describe '#value' do
+    it 'can time out' do
+      expect { promise.value!(0.1) }.to raise_error ::Timeout::Error
+    end
+  end
+
+  describe '#value!' do
+    it 'can time out' do
+      expect { promise.value!(0.1) }.to raise_error ::Timeout::Error
     end
   end
 end

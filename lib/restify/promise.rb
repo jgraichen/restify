@@ -14,8 +14,13 @@ module Restify
     end
 
     def wait(timeout = nil)
-      execute(timeout) if pending?
-      super
+      Timeout.new(timeout, self).tap do |t|
+        execute(t) if pending?
+
+        super
+        raise t if incomplete?
+        self
+      end
     end
 
     def then(&block)
@@ -29,9 +34,7 @@ module Restify
     protected
 
     # @!visibility private
-    def ns_execute(timeout)
-      timeout = get_timeout(timeout)
-
+    def ns_execute(timeout = nil)
       return unless compare_and_set_state(:processing, :pending)
       return unless @task || @dependencies.any?
 
@@ -44,15 +47,16 @@ module Restify
     end
 
     # @!visibility private
-    def ns_exec(timeout)
-      ::Timeout.timeout(timeout) do
-        args  = @dependencies.map {|d| d.value!(timeout) }
-        value = @task ? @task.call(*args) : args
+    def ns_exec(timeout = nil)
+      t = Timeout.new(timeout, self)
 
-        value = value.value!(timeout) while value.is_a?(Restify::Promise)
-
-        value
+      args = @dependencies.map do |d|
+        t.wait_on!(d)
       end
+
+      value = @task ? @task.call(*args) : args
+      value = t.wait_on!(value) while value.is_a?(Promise)
+      value
     end
 
     class << self
@@ -87,24 +91,6 @@ module Restify
       def reject(reason)
         @promise.send :complete, false, nil, reason
       end
-    end
-
-    private
-
-    def get_timeout(timeout)
-      return DEFAULT_TIMEOUT if timeout.nil?
-
-      begin
-        timeout = Integer(timeout)
-      rescue ArgumentError
-        raise ArgumentError.new 'Timeout must be an integer'
-      end
-
-      if timeout < 1
-        raise ArgumentError.new 'Timeout must be > 0.'
-      end
-
-      timeout
     end
   end
 end

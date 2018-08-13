@@ -12,6 +12,7 @@ require 'addressable/template'
 module Restify
   require 'restify/error'
   require 'restify/logging'
+  require 'restify/timeout'
 
   require 'restify/promise'
   require 'restify/registry'
