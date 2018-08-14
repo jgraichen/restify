@@ -3,9 +3,6 @@
 module Restify
   #
   class Promise < Concurrent::IVar
-    # Default wait timeout of 30 seconds.
-    DEFAULT_TIMEOUT = 300
-
     def initialize(*dependencies, &task)
       @task         = task
       @dependencies = dependencies.flatten

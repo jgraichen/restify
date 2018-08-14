@@ -4,7 +4,12 @@ require 'hitimes'
 
 module Restify
   class Timeout
-    DEFAULT = 300
+    class << self
+      attr_accessor :default_timeout
+    end
+
+    # Default wait timeout of 300 seconds.
+    self.default_timeout = 300
 
     def initialize(timeout, target = nil)
       @timeout = parse_timeout(timeout)
@@ -37,7 +42,7 @@ module Restify
     end
 
     def parse_timeout(value)
-      return DEFAULT if value.nil?
+      return self.class.default_timeout if value.nil?
 
       begin
         value = Float(value)
