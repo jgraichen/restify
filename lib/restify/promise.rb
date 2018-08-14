@@ -14,13 +14,13 @@ module Restify
     end
 
     def wait(timeout = nil)
-      Timeout.new(timeout, self).tap do |t|
-        execute(t) if pending?
+      t = Timeout.new(timeout, self)
 
-        super
-        raise t if incomplete?
-        self
-      end
+      execute(t) if pending?
+
+      super
+      raise t if incomplete?
+      self
     end
 
     def then(&block)
