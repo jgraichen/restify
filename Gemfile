@@ -15,6 +15,7 @@ group :test do
   gem 'coveralls'
   gem 'rspec', '~> 3.0'
   gem 'rspec-collection_matchers'
+  gem 'rubocop', '~> 0.58.0'
   gem 'webmock'
 end
 

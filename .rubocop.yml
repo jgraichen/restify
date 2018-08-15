@@ -1,7 +1,27 @@
 AllCops:
   Include:
     - '**/*.rb'
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 2.2
+
+
+Layout/AlignParameters:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/CaseIndentation:
+  EnforcedStyle: end
+  SupportedStyles:
+    - case
+    - end
+  IndentOneStep: true
+
+Layout/SpaceInsideBlockBraces:
+  EnforcedStyle: space
+  EnforcedStyleForEmptyBraces: no_space
+  SpaceBeforeBlockParameters: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
 
 Metrics/BlockLength:
   Exclude:
@@ -11,14 +31,9 @@ Metrics/LineLength:
   Exclude:
     - 'spec/**/*_spec.rb'
 
-Style/AlignParameters:
-  EnforcedStyle: with_fixed_indentation
 
 Style/BracesAroundHashParameters:
   EnforcedStyle: context_dependent
-
-Style/SpaceInsideHashLiteralBraces:
-  EnforcedStyle: no_space
 
 Style/RaiseArgs:
   EnforcedStyle: compact
@@ -26,28 +41,11 @@ Style/RaiseArgs:
 Style/Documentation:
   Enabled: false
 
-Style/SpaceInsideBlockBraces:
-  EnforcedStyle: space
-  EnforcedStyleForEmptyBraces: no_space
-  SpaceBeforeBlockParameters: false
-
 Style/SignalException:
   EnforcedStyle: only_raise
-
-Style/CaseIndentation:
-  EnforcedStyle: end
-  SupportedStyles:
-    - case
-    - end
-  IndentOneStep: true
 
 Style/ClassAndModuleChildren:
   Enabled: false
 
 Style/TrivialAccessors:
   AllowPredicates: true
-
-Style/FileName:
-  Exclude:
-    - Rakefile
-    - Gemfile
