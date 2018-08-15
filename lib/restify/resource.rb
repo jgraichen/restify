@@ -3,7 +3,6 @@
 require 'delegate'
 
 module Restify
-  #
   class Resource < SimpleDelegator
     # @api private
     #

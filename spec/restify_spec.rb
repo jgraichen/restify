@@ -49,7 +49,7 @@ describe Restify do
             Transfer-Encoding: chunked
 
             {"errors":{"name":["can't be blank"]}}
-          EOF
+        EOF
       end
 
       stub_request(:post, 'http://localhost/base/users')
@@ -67,7 +67,7 @@ describe Restify do
               "blurb_url": "http://localhost/base/users/john.smith/blurb",
               "languages": ["de", "en"]
             }
-          EOF
+        EOF
       end
 
       stub_request(:get, 'http://localhost/base/users/john.smith')

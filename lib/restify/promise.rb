@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Restify
-  #
   class Promise < Concurrent::IVar
     def initialize(*dependencies, &task)
       @task         = task

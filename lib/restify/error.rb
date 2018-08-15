@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module Restify
-  #
-
   # A {NetworkError} is raised on unusual network exceptions such as
   # unresolvable hosts or disconnects.
   #

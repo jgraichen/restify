@@ -263,7 +263,7 @@ module Restify
         Thread.new do
           begin
             EventMachine.run {}
-          rescue => e
+          rescue StandardError => e
             logger.error(e)
             raise e
           end

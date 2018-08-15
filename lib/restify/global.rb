@@ -33,9 +33,7 @@ module Restify
       ::Logging.logger[Restify]
     end
 
-    def logger=(logger)
-
-    end
+    def logger=(logger); end
 
     private
 

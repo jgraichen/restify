@@ -22,7 +22,7 @@ describe Restify do
     it 'sends the headers only for that request' do
       root = context.get(
         {},
-        headers: {'Accept' => 'application/msgpack, application/json'}
+        {headers: {'Accept' => 'application/msgpack, application/json'}}
       ).value!
 
       root.rel(:self).get.value!
@@ -55,7 +55,7 @@ describe Restify do
     it 'can overwrite headers for single requests' do
       root = context.get(
         {},
-        headers: {'Accept' => 'application/xml'}
+        {headers: {'Accept' => 'application/xml'}}
       ).value!
 
       root.rel(:self).get.value!
@@ -71,7 +71,7 @@ describe Restify do
     it 'can add additional headers for single requests' do
       root = context.get(
         {},
-        headers: {'X-Custom' => 'foobar'}
+        {headers: {'X-Custom' => 'foobar'}}
       ).value!
 
       root.rel(:self).get.value!

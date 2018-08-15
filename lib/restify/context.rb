@@ -35,7 +35,7 @@ module Restify
     end
 
     def inherit(uri, **kwargs)
-      uri = self.uri unless uri
+      uri ||= self.uri
       Context.new uri, kwargs.merge(options)
     end
 

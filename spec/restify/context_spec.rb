@@ -40,7 +40,7 @@ describe Restify::Context do
         subject { super().options[:headers] }
 
         it 'all headers are serialized' do
-          expect(subject).to eq({'Accept' => 'application/json'})
+          expect(subject).to eq('Accept' => 'application/json')
         end
       end
     end

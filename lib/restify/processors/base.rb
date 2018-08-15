@@ -1,16 +1,12 @@
 # frozen_string_literal: true
 
 module Restify
-  #
   module Processors
-    #
     class Base
       extend Forwardable
 
-      #
       attr_reader :context
 
-      #
       attr_reader :response
 
       def initialize(context, response)

@@ -101,7 +101,7 @@ module Restify
             else
               begin
                 raise "(#{req.response_header.status}) #{req.error}"
-              rescue => e
+              rescue StandardError => e
                 writer.reject e
               end
             end
@@ -128,7 +128,7 @@ module Restify
         Thread.new do
           begin
             EventMachine.run {}
-          rescue => e
+          rescue StandardError => e
             puts "#{self.class} -> #{e}\n#{e.backtrace.join("\n")}"
             raise e
           end

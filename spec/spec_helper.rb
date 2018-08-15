@@ -48,8 +48,6 @@ RSpec.configure do |config|
   end
 
   config.after(:all) do
-    if defined?(EventMachine) && EventMachine.reactor_running?
-      EventMachine.stop
-    end
+    EventMachine.stop if defined?(EventMachine) && EventMachine.reactor_running?
   end
 end
