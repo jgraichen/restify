@@ -1,6 +1,8 @@
 # Restify
 
-Restify is an experimental hypermedia REST client that does parallel, concurrent and keep-alive requests by default.
+[![Build Status](https://travis-ci.org/jgraichen/restify.svg?branch=master)](https://travis-ci.org/jgraichen/restify)
+
+Restify is an hypermedia REST client that does parallel, concurrent and keep-alive requests by default.
 
 Restify scans Link headers and returned resource for links and relations to other resources, represented as RFC6570 URI Templates, and exposes those to the developer.
 
@@ -121,7 +123,7 @@ See commented example in main spec [`spec/restify_spec.rb`](https://github.com/j
 
 ## License
 
-Copyright (C) 2014-2015 Jan Graichen
+Copyright (C) 2014-2018 Jan Graichen
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
