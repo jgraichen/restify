@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.7.0 (unreleased)
+## 1.7.0
 
 * Introduce promise dependency timeouts (#15)
 
