@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0 (unreleased)
+
+* Introduce promise dependency timeouts (#15)
+
 ## 1.6.0
 
 * Specify headers on restify clients and individual requests (#14)
