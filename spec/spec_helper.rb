@@ -51,7 +51,7 @@ RSpec.configure do |config|
     ::Logging.logger.root.add_appenders ::Logging.appenders.stdout
   end
 
-  config.after(:all) do
+  config.after(:suite) do
     EventMachine.stop if defined?(EventMachine) && EventMachine.reactor_running?
   end
 end
