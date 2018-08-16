@@ -40,6 +40,10 @@ Dir[File.expand_path('spec/support/**/*.rb')].each {|f| require f }
 RSpec.configure do |config|
   config.order = 'random'
 
+  config.before(:suite) do
+    ::Restify::Timeout.default_timeout = 2
+  end
+
   config.before(:each) do
     Ethon.logger = ::Logging.logger[Ethon] if defined?(Ethon)
 
