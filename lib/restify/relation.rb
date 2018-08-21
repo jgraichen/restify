@@ -27,6 +27,10 @@ module Restify
       request :get, nil, params, opts
     end
 
+    def head(params = {}, opts = {})
+      request :head, nil, params, opts
+    end
+
     def delete(params = {}, opts = {})
       request :delete, nil, params, opts
     end
