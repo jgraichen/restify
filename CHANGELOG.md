@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.0
+
+* Add HEAD request method (#16)
+
 ## 1.7.0
 
 * Introduce promise dependency timeouts (#15)
