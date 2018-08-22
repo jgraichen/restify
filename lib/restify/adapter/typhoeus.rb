@@ -27,6 +27,8 @@ module Restify
         @sync
       end
 
+      # rubocop:disable AbcSize
+      # rubocop:disable MethodLength
       def call_native(request, writer)
         req = convert(request, writer)
 
@@ -50,9 +52,12 @@ module Restify
           @signal.signal
         end
       end
+      # rubocop:enable all
 
       private
 
+      # rubocop:disable AbcSize
+      # rubocop:disable MethodLength
       def convert(request, writer)
         ::Typhoeus::Request.new(
           request.uri,
@@ -79,6 +84,7 @@ module Restify
           end
         end
       end
+      # rubocop:enable all
 
       def convert_back(response, request)
         uri     = request.uri
@@ -117,6 +123,7 @@ module Restify
         @hydra.queued_requests.any? || @hydra.multi.easy_handles.any?
       end
 
+      # rubocop:disable MethodLength
       def _run
         debug 'hydra:run'
         @hydra.run while _ongoing?
@@ -132,6 +139,7 @@ module Restify
       rescue StandardError => e
         logger.error(e)
       end
+      # rubocop:enable all
 
       def _log_prefix
         "[#{object_id}/#{Thread.current.object_id}]"

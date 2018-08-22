@@ -80,6 +80,7 @@ module Restify
         raise 'Nothing to follow'
       end
     end
+    # rubocop:enable all
 
     # @api private
     def _restify_relations

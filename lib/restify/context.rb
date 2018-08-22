@@ -66,6 +66,7 @@ module Restify
         end
       end
     end
+    # rubocop:enable all
 
     def encode_with(coder)
       coder.map = marshal_dump

@@ -5,14 +5,14 @@ require 'spec_helper'
 describe Restify do
   let!(:request_stub) do
     stub_request(:get, 'http://localhost/base').to_return do
-      <<-EOF.gsub(/^ {8}/, '')
+      <<-RESPONSE.gsub(/^ {8}/, '')
         HTTP/1.1 200 OK
         Content-Type: application/json
         Transfer-Encoding: chunked
         Link: <http://localhost/base>; rel="self"
 
         { "response": "success" }
-      EOF
+      RESPONSE
     end
   end
 

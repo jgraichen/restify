@@ -104,6 +104,7 @@ module Restify
         end
       end
     end
+    # rubocop:enable all
 
     # Return content type header from response headers.
     #

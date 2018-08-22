@@ -37,6 +37,7 @@ module Restify
             requests << [request, writer, retried]
           end
         end
+        # rubocop:enable all
 
         def connection
           @connection ||= EventMachine::HttpRequest.new(origin)
@@ -107,6 +108,7 @@ module Restify
             end
           end
         end
+        # rubocop:enable all
       end
 
       def call_native(request, writer)

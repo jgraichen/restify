@@ -6,7 +6,7 @@ describe Restify do
   context 'as a dynamic HATEOAS client' do
     before do
       stub_request(:get, 'http://localhost/base').to_return do
-        <<-EOF.gsub(/^ {10}/, '')
+        <<-RESPONSE.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
           Content-Type: application/json
           Transfer-Encoding: chunked
@@ -18,11 +18,11 @@ describe Restify do
             "search_url": "http://localhost/base/search?q={query}",
             "mirror_url": null
           }
-        EOF
+        RESPONSE
       end
 
       stub_request(:get, 'http://localhost/base/users').to_return do
-        <<-EOF.gsub(/^ {10}/, '')
+        <<-RESPONSE.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
           Content-Type: application/json
           Transfer-Encoding: chunked
@@ -37,25 +37,25 @@ describe Restify do
              "name": "Jane Smith",
              "self_url": "http://localhost/base/user/jane.smith"
            }]
-        EOF
+        RESPONSE
       end
 
       stub_request(:post, 'http://localhost/base/users')
         .with(body: {})
         .to_return do
-        <<-EOF.gsub(/^ {12}/, '')
+        <<-RESPONSE.gsub(/^ {12}/, '')
             HTTP/1.1 422 Unprocessable Entity
             Content-Type: application/json
             Transfer-Encoding: chunked
 
             {"errors":{"name":["can't be blank"]}}
-        EOF
+        RESPONSE
       end
 
       stub_request(:post, 'http://localhost/base/users')
         .with(body: {name: 'John Smith'})
         .to_return do
-        <<-EOF.gsub(/^ {12}/, '')
+        <<-RESPONSE.gsub(/^ {12}/, '')
             HTTP/1.1 201 Created
             Content-Type: application/json
             Location: http://localhost/base/users/john.smith
@@ -67,12 +67,12 @@ describe Restify do
               "blurb_url": "http://localhost/base/users/john.smith/blurb",
               "languages": ["de", "en"]
             }
-        EOF
+        RESPONSE
       end
 
       stub_request(:get, 'http://localhost/base/users/john.smith')
         .to_return do
-        <<-EOF.gsub(/^ {10}/, '')
+        <<-RESPONSE.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
           Content-Type: application/json
           Link: <http://localhost/base/users/john.smith>; rel="self"
@@ -82,12 +82,12 @@ describe Restify do
             "name": "John Smith",
             "url": "http://localhost/base/users/john.smith"
           }
-        EOF
+        RESPONSE
       end
 
       stub_request(:get, 'http://localhost/base/users/john.smith/blurb')
         .to_return do
-        <<-EOF.gsub(/^ {10}/, '')
+        <<-RESPONSE.gsub(/^ {10}/, '')
           HTTP/1.1 200 OK
           Content-Type: application/json
           Link: <http://localhost/base/users/john.smith>; rel="user"
@@ -97,7 +97,7 @@ describe Restify do
             "title": "Prof. Dr. John Smith",
             "image": "http://example.org/avatar.png"
           }
-        EOF
+        RESPONSE
       end
     end
 
