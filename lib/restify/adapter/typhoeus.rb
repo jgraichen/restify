@@ -34,14 +34,19 @@ module Restify
           req.run
         else
           @mutex.synchronize do
-            logger.debug { "[#{object_id}/#{Thread.current.object_id}] [#{request.object_id}] request:add method=#{request.method.upcase} url=#{request.uri}" }
+            debug 'request:add',
+              tag: request.object_id,
+              method: request.method.upcase,
+              url: request.uri
+
             @hydra.queue(req)
             @hydra.dequeue_many
 
             thread.run unless thread.status
           end
 
-          logger.debug { "[#{object_id}/#{Thread.current.object_id}] [#{request.object_id}] request:signal" }
+          debug 'request:signal', tag: request.object_id
+
           @signal.signal
         end
       end
@@ -59,12 +64,15 @@ module Restify
           connecttimeout: request.timeout
         ).tap do |req|
           req.on_complete do |response|
-            logger.debug { "[#{object_id}/#{Thread.current.object_id}] [#{request.object_id}] request:complete status=#{response.code}" }
+            debug 'request:complete',
+              tag: request.object_id,
+              status: response.code
 
             if response.timed_out?
               writer.reject Restify::Timeout.new request
-            elsif response.code == 0
-              writer.reject Restify::NetworkError.new request, response.return_message
+            elsif response.code.zero?
+              writer.reject \
+                Restify::NetworkError.new(request, response.return_message)
             else
               writer.fulfill convert_back(response, request)
             end
@@ -92,7 +100,8 @@ module Restify
       def thread
         if @thread.nil? || !@thread.status
           # Recreate thread if nil or dead
-          logger.debug { "[#{object_id}/#{Thread.current.object_id}] hydra:spawn" }
+          debug 'hydra:spawn'
+
           @thread = Thread.new { _loop }
         end
 
@@ -109,19 +118,23 @@ module Restify
       end
 
       def _run
-        logger.debug { "[#{object_id}/#{Process.pid}] hydra:run" }
+        debug 'hydra:run'
         @hydra.run while _ongoing?
-        logger.debug { "[#{object_id}/#{Thread.current.object_id}] hydra:completed" }
+        debug 'hydra:completed'
 
         @mutex.synchronize do
           return if _ongoing?
 
-          logger.debug { "[#{object_id}/#{Thread.current.object_id}] hydra:pause" }
+          debug 'hydra:pause'
           @signal.wait(@mutex, 60)
-          logger.debug { "[#{object_id}/#{Thread.current.object_id}] hydra:resumed" }
+          debug 'hydra:resumed'
         end
       rescue StandardError => e
         logger.error(e)
+      end
+
+      def _log_prefix
+        "[#{object_id}/#{Thread.current.object_id}]"
       end
     end
   end
