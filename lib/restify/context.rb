@@ -59,7 +59,7 @@ module Restify
 
       ret = cache.call(request) {|req| adapter.call(req) }
       ret.then do |response|
-        if response.success?
+        if !response.errored?
           process response
         else
           Context.raise_response_error(response)

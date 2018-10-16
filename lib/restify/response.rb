@@ -123,6 +123,15 @@ module Restify
       (200...300).cover? code
     end
 
+    # Check if response is erroneous e.g. the status code
+    # is one of 4XX or 5XX.
+    #
+    # @return [Boolean] True if status code is 2XX otherwise false.
+    #
+    def errored?
+      (400...600).cover? code
+    end
+
     # @api private
     def decoded_body
       @decoded_body ||= begin
