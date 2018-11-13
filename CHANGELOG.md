@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.0
+
+* Do not raise error on 3XX responses but return responses
+
 ## 1.8.0
 
 * Add HEAD request method (#16)
