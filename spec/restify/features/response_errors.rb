@@ -20,6 +20,22 @@ describe Restify do
   describe 'Error handling' do
     subject(:request) { Restify.new('http://localhost/base').get.value! }
 
+    context 'for 400 status codes' do
+      let(:http_status) { '400 Bad Request' }
+
+      it 'throws a ClientError exception' do
+        expect { request }.to raise_error Restify::ClientError
+      end
+    end
+
+    context 'for 401 status codes' do
+      let(:http_status) { '401 Unauthorized' }
+
+      it 'throws a ClientError exception' do
+        expect { request }.to raise_error Restify::ClientError
+      end
+    end
+
     context 'for 404 status codes' do
       let(:http_status) { '404 Not Found' }
 
@@ -28,8 +44,24 @@ describe Restify do
       end
     end
 
-    context 'for any other 4xx status codes' do
+    context 'for 406 status codes' do
+      let(:http_status) { '406 Not Acceptable' }
+
+      it 'throws a ClientError exception' do
+        expect { request }.to raise_error Restify::ClientError
+      end
+    end
+
+    context 'for 422 status codes' do
       let(:http_status) { '422 Unprocessable Entity' }
+
+      it 'throws a ClientError exception' do
+        expect { request }.to raise_error Restify::ClientError
+      end
+    end
+
+    context 'for any other 4xx status codes' do
+      let(:http_status) { '415 Unsupported Media Type' }
 
       it 'throws a ClientError exception' do
         expect { request }.to raise_error Restify::ClientError
