@@ -20,6 +20,17 @@ module Restify
   class ResponseError < StandardError
     attr_reader :response
 
+    def self.from_code(response)
+      case response.code
+        when 400...500
+          ClientError.new(response)
+        when 500...600
+          ServerError.new(response)
+        else
+          raise "Unknown response code: #{response.code}"
+      end
+    end
+
     def initialize(response)
       @response = response
       super "#{response.message} (#{response.code}) for `#{response.uri}':\n" \
