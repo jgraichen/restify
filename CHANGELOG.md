@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Raise more specific error on a few status codes (#17)
+
 ## 1.9.0
 
 * Do not raise error on 3XX responses but return responses
