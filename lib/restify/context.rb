@@ -62,7 +62,7 @@ module Restify
         if !response.errored?
           process response
         else
-          Context.raise_response_error(response)
+          raise ResponseError.from_code(response)
         end
       end
     end
@@ -100,19 +100,6 @@ module Restify
 
     def default_headers
       options.fetch(:headers, {})
-    end
-
-    class << self
-      def raise_response_error(response)
-        case response.code
-          when 400...500
-            raise ClientError.new(response)
-          when 500...600
-            raise ServerError.new(response)
-          else
-            raise "Unknown response code: #{response.code}"
-        end
-      end
     end
   end
 end
