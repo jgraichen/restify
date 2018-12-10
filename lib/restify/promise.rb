@@ -7,6 +7,13 @@ module Restify
       @dependencies = dependencies.flatten
 
       super(&nil)
+
+      # When dependencies were passed in, but none are left after flattening,
+      # then we don't have to wait for explicit dependencies or resolution
+      # through a writer.
+      if !@task && @dependencies.empty? && dependencies.any?
+        complete true, [], nil
+      end
     end
 
     def wait(timeout = nil)
