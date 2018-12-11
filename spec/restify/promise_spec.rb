@@ -163,6 +163,13 @@ describe Restify::Promise do
         expect(subject).to eq 17
       end
     end
+
+    # Nobody does this explicitly, but it can happen when the array of
+    # dependencies is built dynamically.
+    context 'with an empty array of dependencies and without task' do
+      subject { described_class.new([]).value! }
+      it { is_expected.to eq [] }
+    end
   end
 
   describe '#wait' do
