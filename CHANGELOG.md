@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.10.0
 
 * Raise more specific error on a few status codes (#17)
 * Complete promises with an empty list (but a list) of dependencies (#18)
