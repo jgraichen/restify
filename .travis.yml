@@ -1,7 +1,6 @@
-sudo: false
-dist: trusty
-language: ruby
+dist: xenial
 cache: bundler
+language: ruby
 bundler_args: "--without development"
 before_install:
 - gem update --system
@@ -19,7 +18,7 @@ env:
 jobs:
   include:
   - stage: Release
-    rvm: 2.5.3
+    rvm: 2.6.0
     env: []
     script: skip
     install: skip
