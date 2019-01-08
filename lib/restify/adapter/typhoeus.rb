@@ -21,6 +21,7 @@ module Restify
         @hydra  = ::Typhoeus::Hydra.new(**options)
         @mutex  = Mutex.new
         @signal = ConditionVariable.new
+        @thread = nil
       end
 
       def sync?
