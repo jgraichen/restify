@@ -1,91 +1,117 @@
 # Changelog
+All notable changes to this project will be documented in this file.
 
-## 1.10.0
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-* Raise more specific error on a few status codes (#17)
-* Complete promises with an empty list (but a list) of dependencies (#18)
+## [Unreleased]
 
-## 1.9.0
+## 1.10.0 - 2018-12-11
+### Changed
+- Raise more specific error on a few status codes (#17)
+- Complete promises with an empty list (but a list) of dependencies (#18)
 
-* Do not raise error on 3XX responses but return responses
+## 1.9.0 - 2018-11-13
+### Changed
+- Do not raise error on 3XX responses but return responses
 
-## 1.8.0
+## 1.8.0 - 2018-08-22
+### Added
+- Add HEAD request method (#16)
 
-* Add HEAD request method (#16)
+## 1.7.0 - 2018-08-15
+### Added
+- Introduce promise dependency timeouts (#15)
 
-## 1.7.0
+## 1.6.0 - 2018-08-09
+### Changed
+- Specify headers on restify clients and individual requests (#14)
 
-* Introduce promise dependency timeouts (#15)
+## 1.5.0 - 2018-07-31
+### Added
+- Add MessagePack processor enabled by default
 
-## 1.6.0
+### Changed
+- Tune typhoeus adapter to be more race-condition resilent
 
-* Specify headers on restify clients and individual requests (#14)
+## 1.4.4 - 2018-07-13
+### Added
+- Add `#request` to `NetworkError` to ease debugging
 
-## 1.5.0
+### Changed
+- Fix race condition in typhoeus adapter
 
-* Tune typhoeus adapter to be more race-condition resilent
-* Add MessagePack processor enabled by default
+## 1.4.3 - 2017-11-15
+### Added
+- Add advanced logging capabilities using logging gem
 
-## 1.4.4
+### Changed
+- Improve compatibility with webmocks returning `nil` as headers
 
-* Fix race condition in typhoeus adapter
-* Add `#request` to `NetworkError` to ease debugging
+## 1.4.1 - 2017-11-15
+### Changed
+- Fix possible deadlock issues
 
-## 1.4.3
+## 1.4.0 - 2017-11-10
+### Added
+- Add timeout option to requests (only supported by typhoeus adapter)
 
-* Add advanced logging capabilities using logging gem
-* Improve compatibility with webmocks returning `nil` as headers
+### Changed
+- Fix possible concurrency issue with typhoeus adapter
 
-## 1.4.1
+## 1.3.1 - 2017-11-10
+### Changed
+- Improve typhoeus adapters initial request queuing
+- Disable default pipelining
 
-* Fix possible deadlock issues
+## 1.3.0 - 2017-11-08
+### Changed
+- Improve typhoeus adapter to better utilize concurrency
+- Default to new typhoeus adapter
 
-## 1.4.0
+## 1.2.1 - 2017-10-30
+### Changed
+- Fix issue with Ruby 2.2 compatibility
 
-* Fix possible concurrency issue with typhoeus adapter
-* Add timeout option to requests (only supported by typhoeus adapter)
+## 1.2.0 - 2017-10-30
+### Added
+- Add experimental PooledEM adapter (#10)
 
-## 1.3.1
+### Changed
+- Improve marshaling of resources
 
-* Improve typhoeus adapters initial request queuing
-* Disable default pipelining
+## 1.1.0 - 2017-05-12
+### Added
+- Add shortcuts for creating fulfilled / rejected promises (#6)
 
-## 1.3.0
+### Changed
+- Return response body if no processor matches (#7)
 
-* Improve typhoeus adapter to better utilize concurrency
-* Default to new typhoeus adapter
+## 1.0.0 - 2016-08-22
+### Added
+- Experimental cache API doing nothing for now
 
-## 1.2.1
+### Changed
+- Use `~> 1.0` of `concurrent-ruby`
 
-* Fix issue with Ruby 2.2 compatibility
+## 0.5.0 - 2016-04-04
+### Added
+- Add `sync` option to typhoeus adapter
+- Add registry for storing entry points
 
-## 1.2.0
+### Changed
+- Make eventmachine based adapter default
 
-* Add experimental PooledEM adapter (#10)
-* Improve marshalling of resources
+## 0.4.0 - 2016-02-24
+### Added
+- Add method to explicit access resource data
 
-## 1.1.0
+### Changed
+- Use typhoeus as default adapter
+- `Restify.new` returns relation now instead of resource
 
-* Return response body if no processor matches (#7)
-* Add shortcuts for creating fulfilled / rejected promises (#6)
-
-## 1.0.0
-
-* Experimental cache API doing nothing for now
-* Use `~> 1.0` of `concurrent-ruby`
-
-## 0.5.0
-
-* Add `sync` option to typhoeus adapter
-* Add registry for storing entry points
-* Make eventmachine based adapter default
-
-## 0.4.0
-
-* Add method to explicit access resource data
-* Drop obligation in favor of simple Concurrent::IVar based promise class.
+### Removed
+- Drop obligation in favor of simple Concurrent::IVar based promise class.
   Notable changes:
-    - Returned object us of type `Restify::Promise` now.
-    - `value` will not raise exception but return `nil` in case of failure. Use `value!` for old behavior.
-* Use typhoeus as default adapter
-* `Restify.new` returns relation now instead of resource
+  - Returned object us of type `Restify::Promise` now.
+  - `value` will not raise exception but return `nil` in case of failure. Use `value!` for old behavior.
