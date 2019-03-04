@@ -61,6 +61,7 @@ module Restify
     class << self
       def new(timeout, *args)
         return timeout if timeout.is_a?(self)
+
         super
       end
     end
