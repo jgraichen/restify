@@ -23,6 +23,7 @@ module Restify
 
       super
       raise t if incomplete?
+
       self
     end
 

@@ -79,6 +79,7 @@ module Restify
 
     def convert_param(value)
       return value.to_param.to_s if value.respond_to?(:to_param)
+
       value
     end
 
