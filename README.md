@@ -1,6 +1,7 @@
 # Restify
 
 [![Build Status](https://travis-ci.org/jgraichen/restify.svg?branch=master)](https://travis-ci.org/jgraichen/restify)
+[![Code Quality](https://codebeat.co/badges/18ffe6b7-8239-493a-b5b6-be329b9f275d)](https://codebeat.co/projects/github-com-jgraichen-restify-master)
 
 Restify is an hypermedia REST client that does parallel, concurrent and keep-alive requests by default.
 
