@@ -12,7 +12,9 @@ gem 'rake-release'
 gem 'typhoeus'
 
 group :test do
-  gem 'coveralls'
+  gem 'codecov', require: false
+  gem 'simplecov', require: false
+
   gem 'rspec', '~> 3.0'
   gem 'rspec-collection_matchers'
   gem 'rubocop', '~> 0.65.0'
