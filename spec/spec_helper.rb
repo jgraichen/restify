@@ -4,7 +4,9 @@ require 'rspec'
 require 'webmock/rspec'
 
 require 'simplecov'
-SimpleCov.start
+SimpleCov.start do
+  add_filter 'spec'
+end
 
 if ENV['CI']
   require 'codecov'
