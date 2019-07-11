@@ -15,7 +15,7 @@ env:
 jobs:
   include:
   - stage: Release
-    rvm: 2.6.0
+    rvm: 2.6.3
     env: []
     script: skip
     install: skip
