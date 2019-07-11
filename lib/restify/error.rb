@@ -34,6 +34,14 @@ module Restify
           UnprocessableEntity.new(response)
         when 400...500
           ClientError.new(response)
+        when 500
+          InternalServerError.new(response)
+        when 502
+          BadGateway.new(response)
+        when 503
+          ServiceUnavailable.new(response)
+        when 504
+          GatewayTimeout.new(response)
         when 500...600
           ServerError.new(response)
         else
@@ -87,6 +95,13 @@ module Restify
   # 5XX status code.
   class ServerError < ResponseError; end
 
+  # A {GatewayError} is the common base class for 502, 503 and 504
+  # response codes often used by load balancers when upstream servers are
+  # failing or not available.
+  #
+  # This can be used to catch "common" gateway responses.
+  class GatewayError < ResponseError; end
+
   ###
   # CONCRETE SUBCLASSES FOR TYPICAL STATUS CODES
   #
@@ -97,4 +112,10 @@ module Restify
   class NotFound < ClientError; end
   class NotAcceptable < ClientError; end
   class UnprocessableEntity < ClientError; end
+
+  class InternalServerError < ServerError; end
+
+  class BadGateway < GatewayError; end
+  class ServiceUnavailable < GatewayError; end
+  class GatewayTimeout < GatewayError; end
 end
