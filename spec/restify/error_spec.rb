@@ -38,6 +38,11 @@ describe Restify::ResponseError do
       it { is_expected.to be_a ::Restify::NotAcceptable }
     end
 
+    context 'with 410 Gone' do
+      let(:code) { 410 }
+      it { is_expected.to be_a ::Restify::Gone }
+    end
+
     context 'with 422 Unprocessable Entity' do
       let(:code) { 422 }
       it { is_expected.to be_a ::Restify::UnprocessableEntity }

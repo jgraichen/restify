@@ -30,6 +30,8 @@ module Restify
           NotFound.new(response)
         when 406
           NotAcceptable.new(response)
+        when 410
+          Gone.new(response)
         when 422
           UnprocessableEntity.new(response)
         when 400...500
@@ -111,6 +113,7 @@ module Restify
   class Unauthorized < ClientError; end
   class NotFound < ClientError; end
   class NotAcceptable < ClientError; end
+  class Gone < ClientError; end
   class UnprocessableEntity < ClientError; end
 
   class InternalServerError < ServerError; end
