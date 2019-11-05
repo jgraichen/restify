@@ -102,7 +102,7 @@ module Restify
   # failing or not available.
   #
   # This can be used to catch "common" gateway responses.
-  class GatewayError < ResponseError; end
+  class GatewayError < ServerError; end
 
   ###
   # CONCRETE SUBCLASSES FOR TYPICAL STATUS CODES
