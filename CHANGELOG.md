@@ -8,18 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 ---
 
-### New
+### Added
 * Explicit exception class for HTTP status code 410 (Gone)
 
-### Changes
+### Changed
 
-### Fixes
-
-### Breaks
+### Fixed
+* `GatewayError` exception classes introduced in v1.11.0 now properly inherit from `ServerError` (#30)
 
 
 ## 1.11.0 - (2019-07-11)
-### New
+### Added
 * Explicit exception classes for HTTP status codes 500, 502, 503, 504
 
 ## 1.10.0 - 2018-12-11
