@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'activesupport'
   spec.add_runtime_dependency 'addressable', '~> 2.3'
   spec.add_runtime_dependency 'concurrent-ruby', '~> 1.0'
-  spec.add_runtime_dependency 'hashie', '~> 3.3'
+  spec.add_runtime_dependency 'hashie', '>= 3.3', '< 5.0'
   spec.add_runtime_dependency 'rack'
   spec.add_runtime_dependency 'typhoeus', '~> 1.3'
   spec.add_runtime_dependency 'logging', '~> 2.0'
