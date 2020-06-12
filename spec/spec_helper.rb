@@ -38,7 +38,7 @@ require 'webmock/rspec'
 require 'rspec/collection_matchers'
 require 'em-synchrony'
 
-Dir[File.expand_path('spec/support/**/*.rb')].each {|f| require f }
+Dir[File.expand_path('spec/support/**/*.rb')].sort.each {|f| require f }
 
 RSpec.configure do |config|
   config.order = 'random'

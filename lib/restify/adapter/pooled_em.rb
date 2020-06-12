@@ -241,9 +241,9 @@ module Restify
                 @pool.remove(conn)
                 writer.reject(req.error)
               end
-            rescue Exception => ex # rubocop:disable Lint/RescueException
+            rescue Exception => e # rubocop:disable Lint/RescueException
               @pool.remove(conn)
-              writer.reject(ex)
+              writer.reject(e)
             end
           end
         end

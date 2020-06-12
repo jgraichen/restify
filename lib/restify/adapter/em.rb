@@ -63,8 +63,8 @@ module Restify
               query: request.uri.normalized_query,
               body: request.body,
               head: request.headers
-          rescue Exception => err # rubocop:disable Lint/RescueException
-            writer.reject err
+          rescue Exception => e # rubocop:disable Lint/RescueException
+            writer.reject e
             requests.shift unless pipeline?
             return
           end

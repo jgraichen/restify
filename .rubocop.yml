@@ -10,7 +10,7 @@ Layout/CaseIndentation:
     - case
     - end
 
-Layout/ParameterAlignment:
+Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
 
 Layout/SpaceInsideBlockBraces:

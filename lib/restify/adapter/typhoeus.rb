@@ -75,7 +75,7 @@ module Restify
           headers: DEFAULT_HEADERS.merge(request.headers),
           body: request.body,
           timeout: request.timeout,
-          connecttimeout: request.timeout,
+          connecttimeout: request.timeout
         ).tap do |req|
           req.on_complete do |response|
             debug 'request:complete',

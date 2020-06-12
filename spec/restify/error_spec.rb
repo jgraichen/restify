@@ -14,7 +14,6 @@ describe Restify::ResponseError do
     allow(response).to receive(:decoded_body).and_return({})
   end
 
-
   describe '.from_code' do
     subject(:err) { described_class.from_code(response) }
 
