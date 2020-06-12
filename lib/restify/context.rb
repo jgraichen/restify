@@ -36,7 +36,7 @@ module Restify
 
     def inherit(uri, **kwargs)
       uri ||= self.uri
-      Context.new uri, kwargs.merge(options)
+      Context.new(uri, **kwargs, **options)
     end
 
     def process(response)

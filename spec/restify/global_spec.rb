@@ -26,7 +26,7 @@ describe Restify::Global do
       let(:options) { {accept: 'application.vnd.github.v3+json'} }
       let(:context) { Restify::Context.new uri, **options }
 
-      subject { global.new name, options }
+      subject { global.new(name, **options) }
 
       it 'returns relation for stored registry item' do
         Restify::Registry.store name, uri, options

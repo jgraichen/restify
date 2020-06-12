@@ -39,9 +39,9 @@ module Restify
 
     def resolve_context(uri, **opts)
       if uri.is_a? Symbol
-        Restify::Registry.fetch(uri).inherit(nil, opts)
+        Restify::Registry.fetch(uri).inherit(nil, **opts)
       else
-        Context.new uri, opts
+        Context.new(uri, **opts)
       end
     end
   end
