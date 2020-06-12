@@ -16,12 +16,20 @@ module Restify
         'Transfer-Encoding' => ''
       }.freeze
 
-      def initialize(sync: false, **options)
-        @sync   = sync
-        @hydra  = ::Typhoeus::Hydra.new(**options)
-        @mutex  = Mutex.new
-        @signal = ConditionVariable.new
-        @thread = nil
+      DEFAULT_OPTIONS = {
+        followlocation: true,
+        tcp_keepalive: true,
+        tcp_keepidle: 5,
+        tcp_keepintvl: 5
+      }.freeze
+
+      def initialize(sync: false, options: {}, **kwargs)
+        @sync    = sync
+        @hydra   = ::Typhoeus::Hydra.new(**kwargs)
+        @mutex   = Mutex.new
+        @signal  = ConditionVariable.new
+        @thread  = nil
+        @options = DEFAULT_OPTIONS.merge(options)
       end
 
       def sync?
@@ -62,12 +70,12 @@ module Restify
       def convert(request, writer)
         ::Typhoeus::Request.new(
           request.uri,
+          **@options,
           method: request.method,
           headers: DEFAULT_HEADERS.merge(request.headers),
           body: request.body,
-          followlocation: true,
           timeout: request.timeout,
-          connecttimeout: request.timeout
+          connecttimeout: request.timeout,
         ).tap do |req|
           req.on_complete do |response|
             debug 'request:complete',

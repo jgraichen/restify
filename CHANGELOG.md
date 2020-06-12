@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ---
 
 ### New
+* typhoeus: Support setting per-request libcurl options on adapter
+* typhoeus: Enable short TCP keepalive probes by default (5s/5s)
 
 ### Changes
 
