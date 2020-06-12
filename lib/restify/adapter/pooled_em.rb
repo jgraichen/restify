@@ -200,9 +200,9 @@ module Restify
         @pool = Pool.new(**kwargs)
       end
 
-      # rubocop:disable MethodLength
-      # rubocop:disable AbcSize
-      # rubocop:disable BlockLength
+      # rubocop:disable Metrics/MethodLength
+      # rubocop:disable Metrics/AbcSize
+      # rubocop:disable Metrics/BlockLength
       def call_native(request, writer)
         next_tick do
           defer = @pool.get(request)
@@ -241,7 +241,7 @@ module Restify
                 @pool.remove(conn)
                 writer.reject(req.error)
               end
-            rescue Exception => ex # rubocop:disable RescueException
+            rescue Exception => ex # rubocop:disable Lint/RescueException
               @pool.remove(conn)
               writer.reject(ex)
             end

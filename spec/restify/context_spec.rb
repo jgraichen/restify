@@ -47,7 +47,7 @@ describe Restify::Context do
 
     context 'YAML' do
       let(:dump) { YAML.dump(context) }
-      let(:load) { YAML.load(dump) } # rubocop:disable YAMLLoad
+      let(:load) { YAML.load(dump) } # rubocop:disable Security/YAMLLoad
 
       subject { load }
 
@@ -56,7 +56,7 @@ describe Restify::Context do
 
     context 'Marshall' do
       let(:dump) { Marshal.dump(context) }
-      let(:load) { Marshal.load(dump) } # rubocop:disable MarshalLoad
+      let(:load) { Marshal.load(dump) } # rubocop:disable Security/MarshalLoad
 
       subject { load }
 

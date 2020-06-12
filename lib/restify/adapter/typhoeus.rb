@@ -36,8 +36,8 @@ module Restify
         @sync
       end
 
-      # rubocop:disable AbcSize
-      # rubocop:disable MethodLength
+      # rubocop:disable Metrics/AbcSize
+      # rubocop:disable Metrics/MethodLength
       def call_native(request, writer)
         req = convert(request, writer)
 
@@ -65,8 +65,8 @@ module Restify
 
       private
 
-      # rubocop:disable AbcSize
-      # rubocop:disable MethodLength
+      # rubocop:disable Metrics/AbcSize
+      # rubocop:disable Metrics/MethodLength
       def convert(request, writer)
         ::Typhoeus::Request.new(
           request.uri,
@@ -132,7 +132,7 @@ module Restify
         @hydra.queued_requests.any? || @hydra.multi.easy_handles.any?
       end
 
-      # rubocop:disable MethodLength
+      # rubocop:disable Metrics/MethodLength
       def _run
         debug 'hydra:run'
         @hydra.run while _ongoing?
