@@ -19,6 +19,9 @@ if ENV['AUTH']
   headers['Authorization'] = "Basic #{auth}"
 end
 
+# Do not use deprecated indifferent access
+Restify::Processors::Json.indifferent_access = false
+
 gh    = Restify.new('https://api.github.com', headers: headers).get.value!
 user  = gh.rel(:user).get(user: 'jgraichen').value!
 repos = user.rel(:repos).get.value!
@@ -35,8 +38,8 @@ commits.each do |repo, cmts|
   head = cmts.first
 
   puts "==== #{repo['name']} ===="
-  puts "Last commit: #{head[:sha]}"
-  puts "By #{head[:commit][:author][:name]} <#{head[:commit][:author][:email]}>"
-  puts head[:commit][:message].to_s
+  puts "Last commit: #{head['sha']}"
+  puts "By #{head['commit']['author']['name']} <#{head['commit']['author']['email']}>"
+  puts head['commit']['message'].to_s
   puts
 end

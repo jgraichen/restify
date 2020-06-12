@@ -15,20 +15,17 @@ Restify is build upon the following libraries:
 * [addressable](https://github.com/sporkmonger/addressable)
 * [typhoeus](https://github.com/typhoeus/typhoeus)
 
-It has optional HTTP adapters using:
-
-* [em-http-request](https://github.com/igrigorik/em-http-request)
-
 The HTTP adapters are mostly run in a background thread and may not survive mid-application forks.
 
-Included processors can handle:
+Restify includes processors to parse responses and to extract links between resources. The following formats are can be parsed:
 
-* Plain JSON with GitHub-style relations
-* MessagePack with GitHub-style relations *(currently experimental)*
+* JSON
+* MessagePack
 
-(Beside HTTP Link header that's always supported)
+Links are extracted from
 
-Restify requires Ruby 2.0+.
+* HTTP Link header
+* Github-style relations in payloads
 
 ### Planned features
 
@@ -106,9 +103,9 @@ commit = repo.rel(:commits).get.value.first
 And print it:
 
 ```ruby
-puts "Last commit: #{commit[:sha]}"
-puts "By #{commit[:commit][:author][:name]} <#{commit[:commit][:author][:email]}>"
-puts "#{commit[:commit][:message]}"
+puts "Last commit: #{commit['sha']}"
+puts "By #{commit['commit']['author']['name']} <#{commit['commit']['author']['email']}>"
+puts "#{commit['commit']['message']}"
 ```
 
 See commented example in main spec [`spec/restify_spec.rb`](https://github.com/jgraichen/restify/blob/master/spec/restify_spec.rb#L100) or in the `examples` directory.
