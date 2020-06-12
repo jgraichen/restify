@@ -1,7 +1,8 @@
+---
 dist: bionic
 cache: bundler
 language: ruby
-bundler_args: "--without development"
+bundler_args: '--without development'
 rvm:
   - 2.7.1
   - 2.6.6
@@ -13,3 +14,6 @@ env:
   - ADAPTER=em-pooled
   - ADAPTER=typhoeus
   - ADAPTER=typhoeus-sync
+script:
+  - bundle exec rubocop --parallel --fail-level E
+  - bundle exec rspec
