@@ -34,18 +34,26 @@ module Restify
       @uri     = opts.fetch(:uri) { raise ArgumentError.new ':uri required.' }
       @data    = opts.fetch(:data, nil)
       @timeout = opts.fetch(:timeout, 300)
-      @headers = opts.fetch(:headers, {}).merge \
-        'Content-Type' => 'application/json'
+      @headers = opts.fetch(:headers, {})
+
+      @headers.merge! 'Content-Type' => 'application/json' if json?
     end
 
     def body
-      @body ||= begin
-        JSON.dump(data) unless data.nil?
-      end
+      @body ||= json? ? JSON.dump(@data) : @data
     end
 
     def to_s
       "#<#{self.class} #{method.upcase} #{uri}>"
+    end
+
+    private
+
+    def json?
+      return false if @data.nil?
+      return false if @data.is_a? String
+
+      true
     end
   end
 end
