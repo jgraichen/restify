@@ -40,7 +40,7 @@ describe Restify do
       let(:http_status) { '404 Not Found' }
 
       it 'throws a ClientError exception' do
-        expect { request }.to raise_error Restify::NotFoundError
+        expect { request }.to raise_error Restify::NotFound
       end
     end
 
