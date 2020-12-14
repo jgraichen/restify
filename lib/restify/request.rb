@@ -36,7 +36,7 @@ module Restify
       @timeout = opts.fetch(:timeout, 300)
       @headers = opts.fetch(:headers, {})
 
-      @headers.merge! 'Content-Type' => 'application/json' if json?
+      @headers['Content-Type'] ||= 'application/json' if json?
     end
 
     def body

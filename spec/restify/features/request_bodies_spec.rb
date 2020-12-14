@@ -37,6 +37,18 @@ describe Restify do
           request_stub.with(headers: {'Content-Type' => 'application/json'})
         ).to have_been_requested
       end
+
+      context 'with overridden media type' do
+        let(:headers) { {'Content-Type' => 'application/vnd.api+json'} }
+
+        it 'respects the override' do
+          subject
+
+          expect(
+            request_stub.with(headers: {'Content-Type' => 'application/vnd.api+json'})
+          ).to have_been_requested
+        end
+      end
     end
 
     context 'with strings' do
@@ -56,6 +68,18 @@ describe Restify do
         expect(
           request_stub.with {|req| req.headers['Content-Type'].nil? }
         ).to have_been_requested
+      end
+
+      context 'with overridden media type' do
+        let(:headers) { {'Content-Type' => 'application/x-www-form-urlencoded'} }
+
+        it 'respects the override' do
+          subject
+
+          expect(
+            request_stub.with(headers: {'Content-Type' => 'application/x-www-form-urlencoded'})
+          ).to have_been_requested
+        end
       end
     end
   end
