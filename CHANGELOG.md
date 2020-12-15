@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Breaks
 
 
+## 1.14.0 - (2020-12-15)
+
+### New
+* Allow making requests with non-JSON bodies and custom content types (#42)
+
+
 ## 1.13.0 - (2020-06-12)
 ---
 
