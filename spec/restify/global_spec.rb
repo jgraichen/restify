@@ -29,7 +29,7 @@ describe Restify::Global do
       subject { global.new(name, **options) }
 
       it 'returns relation for stored registry item' do
-        Restify::Registry.store name, uri, options
+        Restify::Registry.store(name, uri, **options)
 
         expect(subject).to be_a Restify::Relation
         expect(subject.pattern).to eq uri
