@@ -4,20 +4,19 @@ require 'spec_helper'
 
 describe Restify do
   let!(:request_stub) do
-    stub_request(:get, 'http://localhost/base').to_return do
-      <<-RESPONSE.gsub(/^ {8}/, '')
+    stub_request(:get, "http://stubserver/base").to_return do
+      <<~HTTP
         HTTP/1.1 200 OK
         Content-Type: application/json
-        Transfer-Encoding: chunked
-        Link: <http://localhost/base>; rel="self"
+        Link: <http://localhost:9292/base>; rel="self"
 
         { "response": "success" }
-      RESPONSE
+      HTTP
     end
   end
 
   context 'with request headers configured for a single request' do
-    let(:context) { Restify.new('http://localhost/base') }
+    let(:context) { Restify.new('http://localhost:9292/base') }
 
     it 'sends the headers only for that request' do
       root = context.get(
@@ -37,7 +36,7 @@ describe Restify do
   context 'with request headers configured for context' do
     let(:context) do
       Restify.new(
-        'http://localhost/base',
+        'http://localhost:9292/base',
         headers: {'Accept' => 'application/msgpack, application/json'}
       )
     end

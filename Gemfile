@@ -15,6 +15,7 @@ group :test do
   gem 'codecov', require: false
   gem 'simplecov', require: false
 
+  gem 'puma'
   gem 'rspec', '~> 3.0'
   gem 'rspec-collection_matchers'
   gem 'rubocop', '~> 1.7.0'

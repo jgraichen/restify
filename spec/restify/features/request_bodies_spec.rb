@@ -4,19 +4,16 @@ require 'spec_helper'
 
 describe Restify do
   let!(:request_stub) do
-    stub_request(:post, 'http://localhost/base')
-      .to_return do
-      <<-RESPONSE.gsub(/^ {8}/, '')
+    stub_request(:post, 'http://stubserver/base').to_return do
+      <<~HTTP
         HTTP/1.1 200 OK
-        Content-Length: 333
-        Transfer-Encoding: chunked
-        Link: <http://localhost/other>; rel="neat"
-      RESPONSE
+        Link: <http://localhost:9292/other>; rel="neat"
+      HTTP
     end
   end
 
   describe 'Request body' do
-    subject { Restify.new('http://localhost/base').post(body, {}, {headers: headers}).value! }
+    subject { Restify.new('http://localhost:9292/base').post(body, {}, {headers: headers}).value! }
     let(:headers) { {} }
 
     context 'with JSON-like data structures' do
@@ -66,18 +63,18 @@ describe Restify do
         subject
 
         expect(
-          request_stub.with {|req| req.headers['Content-Type'].nil? }
+          request_stub.with {|req| req.headers['Content-Type'] !~ /json/ }
         ).to have_been_requested
       end
 
       context 'with overridden media type' do
-        let(:headers) { {'Content-Type' => 'application/x-www-form-urlencoded'} }
+        let(:headers) { {'Content-Type' => 'application/text'} }
 
         it 'respects the override' do
           subject
 
           expect(
-            request_stub.with(headers: {'Content-Type' => 'application/x-www-form-urlencoded'})
+            request_stub.with(headers: {'Content-Type' => 'application/text'})
           ).to have_been_requested
         end
       end

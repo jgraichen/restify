@@ -4,20 +4,19 @@ require 'spec_helper'
 
 describe Restify do
   let!(:request_stub) do
-    stub_request(:head, 'http://localhost/base')
+    stub_request(:head, 'http://stubserver/base')
       .with(query: hash_including({}))
       .to_return do
-      <<-RESPONSE.gsub(/^ {8}/, '')
+      <<~HTTP
         HTTP/1.1 200 OK
         Content-Length: 333
-        Transfer-Encoding: chunked
-        Link: <http://localhost/other>; rel="neat"
-      RESPONSE
+        Link: <http://localhost:9292/other>; rel="neat"
+      HTTP
     end
   end
 
   describe 'HEAD requests' do
-    subject { Restify.new('http://localhost/base').head(params).value! }
+    subject { Restify.new('http://localhost:9292/base').head(params).value! }
     let(:params) { {} }
 
     it 'returns a resource with access to headers' do
