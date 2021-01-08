@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### New
 
 ### Changes
+* Use Ruby 2.5 as baseline for testing and linting
+* Add Ruby 3.0 to automated testing
 
 ### Fixes
 
