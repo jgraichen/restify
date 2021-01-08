@@ -17,7 +17,7 @@ group :test do
 
   gem 'rspec', '~> 3.0'
   gem 'rspec-collection_matchers'
-  gem 'rubocop', '~> 0.81.0'
+  gem 'rubocop', '~> 1.7.0'
   gem 'webmock'
 end
 
