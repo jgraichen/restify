@@ -51,9 +51,7 @@ module Restify
           "Timeout must be an number but is #{value}"
       end
 
-      unless value > 0
-        raise ArgumentError.new "Timeout must be > 0 but is #{value.inspect}."
-      end
+      raise ArgumentError.new "Timeout must be > 0 but is #{value.inspect}." unless value.positive?
 
       value
     end

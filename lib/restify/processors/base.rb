@@ -5,9 +5,7 @@ module Restify
     class Base
       extend Forwardable
 
-      attr_reader :context
-
-      attr_reader :response
+      attr_reader :context, :response
 
       def initialize(context, response)
         @context  = context
@@ -18,9 +16,7 @@ module Restify
         @resource ||= begin
           resource = load
 
-          unless resource.is_a? Restify::Resource
-            resource = Resource.new context, response: response, data: resource
-          end
+          resource = Resource.new context, response: response, data: resource unless resource.is_a? Restify::Resource
 
           resource._restify_response = response
           merge_relations! resource._restify_relations

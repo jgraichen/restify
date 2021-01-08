@@ -97,7 +97,7 @@ module Restify
       text = {
         '@data' => data,
         '@relations' => @relations
-      }.map {|k, v| k + '=' + v.inspect }.join(' ')
+      }.map {|k, v| "#{k}=#{v.inspect}" }.join(' ')
 
       "#<#{self.class} #{text}>"
     end

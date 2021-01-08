@@ -110,15 +110,22 @@ module Restify
   # This makes it easy to rescue specific expected error types.
 
   class BadRequest < ClientError; end
+
   class Unauthorized < ClientError; end
+
   class NotFound < ClientError; end
+
   class NotAcceptable < ClientError; end
+
   class Gone < ClientError; end
+
   class UnprocessableEntity < ClientError; end
 
   class InternalServerError < ServerError; end
 
   class BadGateway < GatewayError; end
+
   class ServiceUnavailable < GatewayError; end
+
   class GatewayTimeout < GatewayError; end
 end

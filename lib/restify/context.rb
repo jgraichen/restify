@@ -59,10 +59,10 @@ module Restify
 
       ret = cache.call(request) {|req| adapter.call(req) }
       ret.then do |response|
-        if !response.errored?
-          process response
-        else
+        if response.errored?
           raise ResponseError.from_code(response)
+        else
+          process response
         end
       end
     end

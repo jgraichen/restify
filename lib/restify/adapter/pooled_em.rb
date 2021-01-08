@@ -63,7 +63,7 @@ module Restify
         #
         def release(conn)
           @available.unshift(conn) if @available.size < @size
-          @used -= 1 if @used > 0
+          @used -= 1 if @used.positive?
 
           logger.debug do
             "[#{conn.uri}] Released to pool (#{@available.size}/#{@used}/#{size})"
@@ -97,7 +97,7 @@ module Restify
         private
 
         def close(conn)
-          @used -= 1 if @used > 0
+          @used -= 1 if @used.positive?
           @host[conn.uri.to_s] -= 1
 
           conn.close
@@ -212,39 +212,37 @@ module Restify
           end
 
           defer.callback do |conn|
-            begin
-              req = conn.send request.method.downcase,
-                keepalive: true,
-                redirects: 3,
-                path: request.uri.normalized_path,
-                query: request.uri.normalized_query,
-                body: request.body,
-                head: request.headers
+            req = conn.send request.method.downcase,
+              keepalive: true,
+              redirects: 3,
+              path: request.uri.normalized_path,
+              query: request.uri.normalized_query,
+              body: request.body,
+              head: request.headers
 
-              req.callback do
-                writer.fulfill Response.new(
-                  request,
-                  req.last_effective_url,
-                  req.response_header.status,
-                  req.response_header,
-                  req.response
-                )
+            req.callback do
+              writer.fulfill Response.new(
+                request,
+                req.last_effective_url,
+                req.response_header.status,
+                req.response_header,
+                req.response
+              )
 
-                if req.response_header['CONNECTION'] == 'close'
-                  @pool.remove(conn)
-                else
-                  @pool << conn
-                end
-              end
-
-              req.errback do
+              if req.response_header['CONNECTION'] == 'close'
                 @pool.remove(conn)
-                writer.reject(req.error)
+              else
+                @pool << conn
               end
-            rescue Exception => e # rubocop:disable Lint/RescueException
-              @pool.remove(conn)
-              writer.reject(e)
             end
+
+            req.errback do
+              @pool.remove(conn)
+              writer.reject(req.error)
+            end
+          rescue Exception => e # rubocop:disable Lint/RescueException
+            @pool.remove(conn)
+            writer.reject(e)
           end
         end
       end
@@ -261,12 +259,10 @@ module Restify
         return if EventMachine.reactor_running?
 
         Thread.new do
-          begin
-            EventMachine.run {}
-          rescue StandardError => e
-            logger.error(e)
-            raise e
-          end
+          EventMachine.run {}
+        rescue StandardError => e
+          logger.error(e)
+          raise e
         end
       end
     end

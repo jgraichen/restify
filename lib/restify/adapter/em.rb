@@ -128,12 +128,10 @@ module Restify
         return if EventMachine.reactor_running?
 
         Thread.new do
-          begin
-            EventMachine.run {}
-          rescue StandardError => e
-            puts "#{self.class} -> #{e}\n#{e.backtrace.join("\n")}"
-            raise e
-          end
+          EventMachine.run {}
+        rescue StandardError => e
+          puts "#{self.class} -> #{e}\n#{e.backtrace.join("\n")}"
+          raise e
         end
       end
     end

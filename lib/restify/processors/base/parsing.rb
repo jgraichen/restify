@@ -24,9 +24,7 @@ module Restify
               data      = object.each_with_object({}, &method(:parse_data))
               relations = object.each_with_object({}, &method(:parse_rels))
 
-              if self.class.indifferent_access?
-                data = with_indifferent_access(data)
-              end
+              data = with_indifferent_access(data) if self.class.indifferent_access?
 
               Resource.new context,
                 data: data,
@@ -56,9 +54,7 @@ module Restify
                      return
                  end
 
-          if relations.key?(name) || pair[1].nil? || pair[1].to_s =~ /\A\w*\z/
-            return
-          end
+          return if relations.key?(name) || pair[1].nil? || pair[1].to_s =~ /\A\w*\z/
 
           relations[name] = pair[1].to_s
         end
