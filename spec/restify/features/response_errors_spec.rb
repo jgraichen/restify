@@ -4,21 +4,13 @@ require 'spec_helper'
 
 describe Restify do
   let!(:request_stub) do
-    stub_request(:get, 'http://localhost/base')
-      .to_return do
-      <<-RESPONSE.gsub(/^ {8}/, '')
-        HTTP/1.1 #{http_status}
-        Content-Length: 333
-        Transfer-Encoding: chunked
-        Link: <http://localhost/other>; rel="neat"
-      RESPONSE
-    end
+    stub_request(:get, 'http://stubserver/base').to_return(status: http_status)
   end
 
   let(:http_status) { '200 OK' }
 
   describe 'Error handling' do
-    subject(:request) { Restify.new('http://localhost/base').get.value! }
+    subject(:request) { Restify.new('http://localhost:9292/base').get.value! }
 
     context 'for 400 status codes' do
       let(:http_status) { '400 Bad Request' }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rspec'
-require 'webmock/rspec'
+require 'rspec/collection_matchers'
 
 require 'simplecov'
 SimpleCov.start do
@@ -34,17 +34,13 @@ if ENV['ADAPTER']
   end
 end
 
-require 'webmock/rspec'
-require 'rspec/collection_matchers'
-require 'em-synchrony'
-
-Dir[File.expand_path('spec/support/**/*.rb')].sort.each {|f| require f }
+require_relative 'support/stub_server.rb'
 
 RSpec.configure do |config|
   config.order = 'random'
 
   config.before(:suite) do
-    ::Restify::Timeout.default_timeout = 2
+    ::Restify::Timeout.default_timeout = 0.1
   end
 
   config.before(:each) do

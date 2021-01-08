@@ -5,99 +5,94 @@ require 'spec_helper'
 describe Restify do
   context 'as a dynamic HATEOAS client' do
     before do
-      stub_request(:get, 'http://localhost/base').to_return do
-        <<-RESPONSE.gsub(/^ {10}/, '')
+      stub_request(:get, 'http://stubserver/base').to_return do
+        <<~HTTP
           HTTP/1.1 200 OK
           Content-Type: application/json
-          Transfer-Encoding: chunked
-          Link: <http://localhost/base/users{/id}>; rel="users"
-          Link: <http://localhost/base/courses{/id}>; rel="courses"
+          Link: <http://localhost:9292/base/users{/id}>; rel="users"
+          Link: <http://localhost:9292/base/courses{/id}>; rel="courses"
 
           {
-            "profile_url": "http://localhost/base/profile",
-            "search_url": "http://localhost/base/search?q={query}",
+            "profile_url": "http://localhost:9292/base/profile",
+            "search_url": "http://localhost:9292/base/search?q={query}",
             "mirror_url": null
           }
-        RESPONSE
+        HTTP
       end
 
-      stub_request(:get, 'http://localhost/base/users').to_return do
-        <<-RESPONSE.gsub(/^ {10}/, '')
+      stub_request(:get, 'http://stubserver/base/users')
+        .to_return do
+        <<~HTTP
           HTTP/1.1 200 OK
           Content-Type: application/json
-          Transfer-Encoding: chunked
 
           [{
-             "name": "John Smith",
-             "url": "http://localhost/base/users/john.smith",
-             "blurb_url": "http://localhost/base/users/john.smith/blurb",
-             "languages": ["de", "en"]
-           },
-           {
-             "name": "Jane Smith",
-             "self_url": "http://localhost/base/user/jane.smith"
-           }]
-        RESPONSE
+            "name": "John Smith",
+            "url": "http://localhost:9292/base/users/john.smith",
+            "blurb_url": "http://localhost:9292/base/users/john.smith/blurb",
+            "languages": ["de", "en"]
+          },
+          {
+            "name": "Jane Smith",
+            "self_url": "http://localhost:9292/base/user/jane.smith"
+          }]
+        HTTP
       end
 
-      stub_request(:post, 'http://localhost/base/users')
+      stub_request(:post, 'http://stubserver/base/users')
         .with(body: {})
         .to_return do
-        <<-RESPONSE.gsub(/^ {12}/, '')
-            HTTP/1.1 422 Unprocessable Entity
-            Content-Type: application/json
-            Transfer-Encoding: chunked
+        <<~HTTP
+          HTTP/1.1 422 Unprocessable Entity
+          Content-Type: application/json
 
-            {"errors":{"name":["can't be blank"]}}
-        RESPONSE
+          {"errors":{"name":["can't be blank"]}}
+        HTTP
       end
 
-      stub_request(:post, 'http://localhost/base/users')
+      stub_request(:post, 'http://stubserver/base/users')
         .with(body: {name: 'John Smith'})
         .to_return do
-        <<-RESPONSE.gsub(/^ {12}/, '')
-            HTTP/1.1 201 Created
-            Content-Type: application/json
-            Location: http://localhost/base/users/john.smith
-            Transfer-Encoding: chunked
-
-            {
-              "name": "John Smith",
-              "url": "http://localhost/base/users/john.smith",
-              "blurb_url": "http://localhost/base/users/john.smith/blurb",
-              "languages": ["de", "en"]
-            }
-        RESPONSE
-      end
-
-      stub_request(:get, 'http://localhost/base/users/john.smith')
-        .to_return do
-        <<-RESPONSE.gsub(/^ {10}/, '')
-          HTTP/1.1 200 OK
+        <<~HTTP
+          HTTP/1.1 201 Created
           Content-Type: application/json
-          Link: <http://localhost/base/users/john.smith>; rel="self"
-          Transfer-Encoding: chunked
+          Location: http://localhost:9292/base/users/john.smith
 
           {
             "name": "John Smith",
-            "url": "http://localhost/base/users/john.smith"
+            "url": "http://localhost:9292/base/users/john.smith",
+            "blurb_url": "http://localhost:9292/base/users/john.smith/blurb",
+            "languages": ["de", "en"]
           }
-        RESPONSE
+        HTTP
       end
 
-      stub_request(:get, 'http://localhost/base/users/john.smith/blurb')
+      stub_request(:get, 'http://stubserver/base/users/john.smith')
         .to_return do
-        <<-RESPONSE.gsub(/^ {10}/, '')
+        <<~HTTP
           HTTP/1.1 200 OK
           Content-Type: application/json
-          Link: <http://localhost/base/users/john.smith>; rel="user"
-          Transfer-Encoding: chunked
+          Link: <http://localhost:9292/base/users/john.smith>; rel="self"
+
+          {
+            "name": "John Smith",
+            "url": "http://localhost:9292/base/users/john.smith"
+          }
+        HTTP
+      end
+
+      stub_request(:get, 'http://stubserver/base/users/john.smith/blurb')
+        .to_return do
+        <<~HTTP
+          HTTP/1.1 200 OK
+          Content-Type: application/json
+          Link: <http://localhost:9292/base/users/john.smith>; rel="user"
 
           {
             "title": "Prof. Dr. John Smith",
             "image": "http://example.org/avatar.png"
           }
-        RESPONSE
+        HTTP
       end
     end
 
@@ -107,7 +102,7 @@ describe Restify do
 
         # First request the entry resource usually the
         # root using GET and wait for it.
-        root = Restify.new('http://localhost/base').get.value!
+        root = Restify.new('http://localhost:9292/base').get.value!
 
         # Therefore we need the `users` relations of our root
         # resource.
@@ -194,7 +189,7 @@ describe Restify do
         skip 'Seems to be impossible to detect EM scheduled fibers from within'
 
         EM.synchrony do
-          root = Restify.new('http://localhost/base').get.value!
+          root = Restify.new('http://localhost:9292/base').get.value!
 
           users_relation = root.rel(:users)
 
