@@ -92,7 +92,7 @@ RSpec.configure do |config|
 
     # Net::HTTP adapter must be enabled, otherwise webmock fails to create mock
     # responses from raw strings.
-    WebMock.enable!(except: %i[em_http_request typhoeus])
+    WebMock.disable!(except: %i[net_http])
   end
 
   config.around(:each) do |example|
