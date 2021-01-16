@@ -43,7 +43,7 @@ module Stub
       # If no stub matched `nil` is returned.
       if response
         status = response.status
-        status = status.to_s.split(' ', 2) if !status.is_a?(Array)
+        status = status.to_s.split(' ', 2) unless status.is_a?(Array)
         status = Integer(status[0])
 
         [status, response.headers || {}, [response.body.to_s]]
@@ -72,7 +72,7 @@ module Stub
   end
 
   class << self
-    def start_server! # rubocop:disable Metrics/MethodLength
+    def start_server!
       @server = ::Puma::Server.new(Handler.new)
       @server.add_tcp_listener('localhost', 9292)
 
