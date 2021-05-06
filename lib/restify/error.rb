@@ -34,6 +34,8 @@ module Restify
           Gone.new(response)
         when 422
           UnprocessableEntity.new(response)
+        when 429
+          TooManyRequests.new(response)
         when 400...500
           ClientError.new(response)
         when 500
@@ -120,6 +122,8 @@ module Restify
   class Gone < ClientError; end
 
   class UnprocessableEntity < ClientError; end
+
+  class TooManyRequests < ClientError; end
 
   class InternalServerError < ServerError; end
 

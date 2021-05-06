@@ -52,6 +52,14 @@ describe Restify do
       end
     end
 
+    context 'for 429 status codes' do
+      let(:http_status) { '429 Too Many Requests' }
+
+      it 'throws a TooManyRequests exception' do
+        expect { request }.to raise_error Restify::TooManyRequests
+      end
+    end
+
     context 'for any other 4xx status codes' do
       let(:http_status) { '415 Unsupported Media Type' }
 
