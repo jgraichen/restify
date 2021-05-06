@@ -123,7 +123,20 @@ module Restify
 
   class UnprocessableEntity < ClientError; end
 
-  class TooManyRequests < ClientError; end
+  class TooManyRequests < ClientError
+    def retry_after
+      case response.headers['RETRY_AFTER']
+        when /^\d+$/
+          DateTime.now + Rational(response.headers['RETRY_AFTER'].to_i, 86_400)
+        when String
+          begin
+            DateTime.httpdate response.headers['RETRY_AFTER']
+          rescue ArgumentError
+            nil
+          end
+      end
+    end
+  end
 
   class InternalServerError < ServerError; end
 
