@@ -18,7 +18,7 @@ group :test do
   gem 'puma'
   gem 'rspec', '~> 3.0'
   gem 'rspec-collection_matchers'
-  gem 'rubocop', '~> 1.7.0'
+  gem 'rubocop', '~> 1.14.0'
   gem 'webmock'
 end
 
