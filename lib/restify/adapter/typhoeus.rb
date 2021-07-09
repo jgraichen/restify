@@ -43,7 +43,8 @@ module Restify
         req = convert(request, writer)
 
         if sync?
-          req.run
+          @hydra.queue(req)
+          @hydra.run
         else
           debug 'request:add',
             tag: request.object_id,
