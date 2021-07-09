@@ -12,12 +12,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### New
 
 ### Changes
-* Use Ruby 2.5 as baseline for testing and linting
-* Add Ruby 3.0 to automated testing
 
 ### Fixes
 
 ### Breaks
+
+
+## 1.15.0 - (2021-07-09)
+---
+
+### New
+* Improve memory usage when running lots of requests with typhoeus adapter
+* Use hydra for synchronous requests
+* Increased thread stability of typhoeus adapter (new internal queuing mechanism)
+
+### Changes
+* Use Ruby 2.5 as baseline for testing and linting
+* Add Ruby 3.0 to automated testing
+* Changed timing behavior for multiple requests due to new internal queuing mechanism for the typhoeus adapter
 
 
 ## 1.14.0 - (2020-12-15)
