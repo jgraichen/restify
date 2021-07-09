@@ -128,7 +128,14 @@ module Restify
 
       # rubocop:disable Metrics/MethodLength
       def run
+        runs = 0
+
         loop do
+          if @queue.empty? && runs > 100
+            debug 'hydra:gc'
+            GC.start(full_mark: false, immediate_sweep: false)
+            runs = 0
+          end
 
           debug 'hydra:pop'
 
