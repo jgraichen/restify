@@ -24,19 +24,20 @@ module Restify
       }.freeze
 
       def initialize(sync: false, options: {}, **kwargs)
-        @sync    = sync
         @hydra   = ::Typhoeus::Hydra.new(**kwargs)
         @mutex   = Mutex.new
-        @signal  = ConditionVariable.new
-        @thread  = nil
         @options = DEFAULT_OPTIONS.merge(options)
+        @queue   = Queue.new
+        @sync    = sync
+        @thread  = nil
+
+        super()
       end
 
       def sync?
         @sync
       end
 
-      # rubocop:disable Metrics/AbcSize
       # rubocop:disable Metrics/MethodLength
       def call_native(request, writer)
         req = convert(request, writer)
@@ -44,24 +45,17 @@ module Restify
         if sync?
           req.run
         else
-          @mutex.synchronize do
-            debug 'request:add',
-              tag: request.object_id,
-              method: request.method.upcase,
-              url: request.uri
+          debug 'request:add',
+            tag: request.object_id,
+            method: request.method.upcase,
+            url: request.uri
 
-            @hydra.queue(req)
-            @hydra.dequeue_many
+          @queue << convert(request, writer)
 
-            thread.run unless thread.status
-          end
-
-          debug 'request:signal', tag: request.object_id
-
-          @signal.signal
+          thread.run unless thread.status
         end
       end
-      # rubocop:enable all
+      # rubocop:enable Metrics/MethodLength
 
       private
 
@@ -90,10 +84,15 @@ module Restify
             else
               writer.fulfill convert_back(response, request)
             end
+
+            # Add all newly queued requests to active hydra, e.g. requests
+            # queued in a completion callback.
+            dequeue_all
           end
         end
       end
-      # rubocop:enable all
+      # rubocop:enable Metrics/MethodLength
+      # rubocop:enable Metrics/AbcSize
 
       def convert_back(response, request)
         uri     = request.uri
@@ -117,38 +116,44 @@ module Restify
           # Recreate thread if nil or dead
           debug 'hydra:spawn'
 
-          @thread = Thread.new { _loop }
+          @thread = Thread.new do
+            Thread.current.name = 'Restify/Typhoeus Background'
+            run
+          end
         end
 
         @thread
       end
 
-      def _loop
-        Thread.current.name = 'Restify/Typhoeus Background'
-        loop { _run }
-      end
-
-      def _ongoing?
-        @hydra.queued_requests.any? || @hydra.multi.easy_handles.any?
-      end
-
       # rubocop:disable Metrics/MethodLength
-      def _run
-        debug 'hydra:run'
-        @hydra.run while _ongoing?
-        debug 'hydra:completed'
+      def run
+        loop do
 
-        @mutex.synchronize do
-          return if _ongoing?
+          debug 'hydra:pop'
 
-          debug 'hydra:pause'
-          @signal.wait(@mutex, 60)
-          debug 'hydra:resumed'
+          # Wait for next item and add all available requests to hydra
+          @hydra.queue @queue.pop
+          dequeue_all
+
+          debug 'hydra:run'
+          @hydra.run
+          runs += 1
+          debug 'hydra:completed'
+        rescue StandardError => e
+          logger.error(e)
         end
-      rescue StandardError => e
-        logger.error(e)
+      ensure
+        debug 'hydra:exit'
       end
-      # rubocop:enable all
+      # rubocop:enable Metrics/MethodLength
+
+      def dequeue_all
+        loop do
+          @hydra.queue @queue.pop(true)
+        rescue ThreadError
+          break
+        end
+      end
 
       def _log_prefix
         "[#{object_id}/#{Thread.current.object_id}]"
