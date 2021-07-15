@@ -14,9 +14,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changes
 
 ### Fixes
-* Typhoeus internal exception when request timed out
 
 ### Breaks
+
+
+## 1.15.1 - (2021-07-15)
+---
+
+### Fixes
+* Typhoeus internal exception when request timed out
 
 
 ## 1.15.0 - (2021-07-09)
