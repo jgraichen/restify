@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changes
 
 ### Fixes
+* Typhoeus internal exception when request timed out
 
 ### Breaks
 
@@ -33,6 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 
 ## 1.14.0 - (2020-12-15)
+---
 
 ### New
 * Allow making requests with non-JSON bodies and custom content types (#42)

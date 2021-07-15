@@ -40,18 +40,22 @@ module Stub
       WebMock::RequestRegistry.instance.requested_signatures.put(signature)
       response = ::WebMock::StubRegistry.instance.response_for_request(signature)
 
-      # If no stub matched `nil` is returned.
-      if response
-        status = response.status
-        status = status.to_s.split(' ', 2) unless status.is_a?(Array)
-        status = Integer(status[0])
-
-        [status, response.headers || {}, [response.body.to_s]]
-      else
-        # Return special HTTP 599 with the error message that would normally
-        # appear on missing stubs.
-        [599, {}, [WebMock::NetConnectNotAllowedError.new(signature).message]]
+      # Return special HTTP 599 with the error message that would normally
+      # appear on missing stubs.
+      unless response
+        return [599, {}, [WebMock::NetConnectNotAllowedError.new(signature).message]]
       end
+
+      if response.should_timeout
+        sleep 10
+        return [599, {}, ['Timeout']]
+      end
+
+      status = response.status
+      status = status.to_s.split(' ', 2) unless status.is_a?(Array)
+      status = Integer(status[0])
+
+      [status, response.headers || {}, [response.body.to_s]]
     end
   end
 

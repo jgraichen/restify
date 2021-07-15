@@ -49,7 +49,8 @@ module Restify
           debug 'request:add',
             tag: request.object_id,
             method: request.method.upcase,
-            url: request.uri
+            url: request.uri,
+            timeout: request.timeout
 
           @queue << convert(request, writer)
 
@@ -75,11 +76,11 @@ module Restify
           req.on_complete do |response|
             debug 'request:complete',
               tag: request.object_id,
-              status: response.code
+              status: response.code,
+              message: response.return_message,
+              timeout: response.timed_out?
 
-            if response.timed_out?
-              writer.reject Restify::Timeout.new request
-            elsif response.code.zero?
+            if response.timed_out? || response.code.zero?
               writer.reject \
                 Restify::NetworkError.new(request, response.return_message)
             else

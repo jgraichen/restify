@@ -34,13 +34,20 @@ if ENV['ADAPTER']
   end
 end
 
-require_relative 'support/stub_server.rb'
+require_relative 'support/stub_server'
 
 RSpec.configure do |config|
   config.order = 'random'
 
   config.before(:suite) do
-    ::Restify::Timeout.default_timeout = 0.1
+    ::Restify::Timeout.default_timeout = 1.0
+  end
+
+  config.before(:each) do |example|
+    next unless (adapter = example.metadata[:adapter])
+    next if Restify.adapter.is_a?(adapter)
+
+    skip 'Spec not enabled for current adapter'
   end
 
   config.before(:each) do
