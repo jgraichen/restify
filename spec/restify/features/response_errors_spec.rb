@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Restify do
-  let!(:request_stub) do
+  before do
     stub_request(:get, 'http://stubserver/base')
       .to_return(status: http_status, headers: headers)
   end

@@ -1,7 +1,6 @@
-# coding: utf-8
 # frozen_string_literal: true
 
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'restify/version'
 
@@ -28,16 +27,15 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'addressable', '~> 2.3'
   spec.add_runtime_dependency 'concurrent-ruby', '~> 1.0'
   spec.add_runtime_dependency 'hashie', '>= 3.3', '< 5.0'
-  spec.add_runtime_dependency 'rack'
-  spec.add_runtime_dependency 'typhoeus', '~> 1.3'
+  spec.add_runtime_dependency 'hitimes'
   spec.add_runtime_dependency 'logging', '~> 2.0'
   spec.add_runtime_dependency 'msgpack', '~> 1.2'
-  spec.add_runtime_dependency 'hitimes'
+  spec.add_runtime_dependency 'rack'
+  spec.add_runtime_dependency 'typhoeus', '~> 1.3'
 
   spec.add_development_dependency 'bundler'
 
-  if ENV['TRAVIS_BUILD_NUMBER'] && !ENV['TRAVIS_TAG']
-    # Append travis build number for auto-releases
-    spec.version = "#{spec.version}.1.b#{ENV['TRAVIS_BUILD_NUMBER']}"
-  end
+  spec.metadata = {
+    'rubygems_mfa_required' => 'true',
+  }
 end

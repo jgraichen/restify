@@ -3,10 +3,10 @@
 require 'spec_helper'
 
 describe Restify::Cache do
+  subject { cache }
+
   let(:store) { double 'store' }
   let(:cache) { described_class.new store }
-
-  subject { cache }
 
   describe '#call' do
     let(:request) { double 'request' }

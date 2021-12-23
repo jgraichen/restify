@@ -13,14 +13,14 @@ module Restify
 
       DEFAULT_HEADERS = {
         'Expect' => '',
-        'Transfer-Encoding' => ''
+        'Transfer-Encoding' => '',
       }.freeze
 
       DEFAULT_OPTIONS = {
         followlocation: true,
         tcp_keepalive: true,
         tcp_keepidle: 5,
-        tcp_keepintvl: 5
+        tcp_keepintvl: 5,
       }.freeze
 
       def initialize(sync: false, options: {}, **kwargs)
@@ -38,7 +38,6 @@ module Restify
         @sync
       end
 
-      # rubocop:disable Metrics/MethodLength
       def call_native(request, writer)
         req = convert(request, writer)
 
@@ -57,12 +56,9 @@ module Restify
           thread.run unless thread.status
         end
       end
-      # rubocop:enable Metrics/MethodLength
 
       private
 
-      # rubocop:disable Metrics/AbcSize
-      # rubocop:disable Metrics/MethodLength
       def convert(request, writer)
         ::Typhoeus::Request.new(
           request.uri,
@@ -71,7 +67,7 @@ module Restify
           headers: DEFAULT_HEADERS.merge(request.headers),
           body: request.body,
           timeout: request.timeout,
-          connecttimeout: request.timeout
+          connecttimeout: request.timeout,
         ).tap do |req|
           req.on_complete do |response|
             debug 'request:complete',
@@ -93,8 +89,6 @@ module Restify
           end
         end
       end
-      # rubocop:enable Metrics/MethodLength
-      # rubocop:enable Metrics/AbcSize
 
       def convert_back(response, request)
         uri     = request.uri
@@ -127,7 +121,6 @@ module Restify
         @thread
       end
 
-      # rubocop:disable Metrics/MethodLength
       def run
         runs = 0
 
@@ -154,7 +147,6 @@ module Restify
       ensure
         debug 'hydra:exit'
       end
-      # rubocop:enable Metrics/MethodLength
 
       def dequeue_all
         loop do

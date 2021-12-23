@@ -29,7 +29,7 @@ module Restify
         end
 
         # rubocop:disable Style/IdenticalConditionalBranches
-        def call(request, writer, retried = false)
+        def call(request, writer, retried: false)
           if requests.empty?
             requests << [request, writer, retried]
             process_next
@@ -47,10 +47,6 @@ module Restify
           @pipeline
         end
 
-        # rubocop:disable Metrics/AbcSize
-        # rubocop:disable Metrics/CyclomaticComplexity
-        # rubocop:disable Metrics/MethodLength
-        # rubocop:disable Metrics/PerceivedComplexity
         def process_next
           return if requests.empty?
 
@@ -77,7 +73,7 @@ module Restify
               req.last_effective_url,
               req.response_header.status,
               req.response_header,
-              req.response
+              req.response,
             )
 
             if req.response_header['CONNECTION'] == 'close'
@@ -108,7 +104,6 @@ module Restify
             end
           end
         end
-        # rubocop:enable all
       end
 
       def call_native(request, writer)
@@ -128,7 +123,7 @@ module Restify
         return if EventMachine.reactor_running?
 
         Thread.new do
-          EventMachine.run {}
+          EventMachine.run
         rescue StandardError => e
           puts "#{self.class} -> #{e}\n#{e.backtrace.join("\n")}"
           raise e

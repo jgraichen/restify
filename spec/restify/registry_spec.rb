@@ -36,11 +36,11 @@ describe Restify::Registry do
   end
 
   describe '#store / #fetch' do
+    subject { registry.store name, uri, **opts }
+
     let(:name) { 'remote' }
     let(:uri)  { 'http://remote/entry/point' }
     let(:opts) { {accept: 'application/vnd.remote+json'} }
-
-    subject { registry.store name, uri, **opts }
 
     it 'stores registry item' do
       subject

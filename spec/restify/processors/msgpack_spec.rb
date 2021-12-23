@@ -39,6 +39,7 @@ describe Restify::Processors::Msgpack do
 
   describe '#resource' do
     subject { described_class.new(context, response).resource }
+
     before { allow(response).to receive(:body).and_return(body) }
 
     describe 'parsing' do
@@ -56,12 +57,12 @@ describe Restify::Processors::Msgpack do
         let(:body) do
           ::MessagePack.dump(
             'msg' => 'value',
-            'search_url' => 'https://google.com{?q}'
+            'search_url' => 'https://google.com{?q}',
           )
         end
 
         it do
-          is_expected.to eq \
+          expect(subject).to eq \
             'msg' => 'value', 'search_url' => 'https://google.com{?q}'
         end
 
@@ -72,7 +73,7 @@ describe Restify::Processors::Msgpack do
       context 'object with implicit self relation' do
         let(:body) do
           ::MessagePack.dump(
-            'url' => '/self'
+            'url' => '/self',
           )
         end
 
@@ -100,9 +101,9 @@ describe Restify::Processors::Msgpack do
       context 'array with resources' do
         let(:body) do
           ::MessagePack.dump([
-                               {'name' => 'John', 'self_url' => '/users/john'},
-                               {'name' => 'Jane', 'self_url' => '/users/jane'}
-                             ])
+            {'name' => 'John', 'self_url' => '/users/john'},
+            {'name' => 'Jane', 'self_url' => '/users/jane'},
+          ])
         end
 
         it 'parses objects as resources' do
@@ -119,7 +120,7 @@ describe Restify::Processors::Msgpack do
         let(:body) do
           ::MessagePack.dump(
             'john' => {'name' => 'John'},
-            'jane' => {'name' => 'Jane'}
+            'jane' => {'name' => 'Jane'},
           )
         end
 

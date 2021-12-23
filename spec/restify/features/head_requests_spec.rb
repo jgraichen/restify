@@ -17,6 +17,7 @@ describe Restify do
 
   describe 'HEAD requests' do
     subject { Restify.new('http://localhost:9292/base').head(params).value! }
+
     let(:params) { {} }
 
     it 'returns a resource with access to headers' do
@@ -33,7 +34,7 @@ describe Restify do
       it 'adds them to the query string' do
         subject
         expect(
-          request_stub.with(query: {foo: 'bar'})
+          request_stub.with(query: {foo: 'bar'}),
         ).to have_been_requested
       end
     end

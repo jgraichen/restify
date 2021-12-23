@@ -18,5 +18,5 @@ begin
     t.files = %w[lib/**/*.rb]
     t.options = %w[--output-dir doc/]
   end
-rescue LoadError # rubocop:disable HandleExceptions
+rescue LoadError # rubocop:disable Lint/SuppressedException
 end

@@ -17,10 +17,10 @@ module Stub
   #
   # If no stub is found a special HTTP 599 error code will be returned.
   class Handler
-    def call(env) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    def call(env)
       signature = WebMock::RequestSignature.new(
         env['REQUEST_METHOD'].downcase,
-        "http://stubserver#{env['REQUEST_URI']}"
+        "http://stubserver#{env['REQUEST_URI']}",
       )
 
       # Extract request headers from rack env. Most header should start with
@@ -99,7 +99,7 @@ RSpec.configure do |config|
     WebMock.disable!(except: %i[net_http])
   end
 
-  config.around(:each) do |example|
+  config.around do |example|
     example.run
     WebMock.reset!
   end

@@ -8,13 +8,13 @@ describe Restify::Timeout do
   describe '#timeout!' do
     context 'before having timed out' do
       it 'do nothing' do
-        expect { timer.timeout! }.to_not raise_error
+        expect { timer.timeout! }.not_to raise_error
       end
     end
 
     context 'after having timed out' do
       it 'calls given block' do
-        expect { timer.timeout! }.to_not raise_error
+        expect { timer.timeout! }.not_to raise_error
         sleep timer.send(:wait_interval)
         expect { timer.timeout! }.to raise_error ::Restify::Timeout::Error
       end
@@ -40,7 +40,7 @@ describe Restify::Timeout do
           Thread.new { ivar.set :success }
           expect(timer.wait_on!(ivar)).to eq :success
         end
-      end.to_not raise_error
+      end.not_to raise_error
     end
 
     it 'does nothing on successful Promise' do
@@ -48,7 +48,7 @@ describe Restify::Timeout do
         Restify::Promise.fulfilled(:success).tap do |p|
           expect(timer.wait_on!(p)).to eq :success
         end
-      end.to_not raise_error
+      end.not_to raise_error
     end
   end
 end

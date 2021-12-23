@@ -25,6 +25,7 @@ describe Restify::Processors::Base do
 
   describe '#resource' do
     subject { described_class.new(context, response).resource }
+
     before { allow(response).to receive(:body).and_return(body) }
 
     describe 'parsing' do

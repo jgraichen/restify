@@ -89,7 +89,6 @@ module Restify
     #
     # @return [Array<Link>] Links.
     #
-    # rubocop:disable Metrics/MethodLength
     def links
       @links ||= begin
         if headers['LINK']
@@ -104,7 +103,6 @@ module Restify
         end
       end
     end
-    # rubocop:enable all
 
     # Return content type header from response headers.
     #

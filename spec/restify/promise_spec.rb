@@ -8,6 +8,7 @@ describe Restify::Promise do
   describe 'factory methods' do
     describe '#fulfilled' do
       subject { described_class.fulfilled(fulfill_value) }
+
       let(:fulfill_value) { 42 }
 
       it 'returns a fulfilled promise' do
@@ -22,6 +23,7 @@ describe Restify::Promise do
 
     describe '#rejected' do
       subject { described_class.rejected(rejection_reason) }
+
       let(:rejection_reason) { ArgumentError }
 
       it 'returns a rejected promise' do
@@ -104,6 +106,7 @@ describe Restify::Promise do
 
   describe 'result' do
     subject { described_class.new(*dependencies, &task).value! }
+
     let(:dependencies) { [] }
     let(:task) { nil }
 
@@ -125,7 +128,7 @@ describe Restify::Promise do
         [
           Restify::Promise.fulfilled(1),
           Restify::Promise.fulfilled(2),
-          Restify::Promise.fulfilled(3)
+          Restify::Promise.fulfilled(3),
         ]
       end
 
@@ -139,7 +142,7 @@ describe Restify::Promise do
         [[
           Restify::Promise.fulfilled(1),
           Restify::Promise.fulfilled(2),
-          Restify::Promise.fulfilled(3)
+          Restify::Promise.fulfilled(3),
         ]]
       end
 
@@ -152,7 +155,7 @@ describe Restify::Promise do
       let(:dependencies) do
         [
           Restify::Promise.fulfilled(5),
-          Restify::Promise.fulfilled(12)
+          Restify::Promise.fulfilled(12),
         ]
       end
       let(:task) do
@@ -168,6 +171,7 @@ describe Restify::Promise do
     # dependencies is built dynamically.
     context 'with an empty array of dependencies and without task' do
       subject { described_class.new([]).value! }
+
       it { is_expected.to eq [] }
     end
   end
@@ -180,7 +184,7 @@ describe Restify::Promise do
 
   describe '#value' do
     it 'can time out' do
-      expect { promise.value!(0.1) }.to raise_error ::Timeout::Error
+      expect { promise.value(0.1) }.to raise_error ::Timeout::Error
     end
   end
 

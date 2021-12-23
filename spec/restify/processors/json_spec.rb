@@ -29,6 +29,7 @@ describe Restify::Processors::Json do
 
   describe '#resource' do
     subject { described_class.new(context, response).resource }
+
     before { allow(response).to receive(:body).and_return(body) }
 
     describe 'parsing' do
@@ -52,7 +53,7 @@ describe Restify::Processors::Json do
         end
 
         it do
-          is_expected.to eq \
+          expect(subject).to eq \
             'json' => 'value', 'search_url' => 'https://google.com{?q}'
         end
 

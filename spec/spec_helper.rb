@@ -43,14 +43,14 @@ RSpec.configure do |config|
     ::Restify::Timeout.default_timeout = 1.0
   end
 
-  config.before(:each) do |example|
+  config.before do |example|
     next unless (adapter = example.metadata[:adapter])
     next if Restify.adapter.is_a?(adapter)
 
     skip 'Spec not enabled for current adapter'
   end
 
-  config.before(:each) do
+  config.before do
     Ethon.logger = ::Logging.logger[Ethon] if defined?(Ethon)
 
     ::Logging.logger.root.level = :debug

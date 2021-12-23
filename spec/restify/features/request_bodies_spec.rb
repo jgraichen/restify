@@ -14,6 +14,7 @@ describe Restify do
 
   describe 'Request body' do
     subject { Restify.new('http://localhost:9292/base').post(body, {}, {headers: headers}).value! }
+
     let(:headers) { {} }
 
     context 'with JSON-like data structures' do
@@ -23,7 +24,7 @@ describe Restify do
         subject
 
         expect(
-          request_stub.with(body: '{"a":"b","c":"d"}')
+          request_stub.with(body: '{"a":"b","c":"d"}'),
         ).to have_been_requested
       end
 
@@ -31,7 +32,7 @@ describe Restify do
         subject
 
         expect(
-          request_stub.with(headers: {'Content-Type' => 'application/json'})
+          request_stub.with(headers: {'Content-Type' => 'application/json'}),
         ).to have_been_requested
       end
 
@@ -42,7 +43,7 @@ describe Restify do
           subject
 
           expect(
-            request_stub.with(headers: {'Content-Type' => 'application/vnd.api+json'})
+            request_stub.with(headers: {'Content-Type' => 'application/vnd.api+json'}),
           ).to have_been_requested
         end
       end
@@ -55,7 +56,7 @@ describe Restify do
         subject
 
         expect(
-          request_stub.with(body: 'a=b&c=d')
+          request_stub.with(body: 'a=b&c=d'),
         ).to have_been_requested
       end
 
@@ -63,7 +64,7 @@ describe Restify do
         subject
 
         expect(
-          request_stub.with {|req| req.headers['Content-Type'] !~ /json/ }
+          request_stub.with {|req| req.headers['Content-Type'] !~ /json/ },
         ).to have_been_requested
       end
 
@@ -74,7 +75,7 @@ describe Restify do
           subject
 
           expect(
-            request_stub.with(headers: {'Content-Type' => 'application/text'})
+            request_stub.with(headers: {'Content-Type' => 'application/text'}),
           ).to have_been_requested
         end
       end

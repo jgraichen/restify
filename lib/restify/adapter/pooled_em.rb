@@ -164,7 +164,7 @@ module Restify
         def new(origin)
           logger.debug do
             "Connect to '#{origin}' " \
-            "(#{@connect_timeout}/#{@inactivity_timeout})..."
+              "(#{@connect_timeout}/#{@inactivity_timeout})..."
           end
 
           @host[origin] += 1
@@ -197,11 +197,10 @@ module Restify
       end
 
       def initialize(**kwargs)
+        super()
         @pool = Pool.new(**kwargs)
       end
 
-      # rubocop:disable Metrics/MethodLength
-      # rubocop:disable Metrics/AbcSize
       # rubocop:disable Metrics/BlockLength
       def call_native(request, writer)
         next_tick do
@@ -226,7 +225,7 @@ module Restify
                 req.last_effective_url,
                 req.response_header.status,
                 req.response_header,
-                req.response
+                req.response,
               )
 
               if req.response_header['CONNECTION'] == 'close'
@@ -259,7 +258,7 @@ module Restify
         return if EventMachine.reactor_running?
 
         Thread.new do
-          EventMachine.run {}
+          EventMachine.run
         rescue StandardError => e
           logger.error(e)
           raise e

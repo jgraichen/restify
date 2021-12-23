@@ -3,12 +3,13 @@
 require 'spec_helper'
 
 describe Restify::Resource do
+  subject { resource }
+
   let(:data)      { {} }
   let(:relations) { {} }
   let(:context)   { double 'context' }
   let(:response)  { double 'response' }
   let(:resource)  { described_class.new(context, response: response, data: data, relations: relations) }
-  subject { resource }
 
   before do
     allow(context).to receive(:relation?).and_return(false)
@@ -19,12 +20,12 @@ describe Restify::Resource do
     let(:relations) do
       {
         'users' => 'http://example.org/users',
-        'projects' => 'http://example.org/projects'
+        'projects' => 'http://example.org/projects',
       }
     end
 
     describe '#relation?' do
-      it 'should match relations' do
+      it 'matches relations' do
         expect(subject.relation?(:users)).to eq true
         expect(subject.relation?('users')).to eq true
         expect(subject.relation?(:projects)).to eq true
@@ -46,7 +47,7 @@ describe Restify::Resource do
     end
 
     describe '#relation' do
-      it 'should return relation' do
+      it 'returns relation' do
         expect(subject.rel(:users)).to be_a Restify::Relation
 
         expect(subject.rel(:users)).to eq 'http://example.org/users'
@@ -80,7 +81,7 @@ describe Restify::Resource do
       end
     end
 
-    context '#follow!' do
+    describe '#follow!' do
       let(:relations) { {_restify_follow: 'http://localhost/10'} }
 
       it 'returns follow relation' do
@@ -103,14 +104,14 @@ describe Restify::Resource do
   context 'data' do
     let(:data) { double 'data' }
 
-    it 'should delegate methods (I)' do
+    it 'delegates methods (I)' do
       expect(data).to receive(:some_method).and_return(42)
 
       expect(subject).to respond_to :some_method
       expect(subject.some_method).to eq 42
     end
 
-    it 'should delegate methods (II)' do
+    it 'delegates methods (II)' do
       expect(data).to receive(:[]).with(1).and_return(2)
 
       expect(subject).to respond_to :[]
@@ -118,7 +119,7 @@ describe Restify::Resource do
     end
 
     describe '#data' do
-      it 'should return data' do
+      it 'returns data' do
         expect(subject.data).to equal data
       end
     end

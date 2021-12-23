@@ -97,7 +97,7 @@ describe Restify do
     end
 
     context 'within threads' do
-      it 'should consume the API' do
+      it 'consumes the API' do
         # Let's get all users
 
         # First request the entry resource usually the
@@ -185,7 +185,7 @@ describe Restify do
     end
 
     context 'within EM-synchrony' do
-      it 'should consume the API' do
+      it 'consumes the API' do
         skip 'Seems to be impossible to detect EM scheduled fibers from within'
 
         EM.synchrony do

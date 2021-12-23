@@ -21,8 +21,8 @@ module Restify
         def parse(object, root: false)
           case object
             when Hash
-              data      = object.each_with_object({}, &method(:parse_data))
-              relations = object.each_with_object({}, &method(:parse_rels))
+              data      = object.each_with_object({}) {|each, obj| parse_data(each, obj) }
+              relations = object.each_with_object({}) {|each, obj| parse_rels(each, obj) }
 
               data = with_indifferent_access(data) if self.class.indifferent_access?
 
@@ -32,7 +32,7 @@ module Restify
                 relations: relations
 
             when Array
-              object.map(&method(:parse))
+              object.map {|each| parse(each) }
             else
               object
           end

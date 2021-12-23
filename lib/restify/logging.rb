@@ -14,7 +14,7 @@ module Restify
           _log_prefix,
           *Array(tag),
           message,
-          _fmt(**kwargs)
+          _fmt(**kwargs),
         ].map(&:to_s).reject(&:empty?).join(' ')
       end
     end

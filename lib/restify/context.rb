@@ -47,26 +47,22 @@ module Restify
       processor.new(context, response).resource
     end
 
-    # rubocop:disable Metrics/MethodLength
     def request(method, uri, data: nil, headers: {}, **kwargs)
       request = Request.new(
         headers: default_headers.merge(headers),
         **kwargs,
         method: method,
         uri: join(uri),
-        data: data
+        data: data,
       )
 
       ret = cache.call(request) {|req| adapter.call(req) }
       ret.then do |response|
-        if response.errored?
-          raise ResponseError.from_code(response)
-        else
-          process response
-        end
+        raise ResponseError.from_code(response) if response.errored?
+
+        process(response)
       end
     end
-    # rubocop:enable all
 
     def encode_with(coder)
       coder.map = marshal_dump
@@ -79,7 +75,7 @@ module Restify
     def marshal_dump
       {
         uri: uri.to_s,
-        headers: default_headers
+        headers: default_headers,
       }
     end
 

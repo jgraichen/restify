@@ -18,8 +18,9 @@ describe Restify::Context do
       end
 
       describe '#adapter' do
-        let(:kwargs) { {adapter: double('adapter')} }
         subject { super().options[:adapter] }
+
+        let(:kwargs) { {adapter: double('adapter')} }
 
         it 'adapter is not serialized' do
           expect(subject).to equal nil
@@ -27,8 +28,9 @@ describe Restify::Context do
       end
 
       describe '#cache' do
-        let(:kwargs) { {adapter: double('cache')} }
         subject { super().options[:cache] }
+
+        let(:kwargs) { {adapter: double('cache')} }
 
         it 'cache is not serialized' do
           expect(subject).to equal nil
@@ -36,8 +38,9 @@ describe Restify::Context do
       end
 
       describe '#headers' do
-        let(:kwargs) { {headers: {'Accept' => 'application/json'}} }
         subject { super().options[:headers] }
+
+        let(:kwargs) { {headers: {'Accept' => 'application/json'}} }
 
         it 'all headers are serialized' do
           expect(subject).to eq('Accept' => 'application/json')
@@ -46,19 +49,19 @@ describe Restify::Context do
     end
 
     context 'YAML' do
+      subject { load }
+
       let(:dump) { YAML.dump(context) }
       let(:load) { YAML.load(dump) } # rubocop:disable Security/YAMLLoad
-
-      subject { load }
 
       include_examples 'serialization'
     end
 
     context 'Marshall' do
+      subject { load }
+
       let(:dump) { Marshal.dump(context) }
       let(:load) { Marshal.load(dump) } # rubocop:disable Security/MarshalLoad
-
-      subject { load }
 
       include_examples 'serialization'
     end
