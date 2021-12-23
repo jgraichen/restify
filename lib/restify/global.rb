@@ -20,6 +20,7 @@ module Restify
 
     def cache
       @cache ||= begin
+        require 'active_support'
         require 'active_support/cache'
         Restify::Cache.new store: ActiveSupport::Cache::MemoryStore.new
       end
