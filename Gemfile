@@ -18,8 +18,9 @@ group :test do
   gem 'puma'
   gem 'rspec', '~> 3.0'
   gem 'rspec-collection_matchers'
-  gem 'rubocop', '~> 1.23.0'
   gem 'webmock'
+
+  gem 'my-rubocop', github: 'jgraichen/my-rubocop', ref: 'v5'
 end
 
 group :development do
