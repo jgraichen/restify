@@ -52,7 +52,7 @@ describe Restify::Context do
       subject { load }
 
       let(:dump) { YAML.dump(context) }
-      let(:load) { YAML.load(dump) } # rubocop:disable Security/YAMLLoad
+      let(:load) { YAML.load(dump, permitted_classes: [::Restify::Context, ::Symbol]) } # rubocop:disable Security/YAMLLoad
 
       include_examples 'serialization'
     end
