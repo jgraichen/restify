@@ -1,6 +1,7 @@
 # Restify
 
-[![Build Status](https://travis-ci.org/jgraichen/restify.svg?branch=master)](https://travis-ci.org/jgraichen/restify)
+[![Gem Version](https://img.shields.io/gem/v/restify?logo=ruby)](https://rubygems.org/gems/restify)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/jgraichen/restify/test?logo=github)](https://github.com/jgraichen/restify/actions)
 [![Code Quality](https://codebeat.co/badges/18ffe6b7-8239-493a-b5b6-be329b9f275d)](https://codebeat.co/projects/github-com-jgraichen-restify-master)
 
 Restify is an hypermedia REST client that does parallel, concurrent and keep-alive requests by default.
