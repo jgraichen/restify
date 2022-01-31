@@ -13,15 +13,8 @@ module Restify
       end
 
       def resource
-        @resource ||= begin
-          resource = load
-
-          resource = Resource.new context, response: response, data: resource unless resource.is_a? Restify::Resource
-
-          resource._restify_response = response
+        @resource ||= Resource.new(context, response: response, data: load).tap do |resource|
           merge_relations! resource._restify_relations
-
-          resource
         end
       end
 
@@ -30,7 +23,7 @@ module Restify
       # Should be overridden in subclass.
       #
       def load
-        body
+        proc { body }
       end
 
       # @!method body

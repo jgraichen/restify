@@ -3,12 +3,11 @@
 require 'delegate'
 
 module Restify
-  class Resource < SimpleDelegator
+  class Resource < Delegator
     # @api private
     #
     def initialize(context, response: nil, data: nil, relations: {})
-      super(data)
-
+      @data      = data
       @context   = context
       @response  = response
       @relations = relations
@@ -20,6 +19,8 @@ module Restify
     # @return [Boolean] True if resource has relation, false otherwise.
     #
     def relation?(name)
+      data rescue nil # Trigger lazy loading
+
       @relations.key?(name) || @relations.key?(name.to_s)
     end
 
@@ -33,6 +34,8 @@ module Restify
     # @return [Relation] Relation.
     #
     def relation(name)
+      data rescue nil # Trigger lazy loading
+
       if @relations.key? name
         Relation.new @context, @relations.fetch(name)
       else
@@ -42,6 +45,10 @@ module Restify
 
     alias rel relation
 
+    def __getobj__
+      @__getobj__ ||= @data.respond_to?(:call) ? @data.call(self) : @data
+    end
+
     # @!method data
     #
     #   Return response data. Usually a hash or array.
@@ -49,6 +56,8 @@ module Restify
     #   @return [Object] Response data.
     #
     alias data __getobj__
+
+    attr_writer :data
 
     # @!method response
     #

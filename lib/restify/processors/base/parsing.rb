@@ -15,10 +15,15 @@ module Restify
         end
 
         def load
-          parse deserialized_body, root: true
+          proc do |resource|
+            parsed = parse(deserialized_body)
+            resource._restify_relations.merge! parsed._restify_relations if parsed.respond_to?(:_restify_relations)
+
+            parsed.respond_to?(:data) ? parsed.data : parsed
+          end
         end
 
-        def parse(object, root: false)
+        def parse(object)
           case object
             when Hash
               data      = object.each_with_object({}) {|each, obj| parse_data(each, obj) }
@@ -26,10 +31,7 @@ module Restify
 
               data = with_indifferent_access(data) if self.class.indifferent_access?
 
-              Resource.new context,
-                data: data,
-                response: root ? response : nil,
-                relations: relations
+              Resource.new context, data: data, relations: relations
 
             when Array
               object.map {|each| parse(each) }
