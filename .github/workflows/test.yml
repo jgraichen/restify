@@ -35,6 +35,10 @@ jobs:
           - ruby: "3.0"
             adapter: em-pooled
 
+    env:
+      BUNDLE_WITHOUT: development
+      ADAPTER: ${{ matrix.adapter }}
+
     steps:
       - uses: actions/checkout@master
       - uses: ruby/setup-ruby@v1
@@ -42,7 +46,6 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
         env:
-          BUNDLE_WITHOUT: development
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 3
 
@@ -51,6 +54,9 @@ jobs:
   rubocop:
     name: rubocop
     runs-on: ubuntu-20.04
+
+    env:
+      BUNDLE_WITHOUT: development
 
     steps:
       - uses: actions/checkout@master
