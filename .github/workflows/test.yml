@@ -21,19 +21,6 @@ jobs:
           - em-pooled
           - typhoeus
           - typhoeus-sync
-        exclude:
-          - ruby: "3.2"
-            adapter: em
-          - ruby: "3.2"
-            adapter: em-pooled
-          - ruby: "3.1"
-            adapter: em
-          - ruby: "3.1"
-            adapter: em-pooled
-          - ruby: "3.0"
-            adapter: em
-          - ruby: "3.0"
-            adapter: em-pooled
 
     env:
       BUNDLE_WITHOUT: development
