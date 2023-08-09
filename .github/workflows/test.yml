@@ -49,7 +49,7 @@ jobs:
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 3
 
-      - run: bundle exec rspec --color
+      - run: bundle exec rspec --color --format documentation
 
   rubocop:
     name: rubocop
