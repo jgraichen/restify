@@ -41,7 +41,7 @@ RSpec.configure do |config|
 
   config.before do |example|
     next unless (adapter = example.metadata[:adapter])
-    next if Restify.adapter.is_a?(adapter)
+    next if Restify.adapter.class.ancestors.map(&:to_s).include?(adapter)
 
     skip 'Spec not enabled for current adapter'
   end

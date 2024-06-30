@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Restify, adapter: ::Restify::Adapter::Typhoeus do
+describe Restify, adapter: 'Restify::Adapter::Typhoeus' do
   before do
     stub_request(:get, 'http://stubserver/base').to_timeout
   end
