@@ -132,7 +132,7 @@ describe Restify do
           # Because we forgot to send a "name" the server complains
           # with an error code that will lead to a raised error.
 
-          expect(e.status).to eq :unprocessable_entity
+          expect(e.status).to eq :unprocessable_content
           expect(e.code).to eq 422
           expect(e.errors).to eq 'name' => ["can't be blank"]
         end
@@ -200,7 +200,7 @@ describe Restify do
 
           expect { create_user_promise.value! }.to \
             raise_error(Restify::ClientError) do |e|
-            expect(e.status).to eq :unprocessable_entity
+            expect(e.status).to eq :unprocessable_content
             expect(e.code).to eq 422
             expect(e.errors).to eq 'name' => ["can't be blank"]
           end
