@@ -17,12 +17,6 @@ require 'restify'
 
 if ENV['ADAPTER']
   case ENV['ADAPTER'].to_s.downcase
-    when 'em'
-      require 'restify/adapter/em'
-      Restify.adapter = Restify::Adapter::EM.new
-    when 'em-pooled'
-      require 'restify/adapter/pooled_em'
-      Restify.adapter = Restify::Adapter::PooledEM.new
     when 'typhoeus'
       require 'restify/adapter/typhoeus'
       Restify.adapter = Restify::Adapter::Typhoeus.new

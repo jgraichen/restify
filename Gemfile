@@ -5,8 +5,6 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in restify.gemspec
 gemspec
 
-gem 'em-http-request'
-gem 'em-synchrony'
 gem 'rake'
 gem 'rake-release'
 gem 'typhoeus'
