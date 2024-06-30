@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixes
 
 ### Breaks
+* Require Ruby 3.1+
 
 
 ## 1.15.2 - (2021-12-23)
