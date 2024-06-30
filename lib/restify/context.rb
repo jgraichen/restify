@@ -51,9 +51,9 @@ module Restify
       request = Request.new(
         headers: default_headers.merge(headers),
         **kwargs,
-        method: method,
+        method:,
         uri: join(uri),
-        data: data,
+        data:,
       )
 
       ret = cache.call(request) {|req| adapter.call(req) }

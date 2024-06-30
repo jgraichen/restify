@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Restify do
   before do
     stub_request(:get, 'http://stubserver/base')
-      .to_return(status: http_status, headers: headers)
+      .to_return(status: http_status, headers:)
   end
 
   let(:http_status) { '200 OK' }

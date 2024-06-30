@@ -25,8 +25,8 @@ module Restify
       self
     end
 
-    def then(&block)
-      Promise.new([self], &block)
+    def then(&)
+      Promise.new([self], &)
     end
 
     def execute(timeout = nil)

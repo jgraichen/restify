@@ -20,7 +20,7 @@ module Restify
     end
 
     def request(method, data, params, opts = {})
-      context.request method, expand(params), **opts, data: data
+      context.request method, expand(params), **opts, data:
     end
 
     def get(params = {}, opts = {})

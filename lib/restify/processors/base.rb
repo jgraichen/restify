@@ -16,7 +16,7 @@ module Restify
         @resource ||= begin
           resource = load
 
-          resource = Resource.new context, response: response, data: resource unless resource.is_a? Restify::Resource
+          resource = Resource.new context, response:, data: resource unless resource.is_a? Restify::Resource
 
           resource._restify_response = response
           merge_relations! resource._restify_relations

@@ -9,7 +9,7 @@ describe Restify::Resource do
   let(:relations) { {} }
   let(:context)   { double 'context' }
   let(:response)  { double 'response' }
-  let(:resource)  { described_class.new(context, response: response, data: data, relations: relations) }
+  let(:resource)  { described_class.new(context, response:, data:, relations:) }
 
   before do
     allow(context).to receive(:relation?).and_return(false)

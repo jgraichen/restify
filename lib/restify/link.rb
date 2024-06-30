@@ -25,10 +25,10 @@ module Restify
     end
 
     class << self
-      REGEXP_URI = /<[^>]*>\s*/.freeze
-      REGEXP_PAR = /;\s*\w+\s*=\s*/i.freeze
-      REGEXP_QUT = /"[^"]*"\s*/.freeze
-      REGEXP_ARG = /\w+\s*/i.freeze
+      REGEXP_URI = /<[^>]*>\s*/
+      REGEXP_PAR = /;\s*\w+\s*=\s*/i
+      REGEXP_QUT = /"[^"]*"\s*/
+      REGEXP_ARG = /\w+\s*/i
 
       def parse(string)
         scanner = StringScanner.new(string.strip)

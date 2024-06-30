@@ -27,9 +27,9 @@ module Restify
               data = with_indifferent_access(data) if self.class.indifferent_access?
 
               Resource.new context,
-                data: data,
+                data:,
                 response: root ? response : nil,
-                relations: relations
+                relations:
 
             when Array
               object.map {|each| parse(each) }

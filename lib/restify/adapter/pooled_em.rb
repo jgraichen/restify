@@ -249,9 +249,9 @@ module Restify
 
       private
 
-      def next_tick(&block)
+      def next_tick(&)
         ensure_running
-        EventMachine.next_tick(&block)
+        EventMachine.next_tick(&)
       end
 
       def ensure_running

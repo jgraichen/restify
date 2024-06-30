@@ -22,7 +22,7 @@ end
 # Do not use deprecated indifferent access
 Restify::Processors::Json.indifferent_access = false
 
-gh    = Restify.new('https://api.github.com', headers: headers).get.value!
+gh    = Restify.new('https://api.github.com', headers:).get.value!
 user  = gh.rel(:user).get(user: 'jgraichen').value!
 repos = user.rel(:repos).get.value!
 
