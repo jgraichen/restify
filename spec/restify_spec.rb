@@ -145,8 +145,8 @@ describe Restify do
         expect(created_user.response.status).to eq :created
         expect(created_user.response.code).to eq 201
 
-        expect(created_user).to have_key :name
-        expect(created_user.name).to eq 'John Smith'
+        expect(created_user).to have_key 'name'
+        expect(created_user['name']).to eq 'John Smith'
 
         # Let's follow the "Location" header.
         followed_resource = created_user.follow.get.value!
@@ -154,8 +154,8 @@ describe Restify do
         expect(followed_resource.response.status).to eq :ok
         expect(followed_resource.response.code).to eq 200
 
-        expect(followed_resource).to have_key :name
-        expect(followed_resource.name).to eq 'John Smith'
+        expect(followed_resource).to have_key 'name'
+        expect(followed_resource['name']).to eq 'John Smith'
 
         # Now we will fetch a list of all users.
         users = users_relation.get.value!
@@ -168,80 +168,19 @@ describe Restify do
 
         # We have all our attributes and relations here as defined in the
         # responses from the server.
-        expect(user).to have_key :name
-        expect(user[:name]).to eq 'John Smith'
+        expect(user).to have_key 'name'
+        expect(user['name']).to eq 'John Smith'
         expect(user).to have_relation :self
         expect(user).to have_relation :blurb
 
         # Let's get the blurb.
         blurb = user.rel(:blurb).get.value!
 
-        expect(blurb).to have_key :title
-        expect(blurb).to have_key :image
+        expect(blurb).to have_key 'title'
+        expect(blurb).to have_key 'image'
 
-        expect(blurb[:title]).to eq 'Prof. Dr. John Smith'
-        expect(blurb[:image]).to eq 'http://example.org/avatar.png'
-      end
-    end
-
-    context 'within EM-synchrony' do
-      it 'consumes the API' do
-        skip 'Seems to be impossible to detect EM scheduled fibers from within'
-
-        EM.synchrony do
-          root = Restify.new('http://localhost:9292/base').get.value!
-
-          users_relation = root.rel(:users)
-
-          expect(users_relation).to be_a Restify::Relation
-
-          create_user_promise = users_relation.post
-          expect(create_user_promise).to be_a Restify::Promise
-
-          expect { create_user_promise.value! }.to \
-            raise_error(Restify::ClientError) do |e|
-            expect(e.status).to eq :unprocessable_content
-            expect(e.code).to eq 422
-            expect(e.errors).to eq 'name' => ["can't be blank"]
-          end
-
-          created_user = users_relation.post(name: 'John Smith').value!
-
-          expect(created_user.response.status).to eq :created
-          expect(created_user.response.code).to eq 201
-
-          expect(created_user).to have_key :name
-          expect(created_user.name).to eq 'John Smith'
-
-          followed_resource = created_user.follow.get.value!
-
-          expect(followed_resource.response.status).to eq :ok
-          expect(followed_resource.response.code).to eq 200
-
-          expect(followed_resource).to have_key :name
-          expect(followed_resource.name).to eq 'John Smith'
-
-          users = users_relation.get.value!
-
-          expect(users).to have(2).items
-
-          user = users.first
-
-          expect(user).to have_key :name
-          expect(user[:name]).to eq 'John Smith'
-          expect(user).to have_relation :self
-          expect(user).to have_relation :blurb
-
-          blurb = user.rel(:blurb).get.value!
-
-          expect(blurb).to have_key :title
-          expect(blurb).to have_key :image
-
-          expect(blurb[:title]).to eq 'Prof. Dr. John Smith'
-          expect(blurb[:image]).to eq 'http://example.org/avatar.png'
-
-          EventMachine.stop
-        end
+        expect(blurb['title']).to eq 'Prof. Dr. John Smith'
+        expect(blurb['image']).to eq 'http://example.org/avatar.png'
       end
     end
   end
