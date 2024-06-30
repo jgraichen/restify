@@ -10,7 +10,11 @@ if ENV['LOGGING']
   ::Logging.logger.root.level = :debug
 end
 
-gh   = Restify.new('https://api.github.com').get.value
+if (token = ENV['GITHUB_TOKEN'])
+  headers['Authorization'] = "Bearer #{token}"
+end
+
+gh   = Restify.new('https://api.github.com', headers:).get.value
 repo = gh.rel(:repository).get(owner: 'jgraichen', repo: 'restify').value
 cmt  = repo.rel(:commits).get.value.first
 

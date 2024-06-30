@@ -14,9 +14,8 @@ if ENV['LOGGING']
   ::Logging.logger.root.level = :debug
 end
 
-if ENV['AUTH']
-  auth = Base64.encode64(ENV['AUTH']).gsub(/\s+/, '').strip
-  headers['Authorization'] = "Basic #{auth}"
+if (token = ENV['GITHUB_TOKEN'])
+  headers['Authorization'] = "Bearer #{token}"
 end
 
 gh    = Restify.new('https://api.github.com', headers:).get.value!
