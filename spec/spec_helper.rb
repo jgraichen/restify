@@ -4,14 +4,16 @@ require 'rspec'
 require 'rspec/collection_matchers'
 
 require 'simplecov'
+require 'simplecov-cobertura'
+
 SimpleCov.start do
   add_filter 'spec'
 end
 
-if ENV['CI']
-  require 'codecov'
-  SimpleCov.formatter = SimpleCov::Formatter::Codecov
-end
+SimpleCov.formatters = [
+  SimpleCov::Formatter::HTMLFormatter,
+  SimpleCov::Formatter::CoberturaFormatter,
+]
 
 require 'restify'
 

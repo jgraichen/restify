@@ -12,8 +12,8 @@ gem 'rake-release'
 gem 'typhoeus'
 
 group :test do
-  gem 'codecov', require: false
-  gem 'simplecov', require: false
+  gem 'simplecov'
+  gem 'simplecov-cobertura'
 
   gem 'puma'
   gem 'rspec', '~> 3.0'
