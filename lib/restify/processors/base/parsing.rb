@@ -9,11 +9,6 @@ module Restify
       # Parses generic data structures into resources
       #
       module Parsing
-        def self.included(base)
-          base.extend ClassMethods
-          base.indifferent_access = true
-        end
-
         def load
           parse deserialized_body, root: true
         end
@@ -23,8 +18,6 @@ module Restify
             when Hash
               data      = object.each_with_object({}) {|each, obj| parse_data(each, obj) }
               relations = object.each_with_object({}) {|each, obj| parse_rels(each, obj) }
-
-              data = with_indifferent_access(data) if self.class.indifferent_access?
 
               Resource.new context,
                 data:,
@@ -57,18 +50,6 @@ module Restify
           return if relations.key?(name) || pair[1].nil? || pair[1].to_s =~ /\A\w*\z/
 
           relations[name] = pair[1].to_s
-        end
-
-        def with_indifferent_access(data)
-          Hashie::Mash.new data
-        end
-
-        module ClassMethods
-          def indifferent_access?
-            @indifferent_access
-          end
-
-          attr_writer :indifferent_access
         end
       end
     end

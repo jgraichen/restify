@@ -10,9 +10,6 @@ if ENV['LOGGING']
   ::Logging.logger.root.level = :debug
 end
 
-# Do not use deprecated indifferent access
-Restify::Processors::Json.indifferent_access = false
-
 gh   = Restify.new('https://api.github.com').get.value
 repo = gh.rel(:repository).get(owner: 'jgraichen', repo: 'restify').value
 cmt  = repo.rel(:commits).get.value.first

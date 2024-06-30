@@ -4,7 +4,6 @@ require 'forwardable'
 
 require 'restify/version'
 
-require 'hashie'
 require 'concurrent'
 require 'addressable/uri'
 require 'addressable/template'

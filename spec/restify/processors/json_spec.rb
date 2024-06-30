@@ -142,46 +142,6 @@ describe Restify::Processors::Json do
         it { expect(subject.response).to be response }
         it { is_expected.to eq 'BLUB' }
       end
-
-      context 'with indifferent access' do
-        let(:body) do
-          <<-JSON
-            {"name": "John", "age": 24}
-          JSON
-        end
-
-        it '#key?' do
-          expect(subject).to have_key 'name'
-          expect(subject).to have_key 'age'
-
-          expect(subject).to have_key :name
-          expect(subject).to have_key :age
-        end
-
-        it '#[]' do
-          expect(subject['name']).to eq 'John'
-          expect(subject['age']).to eq 24
-
-          expect(subject[:name]).to eq 'John'
-          expect(subject[:age]).to eq 24
-        end
-      end
-
-      context 'with method getter access' do
-        let(:body) do
-          <<-JSON
-            {"name": "John", "age": 24}
-          JSON
-        end
-
-        it '#<method getter>' do
-          expect(subject).to respond_to :name
-          expect(subject).to respond_to :age
-
-          expect(subject.name).to eq 'John'
-          expect(subject.age).to eq 24
-        end
-      end
     end
   end
 end
