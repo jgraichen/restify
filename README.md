@@ -1,8 +1,8 @@
 # Restify
 
 [![Gem Version](https://img.shields.io/gem/v/restify?logo=ruby)](https://rubygems.org/gems/restify)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/jgraichen/restify/test?logo=github)](https://github.com/jgraichen/restify/actions)
-[![Code Quality](https://codebeat.co/badges/18ffe6b7-8239-493a-b5b6-be329b9f275d)](https://codebeat.co/projects/github-com-jgraichen-restify-master)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/jgraichen/restify/test.yml?logo=github)](https://github.com/jgraichen/restify/actions)
+[![Code Quality](https://codebeat.co/badges/368f8033-bd76-48bc-9777-85f1d4befa94)](https://codebeat.co/projects/github-com-jgraichen-restify-main)
 
 Restify is an hypermedia REST client that does parallel, concurrent and keep-alive requests by default.
 
@@ -28,16 +28,19 @@ Links are extracted from
 * HTTP Link header
 * Github-style relations in payloads
 
-### Planned features
-
-* HTTP cache
-* API versions via header
-* Content-Type and Language negotiation
-* Processors for JSON-HAL, etc.
-
 ## Installation
 
-Add it to your Gemfile or install it manually: `$ gem install restify`
+Add it to your Gemfile:
+
+```ruby
+gem 'restify', '~> 1.0'
+```
+
+Or install it manually:
+
+```console
+gem install restify
+```
 
 ## Usage
 
@@ -52,7 +55,7 @@ client = Restify.new('https://api.github.com').get.value
 # ...
 ```
 
-We are essentially requesting `'http://api.github.com'` via HTTP `get`. `get` is returning an `Promise`, similar to Java's `Future`. The `value` call resolves the returned `Promise` by blocking the thread until the resource is actually there. `value!` will additionally raise errors instead of returning `nil`. You can chain handlers using the `then` method. This allows you to be build a dependency chain that will be executed when the last promise is needed.
+We are essentially requesting `'http://api.github.com'` via HTTP `get`. `get` is returning a `Promise`, similar to Java's `Future`. The `value` call resolves the returned `Promise` by blocking the thread until the resource is actually there. `value!` will additionally raise errors instead of returning `nil`. You can chain handlers using the `then` method. This allows you to be build a dependency chain that will be executed when the last promise is needed.
 
 As we can see GitHub returns us a field `repository_url` with a URI template. Restify automatically scans for `*_url` fields in the JSON response and exposes these as relations. It additionally scans the HTTP Header field `Link` for relations like pagination.
 
@@ -87,7 +90,7 @@ This gets us the relation named `repository` that we can request now. The usual 
     end
 ```
 
-URL templates can define some parameters such as `{owner}` or `{repo}`. They will be expanded from the `params` given to the HTTP method method.
+URL templates can define some parameters such as `{owner}` or `{repo}`. They will be expanded from the `params` given to the HTTP method.
 
 Now send a GET request with some parameters to request a specific repository:
 
@@ -122,7 +125,7 @@ See commented example in main spec [`spec/restify_spec.rb`](https://github.com/j
 
 ## License
 
-Copyright (C) 2014-2018 Jan Graichen
+Copyright (C) 2014-2025 Jan Graichen
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
