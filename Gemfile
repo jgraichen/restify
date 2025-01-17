@@ -18,7 +18,7 @@ group :test do
   gem 'rspec-collection_matchers'
   gem 'webmock'
 
-  gem 'my-rubocop', github: 'jgraichen/my-rubocop', ref: 'v5'
+  gem 'my-rubocop', github: 'jgraichen/my-rubocop', ref: '7011bc14dbbf46e9bb240403feef25f7f6bb8dd3'
 end
 
 group :development do
