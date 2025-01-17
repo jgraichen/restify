@@ -7,42 +7,42 @@ describe Restify::Promise do
 
   describe 'factory methods' do
     describe '#fulfilled' do
-      subject { described_class.fulfilled(fulfill_value) }
+      subject(:promise) { described_class.fulfilled(fulfill_value) }
 
       let(:fulfill_value) { 42 }
 
       it 'returns a fulfilled promise' do
-        expect(subject.fulfilled?).to be true
-        expect(subject.rejected?).to be false
+        expect(promise.fulfilled?).to be true
+        expect(promise.rejected?).to be false
       end
 
       it 'wraps the given value' do
-        expect(subject.value!).to eq 42
+        expect(promise.value!).to eq 42
       end
     end
 
     describe '#rejected' do
-      subject { described_class.rejected(rejection_reason) }
+      subject(:promise) { described_class.rejected(rejection_reason) }
 
       let(:rejection_reason) { ArgumentError }
 
       it 'returns a rejected promise' do
-        expect(subject.fulfilled?).to be false
-        expect(subject.rejected?).to be true
+        expect(promise.fulfilled?).to be false
+        expect(promise.rejected?).to be true
       end
 
       it 'bubbles up the caught exception on #value!' do
-        expect { subject.value! }.to raise_error(ArgumentError)
+        expect { promise.value! }.to raise_error(ArgumentError)
       end
 
       it 'swallows the exception on #value' do
-        expect(subject.value).to be_nil
+        expect(promise.value).to be_nil
       end
     end
 
     describe '#create' do
       context 'when fulfilling the promise in the writer block' do
-        subject do
+        subject(:promise) do
           described_class.create do |writer|
             # Calculate a value and fulfill the promise with it
             writer.fulfill 42
@@ -50,17 +50,17 @@ describe Restify::Promise do
         end
 
         it 'returns a fulfilled promise' do
-          expect(subject.fulfilled?).to be true
-          expect(subject.rejected?).to be false
+          expect(promise.fulfilled?).to be true
+          expect(promise.rejected?).to be false
         end
 
         it 'wraps the given value' do
-          expect(subject.value!).to eq 42
+          expect(promise.value!).to eq 42
         end
       end
 
       context 'when rejecting the promise in the writer block' do
-        subject do
+        subject(:promise) do
           described_class.create do |writer|
             # Calculate a value and fulfill the promise with it
             writer.reject ArgumentError
@@ -68,21 +68,21 @@ describe Restify::Promise do
         end
 
         it 'returns a rejected promise' do
-          expect(subject.fulfilled?).to be false
-          expect(subject.rejected?).to be true
+          expect(promise.fulfilled?).to be false
+          expect(promise.rejected?).to be true
         end
 
         it 'bubbles up the caught exception on #value!' do
-          expect { subject.value! }.to raise_error(ArgumentError)
+          expect { promise.value! }.to raise_error(ArgumentError)
         end
 
         it 'swallows the exception on #value' do
-          expect(subject.value).to be_nil
+          expect(promise.value).to be_nil
         end
       end
 
       context 'when fulfilling the promise asynchronously' do
-        subject do
+        subject(:promise) do
           described_class.create do |writer|
             Thread.new do
               sleep 0.1
@@ -92,20 +92,20 @@ describe Restify::Promise do
         end
 
         it 'returns a pending promise' do
-          expect(subject.fulfilled?).to be false
-          expect(subject.rejected?).to be false
-          expect(subject.pending?).to be true
+          expect(promise.fulfilled?).to be false
+          expect(promise.rejected?).to be false
+          expect(promise.pending?).to be true
         end
 
         it 'waits for the fulfillment value' do
-          expect(subject.value!).to eq 42
+          expect(promise.value!).to eq 42
         end
       end
     end
   end
 
   describe 'result' do
-    subject { described_class.new(*dependencies, &task).value! }
+    subject(:result) { described_class.new(*dependencies, &task).value! }
 
     let(:dependencies) { [] }
     let(:task) { nil }
@@ -119,7 +119,7 @@ describe Restify::Promise do
       end
 
       it 'is calculated using the task block' do
-        expect(subject).to eq 42
+        expect(result).to eq 42
       end
     end
 
@@ -133,7 +133,7 @@ describe Restify::Promise do
       end
 
       it 'is an array of the dependencies\' results' do
-        expect(subject).to eq [1, 2, 3]
+        expect(result).to eq [1, 2, 3]
       end
     end
 
@@ -147,7 +147,7 @@ describe Restify::Promise do
       end
 
       it 'is an array of the dependencies\' results' do
-        expect(subject).to eq [1, 2, 3]
+        expect(result).to eq [1, 2, 3]
       end
     end
 
@@ -163,7 +163,7 @@ describe Restify::Promise do
       end
 
       it 'can use the dependencies to calculate the value' do
-        expect(subject).to eq 17
+        expect(result).to eq 17
       end
     end
 

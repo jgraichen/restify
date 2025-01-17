@@ -10,7 +10,7 @@ describe Restify::Relation do
 
   describe '#==' do
     it 'equals pattern' do
-      expect(subject).to eq pattern
+      expect(relation).to eq pattern
     end
   end
 

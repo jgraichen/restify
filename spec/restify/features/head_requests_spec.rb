@@ -16,23 +16,24 @@ describe Restify do
   end
 
   describe 'HEAD requests' do
-    subject { Restify.new('http://localhost:9292/base').head(params).value! }
+    subject(:value) { Restify.new('http://localhost:9292/base').head(params).value! }
 
     let(:params) { {} }
 
     it 'returns a resource with access to headers' do
-      expect(subject.response.headers).to include('CONTENT_LENGTH' => '333')
+      expect(value.response.headers).to include('CONTENT_LENGTH' => '333')
     end
 
     it 'parses Link headers into relations' do
-      expect(subject).to have_relation :neat
+      expect(value).to have_relation :neat
     end
 
     context 'with params' do
       let(:params) { {foo: 'bar'} }
 
       it 'adds them to the query string' do
-        subject
+        value
+
         expect(
           request_stub.with(query: {foo: 'bar'}),
         ).to have_been_requested

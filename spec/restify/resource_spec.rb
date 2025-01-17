@@ -3,18 +3,12 @@
 require 'spec_helper'
 
 describe Restify::Resource do
-  subject { resource }
+  subject(:resource) { described_class.new(context, response:, data:, relations:) }
 
   let(:data)      { {} }
   let(:relations) { {} }
-  let(:context)   { double 'context' }
-  let(:response)  { double 'response' }
-  let(:resource)  { described_class.new(context, response:, data:, relations:) }
-
-  before do
-    allow(context).to receive(:relation?).and_return(false)
-    allow(context).to receive(:relation).and_raise(KeyError)
-  end
+  let(:context)   { instance_double(Restify::Context) }
+  let(:response)  { instance_double(Restify::Response) }
 
   context 'relations' do
     let(:relations) do
@@ -26,41 +20,41 @@ describe Restify::Resource do
 
     describe '#relation?' do
       it 'matches relations' do
-        expect(subject.relation?(:users)).to be true
-        expect(subject.relation?('users')).to be true
-        expect(subject.relation?(:projects)).to be true
-        expect(subject.relation?('projects')).to be true
-        expect(subject.relation?('fuu')).to be false
+        expect(resource.relation?(:users)).to be true
+        expect(resource.relation?('users')).to be true
+        expect(resource.relation?(:projects)).to be true
+        expect(resource.relation?('projects')).to be true
+        expect(resource.relation?('fuu')).to be false
 
-        expect(subject).to have_relation :users
-        expect(subject).to have_relation :projects
+        expect(resource).to have_relation :users
+        expect(resource).to have_relation :projects
 
-        expect(subject.rel?(:users)).to be true
-        expect(subject.rel?('users')).to be true
-        expect(subject.rel?(:projects)).to be true
-        expect(subject.rel?('projects')).to be true
-        expect(subject.rel?('fuu')).to be false
+        expect(resource.rel?(:users)).to be true
+        expect(resource.rel?('users')).to be true
+        expect(resource.rel?(:projects)).to be true
+        expect(resource.rel?('projects')).to be true
+        expect(resource.rel?('fuu')).to be false
 
-        expect(subject).to have_rel :users
-        expect(subject).to have_rel :projects
+        expect(resource).to have_rel :users
+        expect(resource).to have_rel :projects
       end
     end
 
     describe '#relation' do
       it 'returns relation' do
-        expect(subject.rel(:users)).to be_a Restify::Relation
+        expect(resource.rel(:users)).to be_a Restify::Relation
 
-        expect(subject.rel(:users)).to eq 'http://example.org/users'
-        expect(subject.rel('users')).to eq 'http://example.org/users'
-        expect(subject.rel(:projects)).to eq 'http://example.org/projects'
-        expect(subject.rel('projects')).to eq 'http://example.org/projects'
-        expect { subject.rel(:fuu) }.to raise_error KeyError
+        expect(resource.rel(:users)).to eq 'http://example.org/users'
+        expect(resource.rel('users')).to eq 'http://example.org/users'
+        expect(resource.rel(:projects)).to eq 'http://example.org/projects'
+        expect(resource.rel('projects')).to eq 'http://example.org/projects'
+        expect { resource.rel(:fuu) }.to raise_error KeyError
 
-        expect(subject.relation(:users)).to eq 'http://example.org/users'
-        expect(subject.relation('users')).to eq 'http://example.org/users'
-        expect(subject.relation(:projects)).to eq 'http://example.org/projects'
-        expect(subject.relation('projects')).to eq 'http://example.org/projects'
-        expect { subject.relation(:fuu) }.to raise_error KeyError
+        expect(resource.relation(:users)).to eq 'http://example.org/users'
+        expect(resource.relation('users')).to eq 'http://example.org/users'
+        expect(resource.relation(:projects)).to eq 'http://example.org/projects'
+        expect(resource.relation('projects')).to eq 'http://example.org/projects'
+        expect { resource.relation(:fuu) }.to raise_error KeyError
       end
     end
 
@@ -68,15 +62,15 @@ describe Restify::Resource do
       let(:relations) { {_restify_follow: 'http://localhost/10'} }
 
       it 'returns follow relation' do
-        expect(subject.follow).to be_a Restify::Relation
-        expect(subject.follow).to eq 'http://localhost/10'
+        expect(resource.follow).to be_a Restify::Relation
+        expect(resource.follow).to eq 'http://localhost/10'
       end
 
       context 'when nil' do
         let(:relations) { {} }
 
         it 'returns nil' do
-          expect(subject.follow).to be_nil
+          expect(resource.follow).to be_nil
         end
       end
     end
@@ -85,15 +79,15 @@ describe Restify::Resource do
       let(:relations) { {_restify_follow: 'http://localhost/10'} }
 
       it 'returns follow relation' do
-        expect(subject.follow!).to be_a Restify::Relation
-        expect(subject.follow!).to eq 'http://localhost/10'
+        expect(resource.follow!).to be_a Restify::Relation
+        expect(resource.follow!).to eq 'http://localhost/10'
       end
 
       context 'when nil' do
         let(:relations) { {} }
 
         it 'raise runtime error' do
-          expect { subject.follow! }.to raise_error RuntimeError do |err|
+          expect { resource.follow! }.to raise_error RuntimeError do |err|
             expect(err.message).to eq 'Nothing to follow'
           end
         end
@@ -102,25 +96,25 @@ describe Restify::Resource do
   end
 
   context 'data' do
-    let(:data) { double 'data' }
+    let(:data) { double 'data' } # rubocop:disable RSpec/VerifiedDoubles
 
     it 'delegates methods (I)' do
-      expect(data).to receive(:some_method).and_return(42)
+      allow(data).to receive(:some_method).and_return(42)
 
-      expect(subject).to respond_to :some_method
-      expect(subject.some_method).to eq 42
+      expect(resource).to respond_to :some_method
+      expect(resource.some_method).to eq 42
     end
 
     it 'delegates methods (II)' do
-      expect(data).to receive(:[]).with(1).and_return(2)
+      allow(data).to receive(:[]).with(1).and_return(2)
 
-      expect(subject).to respond_to :[]
-      expect(subject[1]).to eq 2
+      expect(resource).to respond_to :[]
+      expect(resource[1]).to eq 2
     end
 
     describe '#data' do
       it 'returns data' do
-        expect(subject.data).to equal data
+        expect(resource.data).to equal data
       end
     end
   end

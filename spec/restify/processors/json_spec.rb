@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Restify::Processors::Json do
   let(:context)  { Restify::Context.new('http://test.host/') }
-  let(:response) { double 'response' }
+  let(:response) { instance_double(Restify::Response) }
 
   before do
     allow(response).to receive_messages(links: [], follow_location: nil)
@@ -12,22 +12,22 @@ describe Restify::Processors::Json do
 
   describe 'class' do
     describe '#accept?' do
-      subject { described_class.accept? response }
+      subject(:accept) { described_class.accept?(response) }
 
       it 'accepts JSON mime type (I)' do
-        expect(response).to receive(:content_type).and_return('application/json')
-        expect(subject).to be_truthy
+        allow(response).to receive(:content_type).and_return('application/json')
+        expect(accept).to be_truthy
       end
 
       it 'accepts JSON mime type (II)' do
-        expect(response).to receive(:content_type).and_return('application/json; abc')
-        expect(subject).to be_truthy
+        allow(response).to receive(:content_type).and_return('application/json; abc')
+        expect(accept).to be_truthy
       end
     end
   end
 
   describe '#resource' do
-    subject { described_class.new(context, response).resource }
+    subject(:resource) { described_class.new(context, response).resource }
 
     before { allow(response).to receive(:body).and_return(body) }
 
@@ -40,7 +40,7 @@ describe Restify::Processors::Json do
         end
 
         it { is_expected.to be_a Restify::Resource }
-        it { expect(subject.response).to be response }
+        it { expect(resource.response).to be response }
         it { is_expected.to eq 'json' => 'value' }
       end
 
@@ -52,12 +52,12 @@ describe Restify::Processors::Json do
         end
 
         it do
-          expect(subject).to eq \
+          expect(resource).to eq \
             'json' => 'value', 'search_url' => 'https://google.com{?q}'
         end
 
         it { is_expected.to have_relation :search }
-        it { expect(subject.relation(:search)).to eq 'https://google.com{?q}' }
+        it { expect(resource.relation(:search)).to eq 'https://google.com{?q}' }
       end
 
       context 'object with implicit self relation' do
@@ -67,7 +67,7 @@ describe Restify::Processors::Json do
           JSON
         end
 
-        it { expect(subject.relation(:self)).to eq '/self' }
+        it { expect(resource.relation(:self)).to eq '/self' }
       end
 
       context 'single array' do
@@ -78,7 +78,7 @@ describe Restify::Processors::Json do
         end
 
         it { is_expected.to be_a Restify::Resource }
-        it { expect(subject.response).to be response }
+        it { expect(resource.response).to be response }
         it { is_expected.to eq [1, 2, nil, 'STR'] }
       end
 
@@ -101,11 +101,11 @@ describe Restify::Processors::Json do
         end
 
         it 'parses objects as resources' do
-          expect(subject).to all(be_a(Restify::Resource))
+          expect(resource).to all(be_a(Restify::Resource))
         end
 
         it 'parses relations of resources' do
-          expect(subject.map {|r| r.relation :self }).to eq \
+          expect(resource.map {|r| r.relation :self }).to eq \
             ['/users/john', '/users/jane']
         end
       end
@@ -119,14 +119,14 @@ describe Restify::Processors::Json do
         end
 
         it { is_expected.to be_a Restify::Resource }
-        it { expect(subject.response).to be response }
+        it { expect(resource.response).to be response }
 
         it 'parses objects as resources' do
-          expect(subject['john']).to be_a Restify::Resource
-          expect(subject['jane']).to be_a Restify::Resource
+          expect(resource['john']).to be_a Restify::Resource
+          expect(resource['jane']).to be_a Restify::Resource
 
-          expect(subject['john']['name']).to eq 'John'
-          expect(subject['jane']['name']).to eq 'Jane'
+          expect(resource['john']['name']).to eq 'John'
+          expect(resource['jane']['name']).to eq 'Jane'
         end
       end
 
@@ -138,7 +138,7 @@ describe Restify::Processors::Json do
         end
 
         it { is_expected.to be_a Restify::Resource }
-        it { expect(subject.response).to be response }
+        it { expect(resource.response).to be response }
         it { is_expected.to eq 'BLUB' }
       end
     end

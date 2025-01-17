@@ -3,15 +3,13 @@
 require 'spec_helper'
 
 describe Restify::Registry do
-  let(:registry) { described_class.instance }
+  subject(:registry) { described_class.instance }
 
   describe 'class' do
     describe '#instance' do
-      subject { described_class.instance }
-
       it 'returns singleton instance' do
-        expect(subject).to be_a described_class
-        expect(subject).to be described_class.instance
+        expect(registry).to be_a described_class
+        expect(registry).to be described_class.instance
       end
     end
 
@@ -36,14 +34,14 @@ describe Restify::Registry do
   end
 
   describe '#store / #fetch' do
-    subject { registry.store name, uri, **opts }
+    subject(:store) { registry.store(name, uri, **opts) }
 
     let(:name) { 'remote' }
     let(:uri)  { 'http://remote/entry/point' }
     let(:opts) { {accept: 'application/vnd.remote+json'} }
 
     it 'stores registry item' do
-      subject
+      store
 
       item = registry.fetch name
 

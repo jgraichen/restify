@@ -13,7 +13,7 @@ describe Restify do
   end
 
   describe 'Request body' do
-    subject { Restify.new('http://localhost:9292/base').post(body, {}, {headers:}).value! }
+    subject(:value) { Restify.new('http://localhost:9292/base').post(body, {}, {headers:}).value! }
 
     let(:headers) { {} }
 
@@ -21,7 +21,7 @@ describe Restify do
       let(:body) { {a: 'b', c: 'd'} }
 
       it 'is serialized as JSON' do
-        subject
+        value
 
         expect(
           request_stub.with(body: '{"a":"b","c":"d"}'),
@@ -29,7 +29,7 @@ describe Restify do
       end
 
       it 'gets a JSON media type for free' do
-        subject
+        value
 
         expect(
           request_stub.with(headers: {'Content-Type' => 'application/json'}),
@@ -40,7 +40,7 @@ describe Restify do
         let(:headers) { {'Content-Type' => 'application/vnd.api+json'} }
 
         it 'respects the override' do
-          subject
+          value
 
           expect(
             request_stub.with(headers: {'Content-Type' => 'application/vnd.api+json'}),
@@ -53,7 +53,7 @@ describe Restify do
       let(:body) { 'a=b&c=d' }
 
       it 'is sent as provided' do
-        subject
+        value
 
         expect(
           request_stub.with(body: 'a=b&c=d'),
@@ -61,7 +61,7 @@ describe Restify do
       end
 
       it 'does not get a JSON media type' do
-        subject
+        value
 
         expect(
           request_stub.with {|req| !req.headers['Content-Type'].include?('json') },
@@ -72,7 +72,7 @@ describe Restify do
         let(:headers) { {'Content-Type' => 'application/text'} }
 
         it 'respects the override' do
-          subject
+          value
 
           expect(
             request_stub.with(headers: {'Content-Type' => 'application/text'}),

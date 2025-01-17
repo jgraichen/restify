@@ -20,7 +20,7 @@ describe Restify::Context do
       describe '#adapter' do
         subject { super().options[:adapter] }
 
-        let(:kwargs) { {adapter: double('adapter')} }
+        let(:kwargs) { {adapter: instance_double(Restify::Adapter::Base)} }
 
         it 'adapter is not serialized' do
           expect(subject).to equal nil
@@ -30,7 +30,7 @@ describe Restify::Context do
       describe '#cache' do
         subject { super().options[:cache] }
 
-        let(:kwargs) { {adapter: double('cache')} }
+        let(:kwargs) { {cache: Object.new} }
 
         it 'cache is not serialized' do
           expect(subject).to equal nil

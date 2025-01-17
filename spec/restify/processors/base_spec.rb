@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe Restify::Processors::Base do
   let(:context)  { Restify::Context.new('http://test.host/') }
-  let(:response) { double 'response' }
+  let(:response) { instance_double(Restify::Response) }
 
   before do
     allow(response).to receive_messages(links: [], follow_location: nil)
@@ -12,18 +12,18 @@ describe Restify::Processors::Base do
 
   describe 'class' do
     describe '#accept?' do
-      subject { described_class.accept? response }
+      subject(:accept) { described_class.accept?(response) }
 
       # If no other processor accepts the request, we have an explicit fallback
       # to the base processor.
       it 'does not accept any responses' do
-        expect(subject).to be_falsey
+        expect(accept).to be_falsey
       end
     end
   end
 
   describe '#resource' do
-    subject { described_class.new(context, response).resource }
+    subject(:resource) { described_class.new(context, response).resource }
 
     before { allow(response).to receive(:body).and_return(body) }
 
@@ -36,7 +36,7 @@ describe Restify::Processors::Base do
         end
 
         it { is_expected.to be_a Restify::Resource }
-        it { expect(subject.response).to be response }
+        it { expect(resource.response).to be response }
         it { is_expected.to eq body }
       end
     end

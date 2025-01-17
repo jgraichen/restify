@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-describe Restify::ResponseError do
-  let(:response) { double 'response' }
+describe Restify::ResponseError do # rubocop:disable RSpec/SpecFilePathFormat
+  let(:response) { instance_double(Restify::Response) }
   let(:message) { 'Error' }
   let(:uri) { 'http://localhost' }
 
