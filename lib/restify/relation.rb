@@ -77,9 +77,34 @@ module Restify
       end
     end
 
-    def convert_param(value)
-      return value.to_param.to_s if value.respond_to?(:to_param)
+    def convert_param(value, nesting: true)
+      # Convert parameters into values acceptable in a
+      # Addressable::Template, with some support for #to_param, but not
+      # for basic types.
+      if value == nil || # rubocop:disable Style/NilComparison
+         value.is_a?(Numeric) ||
+         value.is_a?(Symbol) ||
+         value.is_a?(Hash) ||
+         value == true ||
+         value == false ||
+         value.respond_to?(:to_str)
+        return value
+      end
 
+      # Handle array-link things first to *not* call #to_params on them,
+      # as that will concatenation any Array to "a/b/c". Instead, we
+      # want to check one level of basic types only.
+      if value.respond_to?(:to_ary)
+        return nesting ? value.to_ary.map {|val| convert_param(val, nesting: false) } : value
+      end
+
+      # Handle Rails' #to_param for non-basic types
+      if value.respond_to?(:to_param)
+        return value.to_param
+      end
+
+      # Otherwise, pass raw value to Addressable::Template and let it
+      # explode.
       value
     end
 
