@@ -36,7 +36,7 @@ describe Restify::Promise do
       end
 
       it 'swallows the exception on #value' do
-        expect(subject.value).to be nil
+        expect(subject.value).to be_nil
       end
     end
 
@@ -77,7 +77,7 @@ describe Restify::Promise do
         end
 
         it 'swallows the exception on #value' do
-          expect(subject.value).to be nil
+          expect(subject.value).to be_nil
         end
       end
 
@@ -178,19 +178,19 @@ describe Restify::Promise do
 
   describe '#wait' do
     it 'can time out' do
-      expect { promise.wait(0.1) }.to raise_error ::Timeout::Error
+      expect { promise.wait(0.1) }.to raise_error Timeout::Error
     end
   end
 
   describe '#value' do
     it 'can time out' do
-      expect { promise.value(0.1) }.to raise_error ::Timeout::Error
+      expect { promise.value(0.1) }.to raise_error Timeout::Error
     end
   end
 
   describe '#value!' do
     it 'can time out' do
-      expect { promise.value!(0.1) }.to raise_error ::Timeout::Error
+      expect { promise.value!(0.1) }.to raise_error Timeout::Error
     end
   end
 end

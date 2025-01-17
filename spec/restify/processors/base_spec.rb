@@ -7,8 +7,7 @@ describe Restify::Processors::Base do
   let(:response) { double 'response' }
 
   before do
-    allow(response).to receive(:links).and_return []
-    allow(response).to receive(:follow_location).and_return nil
+    allow(response).to receive_messages(links: [], follow_location: nil)
   end
 
   describe 'class' do

@@ -55,8 +55,8 @@ module Restify
 
     def initialize(response)
       @response = response
-      super "#{response.message} (#{response.code}) for `#{response.uri}':\n" \
-            "  #{errors.inspect}"
+      super("#{response.message} (#{response.code}) for `#{response.uri}':\n  " \
+            "#{errors.inspect}")
     end
 
     # Return response status.

@@ -2,7 +2,7 @@
 
 require 'typhoeus'
 
-::Ethon.logger = ::Logging.logger[Ethon]
+Ethon.logger = Logging.logger[Ethon]
 
 module Restify
   module Adapter
@@ -102,7 +102,7 @@ module Restify
       def convert_headers(headers)
         return {} unless headers.respond_to?(:each_pair)
 
-        headers.each_pair.each_with_object({}) do |header, memo|
+        headers.each_pair.with_object({}) do |header, memo|
           memo[header[0].upcase.tr('-', '_')] = header[1]
         end
       end

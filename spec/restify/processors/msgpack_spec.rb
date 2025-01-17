@@ -7,8 +7,7 @@ describe Restify::Processors::Msgpack do
   let(:response) { double 'response' }
 
   before do
-    allow(response).to receive(:links).and_return []
-    allow(response).to receive(:follow_location).and_return nil
+    allow(response).to receive_messages(links: [], follow_location: nil)
   end
 
   describe 'class' do
@@ -45,7 +44,7 @@ describe Restify::Processors::Msgpack do
     describe 'parsing' do
       context 'single object' do
         let(:body) do
-          ::MessagePack.dump('msg' => 'value')
+          MessagePack.dump('msg' => 'value')
         end
 
         it { is_expected.to be_a Restify::Resource }
@@ -55,7 +54,7 @@ describe Restify::Processors::Msgpack do
 
       context 'object with relation fields' do
         let(:body) do
-          ::MessagePack.dump(
+          MessagePack.dump(
             'msg' => 'value',
             'search_url' => 'https://google.com{?q}',
           )
@@ -72,7 +71,7 @@ describe Restify::Processors::Msgpack do
 
       context 'object with implicit self relation' do
         let(:body) do
-          ::MessagePack.dump(
+          MessagePack.dump(
             'url' => '/self',
           )
         end
@@ -82,7 +81,7 @@ describe Restify::Processors::Msgpack do
 
       context 'single array' do
         let(:body) do
-          ::MessagePack.dump([1, 2, nil, 'STR'])
+          MessagePack.dump([1, 2, nil, 'STR'])
         end
 
         it { is_expected.to be_a Restify::Resource }
@@ -92,7 +91,7 @@ describe Restify::Processors::Msgpack do
 
       context 'array with objects' do
         let(:body) do
-          ::MessagePack.dump([{'a' => 0}, {'b' => 1}])
+          MessagePack.dump([{'a' => 0}, {'b' => 1}])
         end
 
         it { is_expected.to eq [{'a' => 0}, {'b' => 1}] }
@@ -100,7 +99,7 @@ describe Restify::Processors::Msgpack do
 
       context 'array with resources' do
         let(:body) do
-          ::MessagePack.dump([
+          MessagePack.dump([
             {'name' => 'John', 'self_url' => '/users/john'},
             {'name' => 'Jane', 'self_url' => '/users/jane'},
           ])
@@ -118,7 +117,7 @@ describe Restify::Processors::Msgpack do
 
       context 'nested objects' do
         let(:body) do
-          ::MessagePack.dump(
+          MessagePack.dump(
             'john' => {'name' => 'John'},
             'jane' => {'name' => 'Jane'},
           )
@@ -138,7 +137,7 @@ describe Restify::Processors::Msgpack do
 
       context 'single value' do
         let(:body) do
-          ::MessagePack.dump('BLUB')
+          MessagePack.dump('BLUB')
         end
 
         it { is_expected.to be_a Restify::Resource }

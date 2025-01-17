@@ -36,7 +36,7 @@ RSpec.configure do |config|
   config.order = 'random'
 
   config.before(:suite) do
-    ::Restify::Timeout.default_timeout = 1.0
+    Restify::Timeout.default_timeout = 1.0
   end
 
   config.before do |example|
@@ -47,10 +47,10 @@ RSpec.configure do |config|
   end
 
   config.before do
-    Ethon.logger = ::Logging.logger[Ethon] if defined?(Ethon)
+    Ethon.logger = Logging.logger[Ethon] if defined?(Ethon)
 
-    ::Logging.logger.root.level = :debug
-    ::Logging.logger.root.add_appenders ::Logging.appenders.stdout
+    Logging.logger.root.level = :debug
+    Logging.logger.root.add_appenders Logging.appenders.stdout
   end
 
   config.warnings = true

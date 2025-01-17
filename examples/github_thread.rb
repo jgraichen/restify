@@ -6,11 +6,11 @@ require 'restify'
 require 'pry'
 
 if ENV['LOGGING']
-  ::Logging.logger.root.add_appenders Logging.appenders.stdout
-  ::Logging.logger.root.level = :debug
+  Logging.logger.root.add_appenders Logging.appenders.stdout
+  Logging.logger.root.level = :debug
 end
 
-if (token = ENV['GITHUB_TOKEN'])
+if (token = ENV.fetch('GITHUB_TOKEN', nil))
   headers['Authorization'] = "Bearer #{token}"
 end
 
@@ -20,4 +20,4 @@ cmt  = repo.rel(:commits).get.value.first
 
 puts "Last commit: #{cmt['sha']}"
 puts "By #{cmt['commit']['author']['name']} <#{cmt['commit']['author']['email']}>"
-puts cmt['commit']['message'].to_s
+puts cmt['commit']['message']

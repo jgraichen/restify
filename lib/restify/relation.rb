@@ -72,7 +72,7 @@ module Restify
     private
 
     def convert(params)
-      params.each_pair.each_with_object({}) do |param, hash|
+      params.each_pair.with_object({}) do |param, hash|
         hash[param[0]] = convert_param param[1]
       end
     end

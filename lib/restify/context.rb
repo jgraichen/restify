@@ -80,7 +80,7 @@ module Restify
     end
 
     def marshal_load(dump)
-      initialize dump.delete(:uri), \
+      initialize dump.delete(:uri),
         headers: dump.fetch(:headers)
     end
 
