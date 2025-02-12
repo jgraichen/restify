@@ -16,7 +16,7 @@ describe Restify do
   end
 
   describe 'HEAD requests' do
-    subject(:value) { Restify.new('http://localhost:9292/base').head(params).value! }
+    subject(:value) { Restify.new('http://localhost:9292/base').head(params:).value! }
 
     let(:params) { {} }
 

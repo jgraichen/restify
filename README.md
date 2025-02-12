@@ -69,25 +69,15 @@ repositories = client.rel(:repository)
 This gets us the relation named `repository` that we can request now. The usual HTTP methods are available on a relation:
 
 ```ruby
-    def get(params = {})
-      request :get, nil, params
-    end
+def get(params:, **)
 
-    def delete(params = {})
-      request :delete, nil, params
-    end
+def delete(params:, **)
 
-    def post(data = {}, params = {})
-      request :post, data, params
-    end
+def post(data = nil, params:, **)
 
-    def put(data = {}, params = {})
-      request :put, data, params
-    end
+def put(data = nil, params:, **)
 
-    def patch(data = {}, params = {})
-      request :patch, data, params
-    end
+def patch(data = nil, params:, **)
 ```
 
 URL templates can define some parameters such as `{owner}` or `{repo}`. They will be expanded from the `params` given to the HTTP method.
