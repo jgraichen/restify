@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changes
 
+- Strict keyword handling for request methods
+
+  All request methods take parameters and headers as explicit keyword arguments, not as secondary arguments anymore. Change e.g. `get({}, {headers: ...})` into `get(headers: ...)`, and `head(params)` to `head(params:)`.
+
+  `#post`, `#put`, and `#patch` still take an optional first positional data/body argument. Change `post(body, {}, {headers: ...})` to `post(body, headers: ...)`.
+
 ### Fixes
 
 ### Breaks

@@ -138,7 +138,7 @@ describe Restify do
         end
 
         # Let's try again.
-        created_user = users_relation.post(name: 'John Smith').value!
+        created_user = users_relation.post({name: 'John Smith'}).value!
 
         # The server returns a 201 Created response with the created
         # resource.

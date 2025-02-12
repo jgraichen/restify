@@ -29,12 +29,12 @@ module Restify
     #
     attr_reader :timeout
 
-    def initialize(opts = {})
-      @method  = opts.fetch(:method, :get).downcase
-      @uri     = opts.fetch(:uri) { raise ArgumentError.new ':uri required.' }
-      @data    = opts.fetch(:data, nil)
-      @timeout = opts.fetch(:timeout, 300)
-      @headers = opts.fetch(:headers, {})
+    def initialize(uri:, method: :get, data: nil, timeout: 300, headers: {})
+      @uri     = uri
+      @method  = method.to_s.downcase
+      @data    = data
+      @timeout = timeout
+      @headers = headers
 
       @headers['Content-Type'] ||= 'application/json' if json?
     end

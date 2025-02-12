@@ -13,7 +13,7 @@ describe Restify do
   end
 
   describe 'Request body' do
-    subject(:value) { Restify.new('http://localhost:9292/base').post(body, {}, {headers:}).value! }
+    subject(:value) { Restify.new('http://localhost:9292/base').post(body, headers:).value! }
 
     let(:headers) { {} }
 

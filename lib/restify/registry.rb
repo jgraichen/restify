@@ -7,7 +7,7 @@ module Restify
     end
 
     def store(name, uri, **opts)
-      @registry[name] = Context.new uri, **opts
+      @registry[name] = Context.new(uri, **opts)
     end
 
     def fetch(name)
