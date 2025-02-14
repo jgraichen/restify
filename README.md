@@ -69,15 +69,13 @@ repositories = client.rel(:repository)
 This gets us the relation named `repository` that we can request now. The usual HTTP methods are available on a relation:
 
 ```ruby
-def get(params:, **)
+def get(params, params:, headers:, **)
+def head(params, params:, headers:, **)
+def delete(params, params:, headers:, **)
 
-def delete(params:, **)
-
-def post(data = nil, params:, **)
-
-def put(data = nil, params:, **)
-
-def patch(data = nil, params:, **)
+def put(data = nil, params:, headers:, **)
+def post(data = nil, params:, headers:, **)
+def patch(data = nil, params:, headers:, **)
 ```
 
 URL templates can define some parameters such as `{owner}` or `{repo}`. They will be expanded from the `params` given to the HTTP method.
@@ -85,7 +83,7 @@ URL templates can define some parameters such as `{owner}` or `{repo}`. They wil
 Now send a GET request with some parameters to request a specific repository:
 
 ```ruby
-repo = repositories.get(owner: 'jgraichen', repo: 'restify').value
+repo = repositories.get({owner: 'jgraichen', repo: 'restify'}).value
 ```
 
 Now fetch a list of commits for this repo and get this first one:

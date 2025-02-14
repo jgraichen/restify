@@ -7,7 +7,7 @@ describe Restify::Relation do
   subject(:relation) { described_class.new context, pattern }
 
   let(:context)  { Restify::Context.new('http://test.host/') }
-  let(:pattern)  { '/resource/{id}' }
+  let(:pattern)  { '/resource/{id}{?q*}' }
 
   describe '#==' do
     it 'equals pattern' do
@@ -119,5 +119,116 @@ describe Restify::Relation do
 
       it { expect { expanded }.to raise_exception TypeError, /Can't convert Hash into String./ }
     end
+  end
+
+  shared_examples 'non-data-request' do |method|
+    it "issues a #{method.upcase} request" do
+      expect(context).to receive(:request) do |meth, uri, opts|
+        expect(meth).to eq method
+        expect(uri.to_s).to eq 'http://test.host/resource/'
+        expect(opts).to be_nil
+      end
+      relation.send(method)
+    end
+
+    it 'accepts params as keyword argument' do
+      expect(context).to receive(:request) do |meth, uri, opts|
+        expect(meth).to eq method
+        expect(uri.to_s).to eq 'http://test.host/resource/1'
+        expect(opts).to be_nil
+      end
+      relation.send(method, params: {id: 1})
+    end
+
+    it 'accepts params as positional argument' do
+      expect(context).to receive(:request) do |meth, uri, opts|
+        expect(meth).to eq method
+        expect(uri.to_s).to eq 'http://test.host/resource/1'
+        expect(opts).to be_nil
+      end
+      relation.send(method, {id: 1})
+    end
+
+    it 'merges keyword params into positional params' do
+      expect(context).to receive(:request) do |meth, uri, opts|
+        expect(meth).to eq method
+        expect(uri.to_s).to eq 'http://test.host/resource/1?a=2&b=3'
+        expect(opts).to be_nil
+      end
+      relation.send(method, {id: 1, q: {a: 1, c: 1}}, params: {q: {a: 2, b: 3}})
+    end
+  end
+
+  describe '#get' do
+    include_examples 'non-data-request', :get
+  end
+
+  describe '#head' do
+    include_examples 'non-data-request', :head
+  end
+
+  describe '#delete' do
+    include_examples 'non-data-request', :delete
+  end
+
+  shared_examples 'data-request' do |method|
+    let(:data) { Object.new }
+
+    it "issues a #{method.upcase} request" do
+      expect(context).to receive(:request) do |meth, uri, opts|
+        expect(meth).to eq method
+        expect(uri.to_s).to eq 'http://test.host/resource/'
+        expect(opts).to eq({data: nil})
+      end
+      relation.send(method)
+    end
+
+    it 'accepts params as keyword argument' do
+      expect(context).to receive(:request) do |meth, uri, opts|
+        expect(meth).to eq method
+        expect(uri.to_s).to eq 'http://test.host/resource/1'
+        expect(opts).to eq({data: nil})
+      end
+      relation.send(method, params: {id: 1})
+    end
+
+    it 'accepts data as keyword argument' do
+      expect(context).to receive(:request) do |meth, uri, opts|
+        expect(meth).to eq method
+        expect(uri.to_s).to eq 'http://test.host/resource/1'
+        expect(opts).to eq({data:})
+      end
+      relation.send(method, data:, params: {id: 1})
+    end
+
+    it 'accepts data as position argument' do
+      expect(context).to receive(:request) do |meth, uri, opts|
+        expect(meth).to eq method
+        expect(uri.to_s).to eq 'http://test.host/resource/1'
+        expect(opts).to eq({data:})
+      end
+      relation.send(method, data, params: {id: 1})
+    end
+
+    it 'prefers data from keyword argument' do
+      expect(context).to receive(:request) do |meth, uri, opts|
+        expect(meth).to eq method
+        expect(uri.to_s).to eq 'http://test.host/resource/1'
+        expect(opts).to eq({data:})
+      end
+      relation.send(method, 'DATA', data:, params: {id: 1})
+    end
+  end
+
+  describe '#post' do
+    include_examples 'data-request', :post
+  end
+
+  describe '#put' do
+    include_examples 'data-request', :put
+  end
+
+  describe '#patch' do
+    include_examples 'data-request', :patch
   end
 end
