@@ -23,8 +23,26 @@ module Restify
         tcp_keepintvl: 5,
       }.freeze
 
+      # Patch to store easy handles in the queue, instead of requests.
+      # This improves compatibility with OpenTelemetry instrumentation
+      # for Ethon, that needs the request handle to be constructed in
+      # the current threading context, not the background thread were
+      # Typhoeus is running.
+      module EasyOverride
+        def queue(request)
+          request.hydra = self
+          queued_requests << ::Typhoeus::EasyFactory.new(request, self).get
+        end
+
+        def add(handle)
+          multi.add(handle)
+        end
+      end
+
       def initialize(sync: false, options: {}, **kwargs)
-        @hydra   = ::Typhoeus::Hydra.new(**kwargs)
+        @hydra = ::Typhoeus::Hydra.new(**kwargs)
+        @hydra.extend(EasyOverride)
+
         @mutex   = Mutex.new
         @options = DEFAULT_OPTIONS.merge(options)
         @queue   = Queue.new
