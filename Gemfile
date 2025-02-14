@@ -25,8 +25,3 @@ group :development do
   gem 'redcarpet', platform: :ruby
   gem 'yard'
 end
-
-group :development, :test do
-  gem 'pry', platforms: :mri
-  gem 'pry-byebug', platforms: :mri
-end

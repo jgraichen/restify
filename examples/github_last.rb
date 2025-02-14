@@ -5,8 +5,6 @@ $LOAD_PATH << File.expand_path('../lib', __dir__)
 require 'restify'
 require 'base64'
 
-require 'pry'
-
 headers = {}
 
 if ENV['LOGGING']
