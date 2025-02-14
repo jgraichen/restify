@@ -7,8 +7,11 @@ Rake::Release::Task.new do |spec|
   spec.sign_tag = true
 end
 
-RSpec::Core::RakeTask.new(:spec)
-task default: :spec
+begin
+  RSpec::Core::RakeTask.new(:spec)
+  task default: :spec
+rescue LoadError # rubocop:disable Lint/SuppressedException
+end
 
 begin
   require 'yard'
