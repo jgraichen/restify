@@ -3,7 +3,6 @@
 $LOAD_PATH << File.expand_path('../lib', __dir__)
 
 require 'restify'
-require 'pry'
 
 if ENV['LOGGING']
   Logging.logger.root.add_appenders Logging.appenders.stdout
