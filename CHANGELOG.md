@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### New
 
 - Support for Ruby 3.4
+- Experimental support for OpenTelemetry tracing
 
 ### Changes
 

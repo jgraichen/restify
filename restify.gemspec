@@ -28,6 +28,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hitimes'
   spec.add_dependency 'logging', '~> 2.0'
   spec.add_dependency 'msgpack', '~> 1.2'
+  spec.add_dependency 'opentelemetry-api', '~> 1.0'
+  spec.add_dependency 'opentelemetry-common'
   spec.add_dependency 'rack'
   spec.add_dependency 'typhoeus', '~> 1.3'
 
