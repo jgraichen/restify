@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+## 2.0.0 - (2025-02-14)
+
+---
+
+### New
+
 - Support for Ruby 3.4
 - Experimental support for OpenTelemetry tracing
 
@@ -23,8 +35,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   `#post`, `#put`, and `#patch` still take an optional first positional data/body argument. Change `post(body, {}, {headers: ...})` to `post(body, headers: ...)`.
 
   `#get`, `#head`, and `#delete` accept a hash as the first positional argument, which is merged with `params:`. Therefore, passing parameters as data works too: `get({id: 1})`.
-
-### Fixes
 
 ### Breaks
 
