@@ -23,28 +23,31 @@ module Restify
       context.request(method, expand(params), **opts)
     end
 
-    def get(**opts)
-      request(**opts, method: :get)
+    def get(data = {}, params: {}, **opts)
+      request(**opts, method: :get, params: data.merge(params))
     end
 
-    def head(**opts)
-      request(**opts, method: :head)
+    def head(data = {}, params: {}, **opts)
+      request(**opts, method: :head, params: data.merge(params))
     end
 
-    def delete(**opts)
-      request(**opts, method: :head)
+    def delete(data = {}, params: {}, **opts)
+      request(**opts, method: :delete, params: data.merge(params))
     end
 
     def post(data = nil, **opts)
-      request(**opts, method: :post, data: data)
+      opts[:data] = data unless opts.key?(:data)
+      request(**opts, method: :post)
     end
 
     def put(data = nil, **opts)
-      request(**opts, method: :put, data: data)
+      opts[:data] = data unless opts.key?(:data)
+      request(**opts, method: :put)
     end
 
     def patch(data = nil, **opts)
-      request(**opts, method: :patch, data: data)
+      opts[:data] = data unless opts.key?(:data)
+      request(**opts, method: :patch)
     end
 
     def ==(other)

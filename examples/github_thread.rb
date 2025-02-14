@@ -14,7 +14,7 @@ if (token = ENV.fetch('GITHUB_TOKEN', nil))
 end
 
 gh   = Restify.new('https://api.github.com', headers:).get.value
-repo = gh.rel(:repository).get(owner: 'jgraichen', repo: 'restify').value
+repo = gh.rel(:repository).get({owner: 'jgraichen', repo: 'restify'}).value
 cmt  = repo.rel(:commits).get.value.first
 
 puts "Last commit: #{cmt['sha']}"

@@ -17,7 +17,7 @@ if (token = ENV.fetch('GITHUB_TOKEN', nil))
 end
 
 gh    = Restify.new('https://api.github.com', headers:).get.value!
-user  = gh.rel(:user).get(user: 'jgraichen').value!
+user  = gh.rel(:user).get({user: 'jgraichen'}).value!
 repos = user.rel(:repos).get.value!
 
 commits = repos.map do |repo|
