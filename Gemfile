@@ -18,6 +18,9 @@ group :test do
   gem 'rspec-collection_matchers'
   gem 'webmock'
 
+  gem 'opentelemetry-instrumentation-ethon'
+  gem 'opentelemetry-sdk'
+
   gem 'rubocop-config', github: 'jgraichen/my-rubocop', tag: 'v13'
 end
 

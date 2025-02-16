@@ -30,6 +30,7 @@ if ENV['ADAPTER']
   end
 end
 
+require_relative 'support/opentelemetry'
 require_relative 'support/stub_server'
 
 RSpec.configure do |config|
