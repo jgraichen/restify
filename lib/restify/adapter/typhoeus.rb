@@ -23,19 +23,21 @@ module Restify
         tcp_keepintvl: 5,
       }.freeze
 
-      # Patch to store easy handles in the queue, instead of requests.
-      # This improves compatibility with OpenTelemetry instrumentation
-      # for Ethon, that needs the request handle to be constructed in
-      # the current threading context, not the background thread were
-      # Typhoeus is running.
+      # Patch Hydra to restore the correct OpenTelemetry span when
+      # adding the request, so that the Ethon instrumentation can
+      # properly pick up the context where the Restify request
+      # originated from.
+      #
+      # Handle exception from Ethon or WebMock too, and reject the
+      # promise, so that the errors can be handled in user code.
+      # Otherwise, the user would only receive a Promise timeout.
       module EasyOverride
-        def queue(request)
-          request.hydra = self
-          queued_requests << ::Typhoeus::EasyFactory.new(request, self).get
-        end
-
-        def add(handle)
-          multi.add(handle)
+        def add(request)
+          OpenTelemetry::Trace.with_span(request._otel_span) do
+            super(request)
+          rescue Exception => e # rubocop:disable Lint/RescueException
+            request._restify_writer.reject(e)
+          end
         end
       end
 
@@ -78,7 +80,7 @@ module Restify
       private
 
       def convert(request, writer)
-        ::Typhoeus::Request.new(
+        Request.new(
           request.uri,
           **@options,
           method: request.method,
@@ -87,6 +89,9 @@ module Restify
           timeout: request.timeout,
           connecttimeout: request.timeout,
         ).tap do |req|
+          req._otel_span = OpenTelemetry::Trace.current_span
+          req._restify_writer = writer
+
           req.on_complete do |response|
             debug 'request:complete',
               tag: request.object_id,
@@ -176,6 +181,16 @@ module Restify
 
       def _log_prefix
         "[#{object_id}/#{Thread.current.object_id}]"
+      end
+
+      class Request < ::Typhoeus::Request
+        # Keep track of the OTEL span and the restify promise in the
+        # queued Typhoeus request.
+        #
+        # We need to access these to restore the tracing context, or
+        # bubble up exception that happen in the background thread after
+        # queuing, but when Hydra adds the requests to libcurl.
+        attr_accessor :_otel_span, :_restify_writer
       end
     end
   end

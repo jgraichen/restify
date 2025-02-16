@@ -18,6 +18,10 @@ module Stub
   # If no stub is found a special HTTP 599 error code will be returned.
   class Handler
     def call(env)
+      if env['REQUEST_URI'] == '/echo'
+        return [200, {'content-type': 'application/json'}, [env.to_json]]
+      end
+
       signature = WebMock::RequestSignature.new(
         env['REQUEST_METHOD'].downcase,
         "http://stubserver#{env['REQUEST_URI']}",
