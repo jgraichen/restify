@@ -7,7 +7,6 @@ gemspec
 
 gem 'rake'
 gem 'rake-release'
-gem 'typhoeus'
 
 group :test do
   gem 'simplecov'
