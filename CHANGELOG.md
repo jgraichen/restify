@@ -15,10 +15,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixes
 
+### Breaks
+
+## 2.0.1 - (2025-02-16)
+
+---
+
+### Fixes
+
 - Restore compatibility with WebMocks Typhoeus instrumentation
 - Catch WebMock exception and bubble them to the request promises
-
-### Breaks
 
 ## 2.0.0 - (2025-02-14)
 
