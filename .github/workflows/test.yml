@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     env:
-      BUNDLE_WITHOUT: development
+      BUNDLE_WITHOUT: development:test
 
     steps:
       - uses: actions/checkout@master
@@ -60,7 +60,6 @@ jobs:
           ruby-version: "3.4"
           bundler-cache: true
         env:
-          BUNDLE_WITHOUT: development:test
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 3
 
