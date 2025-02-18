@@ -21,7 +21,7 @@ group :test do
   gem 'webmock'
 end
 
-group :development, :lint do
+group :lint do
   gem 'rubocop-config', github: 'jgraichen/rubocop-config', tag: 'v13'
 end
 
