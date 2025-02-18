@@ -25,7 +25,7 @@ jobs:
           - typhoeus-sync
 
     env:
-      BUNDLE_WITHOUT: development
+      BUNDLE_WITHOUT: development:lint
       ADAPTER: ${{ matrix.adapter }}
 
     steps:
@@ -60,7 +60,7 @@ jobs:
           ruby-version: "3.4"
           bundler-cache: true
         env:
-          BUNDLE_WITHOUT: development
+          BUNDLE_WITHOUT: development:test
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 3
 

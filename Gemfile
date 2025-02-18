@@ -19,7 +19,9 @@ group :test do
   gem 'rspec', '~> 3.0'
   gem 'rspec-collection_matchers'
   gem 'webmock'
+end
 
+group :development, :lint do
   gem 'rubocop-config', github: 'jgraichen/my-rubocop', tag: 'v13'
 end
 
