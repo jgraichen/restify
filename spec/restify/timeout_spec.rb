@@ -16,7 +16,7 @@ describe Restify::Timeout do
       it 'calls given block' do
         expect { timer.timeout! }.not_to raise_error
         sleep timer.send(:wait_interval)
-        expect { timer.timeout! }.to raise_error ::Restify::Timeout::Error
+        expect { timer.timeout! }.to raise_error Restify::Timeout::Error
       end
     end
   end
@@ -25,13 +25,13 @@ describe Restify::Timeout do
     it 'calls block on IVar timeout' do
       expect do
         timer.wait_on!(Concurrent::IVar.new)
-      end.to raise_error ::Restify::Timeout::Error
+      end.to raise_error Restify::Timeout::Error
     end
 
     it 'calls block on Promise timeout' do
       expect do
         timer.wait_on!(Restify::Promise.new)
-      end.to raise_error ::Restify::Timeout::Error
+      end.to raise_error Restify::Timeout::Error
     end
 
     it 'does nothing on successful IVar' do

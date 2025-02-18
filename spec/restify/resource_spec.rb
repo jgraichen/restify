@@ -26,20 +26,20 @@ describe Restify::Resource do
 
     describe '#relation?' do
       it 'matches relations' do
-        expect(subject.relation?(:users)).to eq true
-        expect(subject.relation?('users')).to eq true
-        expect(subject.relation?(:projects)).to eq true
-        expect(subject.relation?('projects')).to eq true
-        expect(subject.relation?('fuu')).to eq false
+        expect(subject.relation?(:users)).to be true
+        expect(subject.relation?('users')).to be true
+        expect(subject.relation?(:projects)).to be true
+        expect(subject.relation?('projects')).to be true
+        expect(subject.relation?('fuu')).to be false
 
         expect(subject).to have_relation :users
         expect(subject).to have_relation :projects
 
-        expect(subject.rel?(:users)).to eq true
-        expect(subject.rel?('users')).to eq true
-        expect(subject.rel?(:projects)).to eq true
-        expect(subject.rel?('projects')).to eq true
-        expect(subject.rel?('fuu')).to eq false
+        expect(subject.rel?(:users)).to be true
+        expect(subject.rel?('users')).to be true
+        expect(subject.rel?(:projects)).to be true
+        expect(subject.rel?('projects')).to be true
+        expect(subject.rel?('fuu')).to be false
 
         expect(subject).to have_rel :users
         expect(subject).to have_rel :projects
@@ -76,7 +76,7 @@ describe Restify::Resource do
         let(:relations) { {} }
 
         it 'returns nil' do
-          expect(subject.follow).to be nil
+          expect(subject.follow).to be_nil
         end
       end
     end

@@ -10,11 +10,11 @@ require 'pry'
 headers = {}
 
 if ENV['LOGGING']
-  ::Logging.logger.root.add_appenders Logging.appenders.stdout
-  ::Logging.logger.root.level = :debug
+  Logging.logger.root.add_appenders Logging.appenders.stdout
+  Logging.logger.root.level = :debug
 end
 
-if (token = ENV['GITHUB_TOKEN'])
+if (token = ENV.fetch('GITHUB_TOKEN', nil))
   headers['Authorization'] = "Bearer #{token}"
 end
 
@@ -39,6 +39,6 @@ commits.each do |repo, cmts|
   puts "==== #{repo['name']} ===="
   puts "Last commit: #{head['sha']}"
   puts "By #{head['commit']['author']['name']} <#{head['commit']['author']['email']}>"
-  puts head['commit']['message'].to_s
+  puts head['commit']['message']
   puts
 end

@@ -64,7 +64,7 @@ describe Restify do
         subject
 
         expect(
-          request_stub.with {|req| req.headers['Content-Type'] !~ /json/ },
+          request_stub.with {|req| !req.headers['Content-Type'].include?('json') },
         ).to have_been_requested
       end
 

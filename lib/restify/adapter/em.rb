@@ -28,7 +28,6 @@ module Restify
           @requests ||= []
         end
 
-        # rubocop:disable Style/IdenticalConditionalBranches
         def call(request, writer, retried: false)
           if requests.empty?
             requests << [request, writer, retried]

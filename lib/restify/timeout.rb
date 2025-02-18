@@ -71,9 +71,9 @@ module Restify
         @target = target
 
         if @target
-          super "Operation on #{@target} timed out"
+          super("Operation on #{@target} timed out")
         else
-          super 'Operation timed out'
+          super('Operation timed out')
         end
       end
     end

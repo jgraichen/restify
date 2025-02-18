@@ -54,7 +54,7 @@ describe Restify::Context do
       let(:dump) { YAML.dump(context) }
 
       if RUBY_VERSION >= '3.1'
-        let(:load) { YAML.safe_load(dump, permitted_classes: [::Restify::Context, ::Symbol]) }
+        let(:load) { YAML.safe_load(dump, permitted_classes: [Restify::Context, Symbol]) }
       else
         let(:load) { YAML.load(dump) } # rubocop:disable Security/YAMLLoad
       end
