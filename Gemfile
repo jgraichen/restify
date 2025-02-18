@@ -22,7 +22,7 @@ group :test do
 end
 
 group :development, :lint do
-  gem 'rubocop-config', github: 'jgraichen/my-rubocop', tag: 'v13'
+  gem 'rubocop-config', github: 'jgraichen/rubocop-config', tag: 'v13'
 end
 
 group :development do
