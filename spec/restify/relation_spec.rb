@@ -59,6 +59,27 @@ describe Restify::Relation do
       it { expect(expanded.to_s).to eq 'http://test.host/resource/1,2' }
     end
 
+    context 'with nil query parameter' do
+      let(:pattern) { '/resource{?abc}' }
+      let(:params) { {abc: nil} }
+
+      it { expect(expanded.to_s).to eq 'http://test.host/resource?abc' }
+    end
+
+    context 'with false query parameter' do
+      let(:pattern) { '/resource{?abc}' }
+      let(:params) { {abc: false} }
+
+      it { expect(expanded.to_s).to eq 'http://test.host/resource?abc=false' }
+    end
+
+    context 'with true query parameter' do
+      let(:pattern) { '/resource{?abc}' }
+      let(:params) { {abc: true} }
+
+      it { expect(expanded.to_s).to eq 'http://test.host/resource?abc=true' }
+    end
+
     context 'with unknown additional query parameter' do
       let(:pattern) { '/resource{?a,b}' }
       let(:params) { {a: 1, b: 2, c: 3} }
