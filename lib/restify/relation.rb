@@ -113,10 +113,12 @@ module Restify
 
     def extract!(params)
       @template.variables.each_with_object({}) do |var, hash|
+        sym = var.to_sym
         if params.key?(var)
           hash[var] = params.delete(var)
-        elsif params.key?(var.to_sym)
-          hash[var] = params.delete(var.to_sym)
+        end
+        if params.key?(sym)
+          hash[sym] = params.delete(sym)
         end
       end
     end

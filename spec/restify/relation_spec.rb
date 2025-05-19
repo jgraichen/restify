@@ -140,6 +140,38 @@ describe Restify::Relation do
 
       it { expect { expanded }.to raise_exception TypeError, /Can't convert Hash into String./ }
     end
+
+    context 'with string-keyed params' do
+      context 'with value' do
+        let(:params) { {'id' => 1} }
+
+        it { expect(expanded.to_s).to eq 'http://test.host/resource/1' }
+      end
+    end
+
+    context 'with mixed-keyed params' do
+      context 'non-overlapping' do
+        let(:params) { {'id' => 1, q: 2} }
+
+        it { expect(expanded.to_s).to eq 'http://test.host/resource/1?q=2' }
+      end
+
+      context 'overlapping (1)' do
+        let(:params) { {'id' => 1, id: 2} }
+
+        it 'prefers symbol value' do
+          expect(expanded.to_s).to eq 'http://test.host/resource/2'
+        end
+      end
+
+      context 'overlapping (2)' do
+        let(:params) { {id: 2, 'id' => 1} }
+
+        it 'prefers symbol value' do
+          expect(expanded.to_s).to eq 'http://test.host/resource/2'
+        end
+      end
+    end
   end
 
   shared_examples 'non-data-request' do |method|
