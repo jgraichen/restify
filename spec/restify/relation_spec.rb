@@ -47,6 +47,19 @@ describe Restify::Relation do
       it { expect(expanded.to_s).to eq 'http://test.host/resource/true' }
     end
 
+    context 'with Object' do
+      let(:object) do
+        Class.new do
+          undef to_param
+        end.new
+      end
+      let(:params) { {id: object} }
+
+      it 'raise a TypeError from adressable' do
+        expect { expanded }.to raise_error(TypeError, /Can't convert #<Class:0x.*> into String or Array/)
+      end
+    end
+
     context 'with #to_param object' do
       let(:params) { {id: cls_to_param.new} }
 
@@ -283,5 +296,11 @@ describe Restify::Relation do
 
   describe '#patch' do
     include_examples 'data-request', :patch
+  end
+
+  describe '#to_s' do
+    subject(:string) { relation.to_s }
+
+    it { is_expected.to eq '/resource/{id}{?q*}' }
   end
 end

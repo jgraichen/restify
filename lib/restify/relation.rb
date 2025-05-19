@@ -16,7 +16,7 @@ module Restify
 
     def initialize(context, template)
       @context  = context
-      @template = Addressable::Template.new template
+      @template = Addressable::Template.new(template)
     end
 
     def request(method:, params: {}, **opts)
@@ -120,14 +120,6 @@ module Restify
         if params.key?(sym)
           hash[sym] = params.delete(sym)
         end
-      end
-    end
-
-    def to_template(pattern)
-      if pattern.is_a?(Addressable::Template)
-        pattern
-      else
-        Addressable::Template.new pattern
       end
     end
   end

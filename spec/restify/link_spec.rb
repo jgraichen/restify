@@ -50,6 +50,16 @@ describe Restify::Link do
         expect { described_class.parse('</>; rel="s", abc-invalid') }
           .to raise_error ArgumentError, /Invalid token at \d+:/i
       end
+
+      it 'errors on invalid param' do
+        expect { described_class.parse('<https://example.org>; rel') }
+          .to raise_error ArgumentError, /Invalid token at \d+:/i
+      end
+
+      it 'errors on invalid param value' do
+        expect { described_class.parse('<https://example.org>; rel=') }
+          .to raise_error ArgumentError, /Invalid token at \d+:/i
+      end
     end
   end
 end

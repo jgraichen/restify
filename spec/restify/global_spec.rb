@@ -21,7 +21,7 @@ describe Restify::Global do
     end
 
     context 'with registry symbol' do
-      subject(:restify) { global.new(uri, **options) }
+      subject(:restify) { global.new(name, **options) }
 
       let(:name) { :registry_item_name }
       let(:uri)     { 'http://api.github.com/' }
@@ -36,6 +36,55 @@ describe Restify::Global do
         expect(restify.context.uri.to_s).to eq uri
         expect(restify.context.options).to eq options
       end
+    end
+  end
+
+  describe '#adapter' do
+    subject(:adapter) { global.adapter }
+
+    it 'defaults to Typhoeus adapter' do
+      expect(adapter).to be_a Restify::Adapter::Typhoeus
+    end
+  end
+
+  describe '#adapter=' do
+    let(:stub) { Object.new }
+
+    # Ensure to reset adapter after these specs!
+    after { Restify.adapter = nil }
+
+    it 'sets a new adapter' do
+      global.adapter = stub
+      expect(global.adapter).to be stub
+    end
+  end
+
+  describe '#cache' do
+    subject(:cache) { global.cache }
+
+    it 'defaults to Typhoeus adapter' do
+      expect(cache).to be_a Restify::Cache
+    end
+  end
+
+  describe '#cache=' do
+    let(:stub) { Object.new }
+
+    # Ensure to reset cache after these specs!
+    after { Restify.cache = nil }
+
+    it 'sets a new adapter' do
+      global.cache = stub
+      expect(global.cache).to be stub
+    end
+  end
+
+  describe '#logger' do
+    subject(:logger) { global.logger }
+
+    it 'returns Restify root logger' do
+      expect(logger).to be_a Logging::Logger
+      expect(logger).to eq Logging.logger[Restify]
     end
   end
 end

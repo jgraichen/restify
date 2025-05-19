@@ -118,4 +118,10 @@ describe Restify::Resource do
       end
     end
   end
+
+  describe '#inspect' do
+    subject(:inspect) { resource.inspect }
+
+    it { is_expected.to eq '#<Restify::Resource @data={} @relations={}>' }
+  end
 end

@@ -14,7 +14,7 @@ module Restify
       end
 
       def call_native(_request, _writer)
-        throw NotImplementedError.new 'Subclass responsibility'
+        raise NotImplementedError.new 'Subclass responsibility'
       end
     end
   end
