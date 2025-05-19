@@ -63,7 +63,7 @@ describe Restify::Relation do
       let(:pattern) { '/resource{?abc}' }
       let(:params) { {abc: nil} }
 
-      it { expect(expanded.to_s).to eq 'http://test.host/resource?abc' }
+      it { expect(expanded.to_s).to eq 'http://test.host/resource' }
     end
 
     context 'with false query parameter' do
