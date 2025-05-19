@@ -15,9 +15,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixes
 
-- Restore literal false in parameter expansion (#68)
-
 ### Breaks
+
+## 2.0.2 - (2025-05-19)
+
+---
+
+### Fixes
+
+- Restore literal false in parameter expansion (#68)
 
 ## 2.0.1 - (2025-02-16)
 
