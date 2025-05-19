@@ -38,7 +38,7 @@ describe Restify::Relation do
     context 'with false' do
       let(:params) { {id: false} }
 
-      it { expect(expanded.to_s).to eq 'http://test.host/resource/' }
+      it { expect(expanded.to_s).to eq 'http://test.host/resource/false' }
     end
 
     context 'with true' do
