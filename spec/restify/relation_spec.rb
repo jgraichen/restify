@@ -38,7 +38,7 @@ describe Restify::Relation do
     context 'with false' do
       let(:params) { {id: false} }
 
-      it { expect(expanded.to_s).to eq 'http://test.host/resource/' }
+      it { expect(expanded.to_s).to eq 'http://test.host/resource/false' }
     end
 
     context 'with true' do
@@ -57,6 +57,27 @@ describe Restify::Relation do
       let(:params) { {id: [1, 2]} }
 
       it { expect(expanded.to_s).to eq 'http://test.host/resource/1,2' }
+    end
+
+    context 'with nil query parameter' do
+      let(:pattern) { '/resource{?abc}' }
+      let(:params) { {abc: nil} }
+
+      it { expect(expanded.to_s).to eq 'http://test.host/resource' }
+    end
+
+    context 'with false query parameter' do
+      let(:pattern) { '/resource{?abc}' }
+      let(:params) { {abc: false} }
+
+      it { expect(expanded.to_s).to eq 'http://test.host/resource?abc=false' }
+    end
+
+    context 'with true query parameter' do
+      let(:pattern) { '/resource{?abc}' }
+      let(:params) { {abc: true} }
+
+      it { expect(expanded.to_s).to eq 'http://test.host/resource?abc=true' }
     end
 
     context 'with unknown additional query parameter' do
@@ -118,6 +139,38 @@ describe Restify::Relation do
       let(:params) { {id: 5, abc: {a: 1, b: 2}} }
 
       it { expect { expanded }.to raise_exception TypeError, /Can't convert Hash into String./ }
+    end
+
+    context 'with string-keyed params' do
+      context 'with value' do
+        let(:params) { {'id' => 1} }
+
+        it { expect(expanded.to_s).to eq 'http://test.host/resource/1' }
+      end
+    end
+
+    context 'with mixed-keyed params' do
+      context 'non-overlapping' do
+        let(:params) { {'id' => 1, q: 2} }
+
+        it { expect(expanded.to_s).to eq 'http://test.host/resource/1?q=2' }
+      end
+
+      context 'overlapping (1)' do
+        let(:params) { {'id' => 1, id: 2} }
+
+        it 'prefers symbol value' do
+          expect(expanded.to_s).to eq 'http://test.host/resource/2'
+        end
+      end
+
+      context 'overlapping (2)' do
+        let(:params) { {id: 2, 'id' => 1} }
+
+        it 'prefers symbol value' do
+          expect(expanded.to_s).to eq 'http://test.host/resource/2'
+        end
+      end
     end
   end
 
