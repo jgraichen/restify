@@ -14,7 +14,6 @@ group :test do
 
   gem 'puma'
   gem 'rspec', '~> 3.0'
-  gem 'rspec-collection_matchers'
   gem 'webmock'
 
   gem 'opentelemetry-instrumentation-ethon'

@@ -9,7 +9,7 @@ describe Restify::Link do
         links = described_class
           .parse('<http://example.org/search{?query}>; rel="search"')
 
-        expect(links).to have(1).item
+        expect(links.size).to eq(1)
         expect(links[0].uri).to eq 'http://example.org/search{?query}'
         expect(links[0].metadata).to eq 'rel' => 'search'
       end
@@ -18,7 +18,7 @@ describe Restify::Link do
         links = described_class
           .parse('<http://example.org/search{?query}>; rel=search')
 
-        expect(links).to have(1).item
+        expect(links.size).to eq(1)
         expect(links[0].uri).to eq 'http://example.org/search{?query}'
         expect(links[0].metadata).to eq 'rel' => 'search'
       end
@@ -27,7 +27,7 @@ describe Restify::Link do
         links = described_class
           .parse('<p://h.tld/p>; rel=abc, <p://h.tld/b>; a=b; c="d"')
 
-        expect(links).to have(2).item
+        expect(links.size).to eq(2)
         expect(links[0].uri).to eq 'p://h.tld/p'
         expect(links[0].metadata).to eq 'rel' => 'abc'
         expect(links[1].uri).to eq 'p://h.tld/b'

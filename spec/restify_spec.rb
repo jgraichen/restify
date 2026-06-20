@@ -161,7 +161,7 @@ describe Restify do
         users = users_relation.get.value!
 
         # We get a collection back (Restify::Collection).
-        expect(users).to have(2).items
+        expect(users.size).to eq(2)
 
         # Let's get the first one.
         user = users.first
