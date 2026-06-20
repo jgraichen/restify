@@ -19,5 +19,5 @@ group :test do
   gem 'opentelemetry-instrumentation-ethon'
   gem 'opentelemetry-sdk'
 
-  gem 'rubocop-config', github: 'jgraichen/my-rubocop', tag: 'v14'
+  gem 'rubocop-config', github: 'jgraichen/my-rubocop', tag: 'v15'
 end

@@ -59,7 +59,7 @@ describe Restify::Context do
         let(:load) { YAML.load(dump) }
       end
 
-      include_examples 'serialization'
+      it_behaves_like 'serialization'
     end
 
     context 'Marshall' do
@@ -68,7 +68,7 @@ describe Restify::Context do
       let(:dump) { Marshal.dump(context) }
       let(:load) { Marshal.load(dump) } # rubocop:disable Security/MarshalLoad
 
-      include_examples 'serialization'
+      it_behaves_like 'serialization'
     end
   end
 end

@@ -38,7 +38,7 @@ describe Restify do
       # Latest span has to be from the Ethon instrumentation and must
       # have the Restify span as a parent.
       spans[0].tap do |span|
-        expect(span.instrumentation_scope.name).to match(/Ethon/)
+        expect(span.instrumentation_scope.name).to include('Ethon')
         expect(span.parent_span_id).to eq spans[1].span_id
       end
     end

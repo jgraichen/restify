@@ -19,7 +19,7 @@ module Restify
 
     private
 
-    def match(_request)
+    def match(_request) # rubocop:disable Naming/PredicateMethod
       false
     end
 

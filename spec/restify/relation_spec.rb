@@ -226,15 +226,15 @@ describe Restify::Relation do
   end
 
   describe '#get' do
-    include_examples 'non-data-request', :get
+    it_behaves_like 'non-data-request', :get
   end
 
   describe '#head' do
-    include_examples 'non-data-request', :head
+    it_behaves_like 'non-data-request', :head
   end
 
   describe '#delete' do
-    include_examples 'non-data-request', :delete
+    it_behaves_like 'non-data-request', :delete
   end
 
   shared_examples 'data-request' do |method|
@@ -287,15 +287,15 @@ describe Restify::Relation do
   end
 
   describe '#post' do
-    include_examples 'data-request', :post
+    it_behaves_like 'data-request', :post
   end
 
   describe '#put' do
-    include_examples 'data-request', :put
+    it_behaves_like 'data-request', :put
   end
 
   describe '#patch' do
-    include_examples 'data-request', :patch
+    it_behaves_like 'data-request', :patch
   end
 
   describe '#to_s' do

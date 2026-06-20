@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rspec'
-require 'rspec/collection_matchers'
 
 require 'simplecov'
 require 'simplecov-cobertura'

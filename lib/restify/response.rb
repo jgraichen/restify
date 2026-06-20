@@ -148,8 +148,8 @@ module Restify
     private
 
     def convert_headers(headers)
-      headers.each_with_object({}) do |pair, hash|
-        hash[pair[0].upcase] = pair[1]
+      headers.each.to_h do |pair|
+        [pair[0].upcase, pair[1]]
       end
     end
   end
