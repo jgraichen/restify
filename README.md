@@ -33,7 +33,7 @@ Links are extracted from
 Add it to your Gemfile:
 
 ```ruby
-gem 'restify', '~> 2.0'
+gem 'restify', '~> 2.1'
 ```
 
 Or install it manually:
