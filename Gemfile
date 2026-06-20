@@ -21,8 +21,3 @@ group :test do
 
   gem 'rubocop-config', github: 'jgraichen/my-rubocop', tag: 'v14'
 end
-
-group :development do
-  gem 'redcarpet', platform: :ruby
-  gem 'yard'
-end
