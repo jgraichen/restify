@@ -42,6 +42,15 @@ describe Restify::Global do
   describe '#adapter' do
     subject(:adapter) { global.adapter }
 
+    around do |example|
+      Restify.adapter.tap do |configured|
+        Restify.adapter = nil
+        example.run
+      ensure
+        Restify.adapter = configured
+      end
+    end
+
     it 'defaults to Typhoeus adapter' do
       expect(adapter).to be_a Restify::Adapter::Typhoeus
     end
@@ -50,8 +59,15 @@ describe Restify::Global do
   describe '#adapter=' do
     let(:stub) { Object.new }
 
-    # Ensure to reset adapter after these specs!
-    after { Restify.adapter = nil }
+    # Ensure to restore the configured adapter after these specs!
+    around do |example|
+      Restify.adapter.tap do |configured|
+        Restify.adapter = nil
+        example.run
+      ensure
+        Restify.adapter = configured
+      end
+    end
 
     it 'sets a new adapter' do
       global.adapter = stub
@@ -62,7 +78,7 @@ describe Restify::Global do
   describe '#cache' do
     subject(:cache) { global.cache }
 
-    it 'defaults to Typhoeus adapter' do
+    it 'defaults to cache instance' do
       expect(cache).to be_a Restify::Cache
     end
   end
@@ -73,7 +89,7 @@ describe Restify::Global do
     # Ensure to reset cache after these specs!
     after { Restify.cache = nil }
 
-    it 'sets a new adapter' do
+    it 'sets a new cache' do
       global.cache = stub
       expect(global.cache).to be stub
     end

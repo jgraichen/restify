@@ -65,8 +65,8 @@ module Stub
 
   class Exception < ::StandardError; end
 
-  # Inject into base adapter to have HTTP 599 (missing stub) error raised as an
-  # extra exception, not just a server error.
+  # Inject into base adapter to have HTTP 599 (missing stub) error
+  # raised as an extra exception, not just a server error.
   module Patch
     def call(request)
       super.then do |response|
@@ -98,8 +98,8 @@ RSpec.configure do |config|
   config.before(:suite) do
     Stub.start_server!
 
-    # Net::HTTP adapter must be enabled, otherwise webmock fails to create mock
-    # responses from raw strings.
+    # Net::HTTP adapter must be enabled, otherwise webmock fails to
+    # create mock responses from raw strings.
     WebMock.disable!(except: %i[net_http])
   end
 
