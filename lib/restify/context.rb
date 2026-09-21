@@ -34,9 +34,9 @@ module Restify
       self.uri.join uri
     end
 
-    def inherit(uri, **kwargs)
+    def inherit(uri, **)
       uri ||= self.uri
-      Context.new(uri, **kwargs, **options)
+      Context.new(uri, **, **options)
     end
 
     def process(response)
@@ -47,10 +47,10 @@ module Restify
       processor.new(context, response).resource
     end
 
-    def request(method, uri, data: nil, headers: {}, **kwargs)
+    def request(method, uri, data: nil, headers: {}, **)
       request = Request.new(
         headers: default_headers.merge(headers),
-        **kwargs,
+        **,
         method:,
         uri: join(uri),
         data:,

@@ -17,12 +17,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Restrict requests and redirects to HTTP(S), as libcurl supports many more
   protocols such as `file://` or `gopher://`
+- Drop EOL Ruby versions 3.1 and 3.2
 
 ### Fixes
 
 - Do not set empty OpenTelemetry attributes for URIs without a port
 
 ### Breaks
+
+- Raise minimum Ruby version to 3.3
 
 ## 2.1.0 - (2026-06-20)
 
