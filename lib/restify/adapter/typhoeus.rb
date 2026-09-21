@@ -49,8 +49,8 @@ module Restify
         end
       end
 
-      def initialize(sync: false, options: {}, **kwargs)
-        @hydra = ::Typhoeus::Hydra.new(**kwargs)
+      def initialize(sync: false, options: {}, **)
+        @hydra = ::Typhoeus::Hydra.new(**)
         @hydra.extend(EasyOverride)
 
         @mutex   = Mutex.new

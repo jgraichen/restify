@@ -19,20 +19,20 @@ module Restify
       @template = Addressable::Template.new(template)
     end
 
-    def request(method:, params: {}, **opts)
-      context.request(method, expand(params), **opts)
+    def request(method:, params: {}, **)
+      context.request(method, expand(params), **)
     end
 
-    def get(data = {}, params: {}, **opts)
-      request(**opts, method: :get, params: data.merge(params))
+    def get(data = {}, params: {}, **)
+      request(**, method: :get, params: data.merge(params))
     end
 
-    def head(data = {}, params: {}, **opts)
-      request(**opts, method: :head, params: data.merge(params))
+    def head(data = {}, params: {}, **)
+      request(**, method: :head, params: data.merge(params))
     end
 
-    def delete(data = {}, params: {}, **opts)
-      request(**opts, method: :delete, params: data.merge(params))
+    def delete(data = {}, params: {}, **)
+      request(**, method: :delete, params: data.merge(params))
     end
 
     def post(data = nil, **opts)

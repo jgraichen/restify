@@ -53,7 +53,7 @@ module Restify
         inout: :rw,
       }.freeze
 
-      def initialize(options: {}, **kwargs)
+      def initialize(options: {}, **)
         @options = DEFAULT_OPTIONS.merge(options)
 
         @selector = NIO::Selector.new
@@ -62,7 +62,7 @@ module Restify
 
         @multi = ::Ethon::Multi.new(
           execution_mode: :socket_action,
-          **kwargs,
+          **,
         )
 
         # libcurl only stores the function pointers, therefore the procs

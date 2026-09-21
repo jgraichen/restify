@@ -2,8 +2,8 @@
 
 module Restify
   module Global
-    def new(uri, **opts)
-      context = resolve_context uri, **opts
+    def new(uri, **)
+      context = resolve_context(uri, **)
 
       Relation.new context, context.uri
     end
@@ -38,11 +38,11 @@ module Restify
 
     private
 
-    def resolve_context(uri, **opts)
+    def resolve_context(uri, **)
       if uri.is_a? Symbol
-        Restify::Registry.fetch(uri).inherit(nil, **opts)
+        Restify::Registry.fetch(uri).inherit(nil, **)
       else
-        Context.new(uri, **opts)
+        Context.new(uri, **)
       end
     end
   end
