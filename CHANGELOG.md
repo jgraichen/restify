@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changes
 
+- Restrict requests and redirects to HTTP(S), as libcurl supports many more
+  protocols such as `file://` or `gopher://`
+
 ### Fixes
 
 - Do not set empty OpenTelemetry attributes for URIs without a port
