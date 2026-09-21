@@ -139,32 +139,35 @@ module Restify
       end
 
       def complete(easy, request, writer)
-        code   = easy.return_code
-        status = easy.response_code
+        writer.set do
+          code   = easy.return_code
+          status = easy.response_code
 
-        debug 'request:complete',
-          tag: request.object_id,
-          status: status,
-          message: code
+          debug 'request:complete',
+            tag: request.object_id,
+            status: status,
+            message: code
 
-        if code != :ok
-          writer.reject \
-            Restify::NetworkError.new(
+          if code != :ok
+            raise Restify::NetworkError.new(
               request,
               ::Ethon::Curl.easy_strerror(code),
             )
-        elsif status.nil? || status.zero?
-          writer.reject \
-            Restify::NetworkError.new(
+          end
+
+          if status.nil? || status.zero?
+            raise Restify::NetworkError.new(
               request,
               'Response without HTTP status',
             )
-        else
-          writer.fulfill convert_back(easy, request)
+          end
+
+          convert_back(easy, request)
         end
       rescue StandardError => e
         # This runs inside a libcurl callback, therefore no exception
-        # must ever escape from here.
+        # must ever escape from here. Anything reaching this point could
+        # not be handed to the promise anymore.
         logger.error(e)
       end
 

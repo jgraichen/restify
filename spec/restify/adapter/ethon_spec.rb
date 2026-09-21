@@ -63,5 +63,19 @@ describe Restify::Adapter::Ethon do
         expect { value }.to raise_error Restify::NetworkError, /without HTTP status/
       end
     end
+
+    # Unexpected errors must reject the promise too, as the caller would
+    # otherwise keep waiting for it until it times out.
+    context 'when building the response fails' do
+      def easy
+        super.tap do |double|
+          allow(double).to receive(:response_headers).and_raise('kaboom')
+        end
+      end
+
+      it 'rejects the promise' do
+        expect { value }.to raise_error 'kaboom'
+      end
+    end
   end
 end

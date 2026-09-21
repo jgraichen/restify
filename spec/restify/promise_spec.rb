@@ -81,6 +81,43 @@ describe Restify::Promise do
         end
       end
 
+      context 'when resolving the promise from a block' do
+        subject(:promise) do
+          described_class.create do |writer|
+            writer.set { block.call }
+          end
+        end
+
+        context 'with a returned value' do
+          let(:block) { -> { 42 } }
+
+          it 'fulfills the promise with it' do
+            expect(promise.fulfilled?).to be true
+            expect(promise.value!).to eq 42
+          end
+        end
+
+        context 'with a raised exception' do
+          let(:block) { -> { raise ArgumentError.new('nope') } }
+
+          it 'rejects the promise with it' do
+            expect(promise.rejected?).to be true
+            expect { promise.value! }.to raise_error ArgumentError, 'nope'
+          end
+        end
+
+        # Handlers can run from e.g. a libcurl callback, from where no
+        # exception must ever escape, not even a non-StandardError.
+        context 'with a raised non-StandardError' do
+          let(:block) { -> { raise NotImplementedError.new('nope') } }
+
+          it 'rejects the promise with it' do
+            expect(promise.rejected?).to be true
+            expect { promise.value! }.to raise_error NotImplementedError, 'nope'
+          end
+        end
+      end
+
       context 'when fulfilling the promise asynchronously' do
         subject(:promise) do
           described_class.create do |writer|
