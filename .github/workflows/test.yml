@@ -12,7 +12,7 @@ permissions:
 jobs:
   rspec:
     name: "${{ matrix.ruby }} / ${{ matrix.adapter }}"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     strategy:
       fail-fast: false
@@ -21,8 +21,6 @@ jobs:
           - "4.0"
           - "3.4"
           - "3.3"
-          - "3.2"
-          - "3.1"
         adapter:
           - ethon
           - typhoeus
@@ -54,7 +52,7 @@ jobs:
 
   rubocop:
     name: rubocop
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     env:
       BUNDLE_WITHOUT: development
