@@ -11,13 +11,14 @@ module Restify
         uri = URI.parse(request.uri)
         name = "#{method} #{uri.scheme}://#{uri.host}:#{uri.port}"
 
+        # Remove `nil` as OTEL spans must not contain any nil attributes
         attributes = {
           'http.request.method' => method,
           'server.address' => uri.host,
           'server.port' => uri.port,
           'url.full' => uri.to_s,
           'url.scheme' => uri.scheme,
-        }
+        }.compact
 
         span = tracer.start_span(name, attributes:, kind: :client)
         OpenTelemetry::Trace.with_span(span) do
