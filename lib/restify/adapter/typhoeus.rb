@@ -23,6 +23,14 @@ module Restify
         tcp_keepintvl: 5,
       }.freeze
 
+      # Restify follows relations from URLs in server responses, and
+      # libcurl supports far more than HTTP, e.g. `file://` or `scp://`.
+      # Therefore only HTTP-like protocols must ever be used, both for
+      # the request itself and when following redirects.
+      #
+      # This is intentionally not configurable.
+      PROTOCOLS = %i[http https].freeze
+
       # Patch Hydra to restore the correct OpenTelemetry span when
       # adding the request, so that the Ethon instrumentation can
       # properly pick up the context where the Restify request
@@ -88,6 +96,10 @@ module Restify
           body: request.body,
           timeout: request.timeout,
           connecttimeout: request.timeout,
+
+          # Block accessing and redirecting to non-HTTP protocols:
+          protocols: PROTOCOLS,
+          redir_protocols: PROTOCOLS,
         ).tap do |req|
           req._otel_span = OpenTelemetry::Trace.current_span
           req._restify_writer = writer
@@ -106,8 +118,8 @@ module Restify
               writer.fulfill convert_back(response, request)
             end
 
-            # Add all newly queued requests to active hydra, e.g. requests
-            # queued in a completion callback.
+            # Add all newly queued requests to active hydra, e.g.
+            # requests queued in a completion callback.
             dequeue_all
           end
         end
