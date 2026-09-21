@@ -6,7 +6,7 @@ require 'simplecov'
 require 'simplecov-cobertura'
 
 SimpleCov.start do
-  add_filter 'spec'
+  skip %r{\Aspec/}i
 end
 
 SimpleCov.formatters = [

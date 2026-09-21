@@ -9,7 +9,7 @@ gem 'rake'
 gem 'rake-release'
 
 group :test do
-  gem 'simplecov'
+  gem 'simplecov', '~> 1.0'
   gem 'simplecov-cobertura'
 
   gem 'puma'
