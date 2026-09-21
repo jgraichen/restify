@@ -29,6 +29,7 @@ module Restify
   module Adapter
     require 'restify/adapter/base'
     require 'restify/adapter/typhoeus'
+    require 'restify/adapter/ethon'
   end
 
   module Processors

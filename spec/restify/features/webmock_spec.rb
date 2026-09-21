@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Restify do
+describe Restify, adapter: 'Restify::Adapter::Typhoeus' do
   before do
     WebMock.enable!
   end

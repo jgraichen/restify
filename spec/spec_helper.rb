@@ -18,6 +18,9 @@ require 'restify'
 
 if ENV['ADAPTER']
   case ENV['ADAPTER'].to_s.downcase
+    when 'ethon'
+      require 'restify/adapter/ethon'
+      Restify.adapter = Restify::Adapter::Ethon.new
     when 'typhoeus'
       require 'restify/adapter/typhoeus'
       Restify.adapter = Restify::Adapter::Typhoeus.new
