@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### New
 
+- Add experimental `Restify::Adapter::Ethon` adapter directly using libcurl in a background event loop
+
 ### Changes
 
 - Restrict requests and redirects to HTTP(S), as libcurl supports many more

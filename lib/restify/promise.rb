@@ -93,6 +93,12 @@ module Restify
       def reject(reason)
         @promise.send :complete, false, nil, reason
       end
+
+      def set
+        fulfill(yield)
+      rescue Exception => e # rubocop:disable Lint/RescueException
+        reject(e)
+      end
     end
   end
 end

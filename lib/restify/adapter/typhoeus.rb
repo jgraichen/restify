@@ -105,17 +105,18 @@ module Restify
           req._restify_writer = writer
 
           req.on_complete do |response|
-            debug 'request:complete',
-              tag: request.object_id,
-              status: response.code,
-              message: response.return_message,
-              timeout: response.timed_out?
+            writer.set do
+              debug 'request:complete',
+                tag: request.object_id,
+                status: response.code,
+                message: response.return_message,
+                timeout: response.timed_out?
 
-            if response.timed_out? || response.code.zero?
-              writer.reject \
-                Restify::NetworkError.new(request, response.return_message)
-            else
-              writer.fulfill convert_back(response, request)
+              if response.timed_out? || response.code.zero?
+                raise Restify::NetworkError.new(request, response.return_message)
+              end
+
+              convert_back(response, request)
             end
 
             # Add all newly queued requests to active hydra, e.g.
