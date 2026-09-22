@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'rack/media_type'
 require 'rack/utils'
 require 'json'
 
@@ -29,6 +30,10 @@ module Restify
     STATUS_CODE_TO_SYMBOL = SYMBOL_TO_STATUS_CODE.invert
 
     # Response body as string.
+    #
+    # The body is encoded according to the charset from the response's
+    # `Content-Type` header. Without a charset, or with one unknown to
+    # Ruby, the body is returned as binary.
     #
     # @return [String] Response body.
     #
@@ -81,7 +86,7 @@ module Restify
       @code    = code
       @status  = STATUS_CODE_TO_SYMBOL[code]
       @headers = convert_headers(headers)
-      @body    = body
+      @body    = encode_body(body)
       @message = Rack::Utils::HTTP_STATUS_CODES[code]
     end
 
@@ -110,6 +115,24 @@ module Restify
     #
     def content_type
       headers['CONTENT_TYPE']
+    end
+
+    # Return the encoding from the response's content type, if any.
+    #
+    # @return [Encoding, nil] Encoding, or nil if the content type
+    #   carries no charset or an encoding unknown to Ruby.
+    #
+    def charset
+      return @charset if defined?(@charset)
+
+      charset = Rack::MediaType.params(content_type.to_s)['charset']
+
+      @charset = begin
+        Encoding.find(charset) if charset
+      rescue ArgumentError
+        # Unknown: keep the body as binary rather than guessing.
+        nil
+      end
     end
 
     # Check if response is successful e.g. the status code
@@ -146,6 +169,12 @@ module Restify
     end
 
     private
+
+    def encode_body(body)
+      return body unless body && charset
+
+      (+body).force_encoding(charset)
+    end
 
     def convert_headers(headers)
       headers.each.to_h do |pair|
