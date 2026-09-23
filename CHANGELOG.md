@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Restrict requests and redirects to HTTP(S), as libcurl supports many more
   protocols such as `file://` or `gopher://`
+- `Restify::Request#uri`, now always parsed and returned as `Addressable::URI`
 - Drop EOL Ruby versions 3.1 and 3.2
 
 ### Fixes

@@ -8,14 +8,15 @@ module Restify
     module Telemetry
       def call(request)
         method = request.method.to_s.upcase
-        uri = URI.parse(request.uri)
-        name = "#{method} #{uri.scheme}://#{uri.host}:#{uri.port}"
+        uri = request.uri
+        port = uri.inferred_port
+        name = "#{method} #{uri.scheme}://#{uri.host}:#{port}"
 
         # Remove `nil` as OTEL spans must not contain any nil attributes
         attributes = {
           'http.request.method' => method,
           'server.address' => uri.host,
-          'server.port' => uri.port,
+          'server.port' => port,
           'url.full' => uri.to_s,
           'url.scheme' => uri.scheme,
         }.compact

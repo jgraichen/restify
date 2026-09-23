@@ -11,7 +11,7 @@ module Restify
 
     # Request URI.
     #
-    # @return [String] Request URI.
+    # @return [Addressable::URI] Request URI.
     #
     attr_reader :uri
 
@@ -30,7 +30,7 @@ module Restify
     attr_reader :timeout
 
     def initialize(uri:, method: :get, data: nil, timeout: 300, headers: {})
-      @uri     = uri
+      @uri     = uri.is_a?(Addressable::URI) ? uri : Addressable::URI.parse(uri)
       @method  = method.to_s.downcase
       @data    = data
       @timeout = timeout
