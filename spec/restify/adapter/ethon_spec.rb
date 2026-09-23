@@ -18,6 +18,7 @@ describe Restify::Adapter::Ethon do
     let(:request) { Restify::Request.new(uri: 'http://example.org/base') }
     let(:return_code) { :ok }
     let(:response_code) { 200 }
+    let(:effective_url) { 'http://example.org/base' }
 
     # A transfer is handed back from libcurl with its return code and,
     # for HTTP, the status code of the response.
@@ -26,6 +27,7 @@ describe Restify::Adapter::Ethon do
         described_class::Easy,
         return_code:,
         response_code:,
+        effective_url:,
         response_headers: "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n",
         response_body: '{}',
       )
@@ -33,6 +35,15 @@ describe Restify::Adapter::Ethon do
 
     it 'fulfills the promise with the response' do
       expect(value.code).to eq 200
+      expect(value.uri.to_s).to eq 'http://example.org/base'
+    end
+
+    context 'when redirected' do
+      let(:effective_url) { 'http://example.org/other/base' }
+
+      it 'uses the effective URL as the response URI' do
+        expect(value.uri.to_s).to eq 'http://example.org/other/base'
+      end
     end
 
     context 'when the transfer failed' do

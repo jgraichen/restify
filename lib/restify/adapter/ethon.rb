@@ -174,11 +174,16 @@ module Restify
       def convert_back(easy, request)
         ::Restify::Response.new(
           request,
-          request.uri,
+          effective_uri(easy, request),
           easy.response_code,
           convert_headers(easy.response_headers),
           easy.response_body,
         )
+      end
+
+      def effective_uri(easy, request)
+        url = easy.effective_url
+        url ? Addressable::URI.parse(url) : request.uri
       end
 
       def convert_headers(raw)
