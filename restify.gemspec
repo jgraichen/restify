@@ -26,7 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'addressable', '~> 2.3'
   spec.add_dependency 'concurrent-ruby', '~> 1.0'
   spec.add_dependency 'ethon', '~> 0.18.0'
-  spec.add_dependency 'hitimes'
   spec.add_dependency 'logging', '~> 2.0'
   spec.add_dependency 'msgpack', '~> 1.2'
   spec.add_dependency 'nio4r', '~> 2.0'

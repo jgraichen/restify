@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'hitimes'
+require 'timeout'
 
 module Restify
   class Timeout
@@ -14,9 +14,7 @@ module Restify
     def initialize(timeout, target = nil)
       @timeout = parse_timeout(timeout)
       @target = target
-
-      @interval = ::Hitimes::Interval.new
-      @interval.start
+      @deadline = now + @timeout
     end
 
     def wait_on!(ivar)
@@ -42,7 +40,11 @@ module Restify
     private
 
     def wait_interval
-      @timeout - @interval.to_f
+      @deadline - now
+    end
+
+    def now
+      Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
 
     def parse_timeout(value)
