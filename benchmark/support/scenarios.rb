@@ -17,6 +17,40 @@ module Bench
     'typhoeus-sync' => -> { Restify::Adapter::Typhoeus.new(sync: true) },
   }.freeze
 
+  # Worker threads kept alive between runs, like an application server
+  # would, so that scenarios do not measure creating threads.
+  class Pool
+    def initialize(size)
+      @size = size
+      @jobs = Queue.new
+      @threads = Array.new(size) do |i|
+        Thread.new do
+          Thread.current.name = "bench-worker-#{i}"
+          loop { work(*@jobs.pop) }
+        end
+      end
+    end
+
+    def run(&block)
+      done = Queue.new
+      @size.times { @jobs << [block, done] }
+
+      errors = Array.new(@size) { done.pop }.compact
+      raise errors.first if errors.any?
+    end
+
+    private
+
+    def work(block, done)
+      block.call
+      done << nil
+    rescue Exception => e # rubocop:disable Lint/RescueException
+      done << e
+    end
+  end
+
+  POOL = Pool.new(4)
+
   RELATIONS = %i[items owner].freeze
   SCENARIOS = {
     'single request' => lambda {|root|
@@ -27,6 +61,9 @@ module Bench
     },
     '10 parallel requests' => lambda do |root|
       Restify::Promise.new(Array.new(10) { root.get }).value!
+    end,
+    '4 threads, 10 parallel requests each' => lambda do |root|
+      POOL.run { Restify::Promise.new(Array.new(10) { root.get }).value! }
     end,
     '2 parallel requests, 2 relations each' => lambda do |root|
       chains = Array.new(2) do
