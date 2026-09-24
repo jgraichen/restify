@@ -74,8 +74,11 @@ module Restify
         req = convert(request, writer)
 
         if sync?
-          @hydra.queue(req)
-          @hydra.run
+          begin
+            req.run
+          rescue Exception => e # rubocop:disable Lint/RescueException
+            writer.reject(e)
+          end
         else
           debug 'request:add',
             tag: request.object_id,
@@ -83,7 +86,7 @@ module Restify
             url: request.uri,
             timeout: request.timeout
 
-          @queue << convert(request, writer)
+          @queue << req
 
           thread.run unless thread.status
         end

@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Do not set empty OpenTelemetry attributes for URIs without a port
 - Encode response bodies using the charset from the `Content-Type` header
 - Do not share connections of the Ethon adapter with forked child processes
+- Do not deadlock the Typhoeus adapter with `sync: true` when used from multiple threads
 
 ### Breaks
 
