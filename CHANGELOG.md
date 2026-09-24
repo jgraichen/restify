@@ -36,6 +36,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   `restify/webmock`, as WebMock's Typhoeus integration does not apply anymore.
 - `typhoeus` is an optional dependency now. Add it to your Gemfile to use
   `Restify::Adapter::Typhoeus`.
+- Remove `logging` dependency. Set a `Logger`-compatible logger with
+  `Restify.logger = Logger.new(...)`, nothing is logged by default. Restify does
+  not change `Ethon.logger` anymore.
 
 ## 2.1.0 - (2026-06-20)
 

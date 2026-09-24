@@ -2,13 +2,14 @@
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __dir__)
 
+require 'logger'
 require 'restify'
 
 require_relative 'server'
 
 module Bench
   # Do not log by default:
-  Logging.logger.root.level = ENV.fetch('LOG_LEVEL', 'warn')
+  Restify.logger = Logger.new($stderr, level: ENV['LOG_LEVEL']) if ENV['LOG_LEVEL']
 
   ADAPTERS = {
     'ethon' => -> { Restify::Adapter::Ethon.new },

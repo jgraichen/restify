@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'logger'
 require 'rspec'
 
 require 'simplecov'
@@ -51,11 +52,9 @@ RSpec.configure do |config|
     skip 'Spec not enabled for current adapter'
   end
 
-  config.before do
-    Ethon.logger = Logging.logger[Ethon] if defined?(Ethon)
-
-    Logging.logger.root.level = :debug
-    Logging.logger.root.add_appenders Logging.appenders.stdout
+  config.before(:suite) do
+    Restify.logger = Logger.new($stdout, level: ENV.fetch('LOG_LEVEL', 'debug'))
+    Ethon.logger = Restify.logger
   end
 
   config.warnings = true

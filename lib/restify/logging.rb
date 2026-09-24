@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
-require 'logging'
-
 module Restify
   module Logging
     def logger
-      @logger ||= ::Logging.logger[self]
+      Restify.logger
     end
 
     def debug(message = nil, tag: nil, **kwargs)
-      logger.debug do
+      logger&.debug(_log_name) do
         [
           _log_prefix,
           *Array(tag),
@@ -17,6 +15,14 @@ module Restify
           _fmt(**kwargs),
         ].map(&:to_s).reject(&:empty?).join(' ')
       end
+    end
+
+    def error(exception)
+      logger&.error(_log_name) { exception }
+    end
+
+    def _log_name
+      is_a?(Module) ? name : self.class.name
     end
 
     def _log_prefix

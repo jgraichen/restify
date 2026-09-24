@@ -3,8 +3,6 @@
 require 'ethon'
 require 'nio'
 
-Ethon.logger = Logging.logger[Ethon]
-
 module Restify
   module Adapter
     #
@@ -129,7 +127,7 @@ module Restify
           begin
             step(timeout.remaining) until promise.complete? || !timeout.remaining.positive?
           rescue StandardError => e
-            logger.error(e)
+            error(e)
           ensure
             @loop.release
           end
@@ -216,7 +214,7 @@ module Restify
         # This runs inside a libcurl callback, therefore no exception
         # must ever escape from here. Anything reaching this point could
         # not be handed to the promise anymore.
-        logger.error(e)
+        error(e)
       end
 
       def convert_back(easy, request)
@@ -293,7 +291,7 @@ module Restify
             @loop.release
           end
         rescue StandardError => e
-          logger.error(e)
+          error(e)
         end
       ensure
         debug 'loop:exit'
@@ -392,7 +390,7 @@ module Restify
 
         :ok
       rescue StandardError => e
-        logger.error(e)
+        error(e)
         :ok
       end
 
@@ -403,7 +401,7 @@ module Restify
 
         :ok
       rescue StandardError => e
-        logger.error(e)
+        error(e)
         :ok
       end
 

@@ -98,9 +98,61 @@ describe Restify::Global do
   describe '#logger' do
     subject(:logger) { global.logger }
 
-    it 'returns Restify root logger' do
-      expect(logger).to be_a Logging::Logger
-      expect(logger).to eq Logging.logger[Restify]
+    around do |example|
+      global.logger.tap do |configured|
+        global.logger = nil
+        example.run
+      ensure
+        global.logger = configured
+      end
+    end
+
+    it 'is not set by default' do
+      expect(logger).to be_nil
+    end
+
+    it 'does not log anything without a logger' do
+      loggable = Class.new { include Restify::Logging }.new
+
+      expect { loggable.debug('message') }.not_to output.to_stdout_from_any_process
+      expect { loggable.error(RuntimeError.new('kaboom')) }.not_to output.to_stderr_from_any_process
+    end
+  end
+
+  describe '#logger=' do
+    let(:configured) { Logger.new(nil) }
+
+    around do |example|
+      global.logger.tap do |previous|
+        example.run
+      ensure
+        global.logger = previous
+      end
+    end
+
+    it 'sets the logger' do
+      global.logger = configured
+
+      expect(global.logger).to be configured
+    end
+
+    it 'is used for messages from Restify' do
+      output = StringIO.new
+      global.logger = Logger.new(output, level: :debug)
+
+      Class.new { include Restify::Logging }.new.debug('message', key: 'value')
+
+      expect(output.string).to include 'message key=value'
+    end
+
+    it 'is used for errors from Restify' do
+      output = StringIO.new
+      global.logger = Logger.new(output)
+
+      stub_const('Loggable', Class.new { include Restify::Logging })
+      Loggable.new.error(RuntimeError.new('kaboom'))
+
+      expect(output.string).to include 'ERROR -- Loggable: kaboom (RuntimeError)'
     end
   end
 end

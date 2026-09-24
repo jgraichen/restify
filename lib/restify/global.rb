@@ -28,11 +28,11 @@ module Restify
       @cache = cache
     end
 
-    def logger
-      ::Logging.logger[Restify]
-    end
+    attr_reader :logger
 
-    def logger=(logger); end
+    def logger=(logger)
+      @logger = logger
+    end
 
     private
 

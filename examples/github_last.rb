@@ -2,15 +2,13 @@
 
 $LOAD_PATH << File.expand_path('../lib', __dir__)
 
+require 'logger'
 require 'restify'
 require 'base64'
 
 headers = {}
 
-if ENV['LOGGING']
-  Logging.logger.root.add_appenders Logging.appenders.stdout
-  Logging.logger.root.level = :debug
-end
+Restify.logger = Logger.new($stdout, level: :debug) if ENV['LOGGING']
 
 if (token = ENV.fetch('GITHUB_TOKEN', nil))
   headers['Authorization'] = "Bearer #{token}"

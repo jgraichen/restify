@@ -8,8 +8,6 @@ rescue LoadError => e
   )
 end
 
-Ethon.logger = Logging.logger[Ethon]
-
 module Restify
   module Adapter
     class Typhoeus < Base
@@ -189,7 +187,7 @@ module Restify
           runs += 1
           debug 'hydra:completed'
         rescue StandardError => e
-          logger.error(e)
+          error(e)
         end
       ensure
         debug 'hydra:exit'
