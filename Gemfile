@@ -8,6 +8,11 @@ gemspec
 gem 'rake'
 gem 'rake-release'
 
+group :benchmark do
+  gem 'benchmark-ips'
+  gem 'benchmark-memory'
+end
+
 group :test do
   gem 'simplecov', '~> 1.0'
   gem 'simplecov-cobertura'
