@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Use the effective URI after redirects for responses and relations
 - Do not set empty OpenTelemetry attributes for URIs without a port
 - Encode response bodies using the charset from the `Content-Type` header
+- Do not share connections of the Ethon adapter with forked child processes
 
 ### Breaks
 

@@ -21,7 +21,7 @@ Restify uses libcurl via Ethon by default. The older [Typhoeus](https://github.c
 Restify.adapter = Restify::Adapter::Typhoeus.new
 ```
 
-The HTTP adapters are mostly run in a background thread and may not survive mid-application forks.
+The default Ethon adapter should work with forking, e.g. in Puma or Unicorn workers. Requests still pending when forking are aborted in the child process.
 
 Restify includes processors to parse responses and to extract links between resources. The following formats are can be parsed:
 

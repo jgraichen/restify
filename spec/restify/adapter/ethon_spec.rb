@@ -186,4 +186,78 @@ describe Restify::Adapter::Ethon do
       end
     end
   end
+
+  describe 'after fork' do
+    let(:adapter) { described_class.new }
+    let(:connects) { Queue.new }
+
+    before do
+      stub_request(:get, 'http://stubserver/fast')
+        .to_return(status: 200, body: '{}')
+      stub_request(:get, 'http://stubserver/slow')
+        .to_return { sleep 0.5 and {status: 200, body: '{}'} }
+
+      allow(adapter).to receive(:complete).and_wrap_original do |m, easy, *args|
+        connects << Ethon::Curl.get_info_long(:num_connects, easy.handle)
+        m.call(easy, *args)
+      end
+    end
+
+    def request(path)
+      Restify::Request.new(uri: "http://localhost:9292/#{path}")
+    end
+
+    def in_child
+      reader, writer = IO.pipe
+
+      pid = fork do
+        reader.close
+        result = begin
+          yield
+        rescue Exception => e # rubocop:disable Lint/RescueException
+          e
+        end
+        writer.write(Marshal.dump(result))
+      ensure
+        # Skip at exit handlers of the parent
+        exit!(0)
+      end
+
+      writer.close
+      Marshal.load(reader.read) # rubocop:disable Security/MarshalLoad
+    ensure
+      reader&.close
+      Process.wait(pid) if pid
+    end
+
+    it 'does not use connections of the parent process' do
+      # The parent process pools and reuses its connection.
+      2.times { adapter.call(request('fast')).value! }
+      expect(Array.new(2) { connects.pop(timeout: 1) }).to eq [1, 0]
+
+      result = in_child do
+        code = adapter.call(request('fast')).value!.code
+        [code, connects.pop(timeout: 1)]
+      end
+
+      # A new connection, not the one pooled by the parent process
+      expect(result).to eq [200, 1]
+
+      # The parent process can still use its connections
+      expect(adapter.call(request('fast')).value!.code).to eq 200
+    end
+
+    it 'rejects requests started before the fork in the child process' do
+      promise = adapter.call(request('slow'))
+
+      result = in_child do
+        promise.value!
+      rescue Restify::NetworkError => e
+        e.message
+      end
+
+      expect(result).to include 'before fork'
+      expect(promise.value!.code).to eq 200
+    end
+  end
 end

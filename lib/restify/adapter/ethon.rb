@@ -54,17 +54,9 @@ module Restify
         inout: :rw,
       }.freeze
 
-      def initialize(options: {}, **)
+      def initialize(options: {}, **multi)
         @options = DEFAULT_OPTIONS.merge(options)
-
-        @selector = NIO::Selector.new
-        @monitors = {}
-        @timer    = nil
-
-        @multi = ::Ethon::Multi.new(
-          execution_mode: :socket_action,
-          **,
-        )
+        @multi_options = multi
 
         # libcurl only stores the function pointers, therefore the procs
         # must be referenced here too, or they would be garbage
@@ -72,22 +64,21 @@ module Restify
         @socketfunction = method(:on_socket).to_proc
         @timerfunction  = method(:on_timer).to_proc
 
-        @multi.socketfunction = @socketfunction
-        @multi.timerfunction  = @timerfunction
-
-        @queue  = Queue.new
         @mutex  = Mutex.new
         @thread = nil
-        @pid    = Process.pid
 
         # Wake up the background thread from `select` when a waiting
         # thread wants to run the loop.
         @loop = LoopLock.new { @selector.wakeup }
 
+        setup
+
         super()
       end
 
       def call_native(request, writer)
+        check_fork!
+
         easy = convert(request, writer)
 
         debug 'request:add',
@@ -121,6 +112,8 @@ module Restify
       # i.e. when waiting from within the loop itself.
       #
       def drive(promise, timeout) # rubocop:disable Naming/PredicateMethod
+        check_fork!
+
         return false if @loop.owned?
 
         while @loop.acquire(timeout) { promise.complete? }
@@ -142,9 +135,52 @@ module Restify
         self
       end
 
+      def setup
+        @pid      = Process.pid
+        @selector = NIO::Selector.new
+        @monitors = {}
+        @timer    = nil
+        @queue    = Queue.new
+
+        @multi = ::Ethon::Multi.new(execution_mode: :socket_action, **@multi_options)
+        @multi.socketfunction = @socketfunction
+        @multi.timerfunction  = @timerfunction
+      end
+
+      def check_fork!
+        return if @pid == Process.pid
+
+        @mutex.synchronize { forked! if @pid != Process.pid }
+      end
+
+      # A forked child process inherits the parent's event loop,
+      # connections and sockets. They must neither be used nor cleaned
+      # up here, as the parent still uses them.
+      #
+      # Therefore, abandon the state without releasing it, and set up
+      # everything again.
+      def forked!
+        abandoned = @multi.easy_handles.dup
+        abandoned << @queue.pop(true) until @queue.empty?
+
+        @multi.handle.autorelease = false
+        abandoned.each {|easy| easy.handle.autorelease = false }
+
+        @thread = nil
+        @loop.reset!
+        setup
+
+        abandoned.each do |easy|
+          easy._restify_writer.reject(
+            Restify::NetworkError.new(easy._restify_request, 'Request started before fork'),
+          )
+        end
+      end
+
       def convert(request, writer)
         Easy.new.tap do |easy|
           easy._otel_span = OpenTelemetry::Trace.current_span
+          easy._restify_request = request
           easy._restify_writer = writer
 
           easy.http_request(
@@ -265,14 +301,8 @@ module Restify
 
       def thread
         @mutex.synchronize do
-          # Spawn thread if not yet started, or recreate it if it died
-          # (e.g. after fork). Reset the loop in the child process.
+          # Spawn thread if not yet started, or recreate it if it died.
           if @thread.nil? || !@thread.status
-            if @pid != Process.pid
-              @pid = Process.pid
-              @loop.reset!
-            end
-
             debug 'loop:spawn'
             @thread = Thread.new { run }
           end
@@ -422,10 +452,10 @@ module Restify
         "[#{object_id}/#{Thread.current.object_id}]"
       end
 
-      # Keep track of the OTEL span and the promise writer to reject on
-      # errors in the background thread
+      # Keep track of the OTEL span, the request and the promise writer to
+      # reject on errors in the background thread or after fork
       class Easy < ::Ethon::Easy
-        attr_accessor :_otel_span, :_restify_writer
+        attr_accessor :_otel_span, :_restify_request, :_restify_writer
       end
     end
   end
