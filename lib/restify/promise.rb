@@ -2,9 +2,16 @@
 
 module Restify
   class Promise < Concurrent::IVar
+    # A driver that can complete this promise in the waiting thread,
+    # e.g. an adapter running its event loop. See `#wait`.
+    #
+    # @api private
+    attr_writer :driver
+
     def initialize(*dependencies, &task)
       @task         = task
       @dependencies = dependencies.flatten
+      @driver       = nil
 
       super(&nil)
 
@@ -19,7 +26,11 @@ module Restify
 
       execute(t) if pending?
 
-      super
+      # Let the driver run on the current thread instead of sleeping and
+      # switching to another thread if possible. If unsupported, the
+      # driver returns false.
+      super unless incomplete? && @driver&.drive(self, t)
+
       raise t if incomplete?
 
       self
@@ -62,8 +73,9 @@ module Restify
     end
 
     class << self
-      def create
+      def create(driver: nil)
         promise = Promise.new
+        promise.driver = driver
         yield Writer.new(promise)
         promise
       end

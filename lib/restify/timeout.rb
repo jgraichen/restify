@@ -31,6 +31,10 @@ module Restify
       raise self if wait_interval <= 0
     end
 
+    def remaining
+      wait_interval
+    end
+
     def exception
       Error.new(@target)
     end

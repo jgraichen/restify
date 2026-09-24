@@ -89,4 +89,101 @@ describe Restify::Adapter::Ethon do
       end
     end
   end
+
+  describe 'waiting on requests' do
+    let(:adapter) { described_class.new }
+
+    # Threads that completed a transfer, i.e. ran the event loop.
+    let(:completed_by) { Queue.new }
+
+    before do
+      stub_request(:get, 'http://stubserver/fast')
+        .to_return(status: 200, body: '{}')
+      stub_request(:get, 'http://stubserver/slow')
+        .to_return { sleep 0.5 and {status: 200, body: '{}'} }
+
+      allow(adapter).to receive(:complete).and_wrap_original do |m, *args|
+        completed_by << Thread.current
+        m.call(*args)
+      end
+    end
+
+    def request(path)
+      Restify::Request.new(uri: "http://localhost:9292/#{path}")
+    end
+
+    def completed_by_threads
+      Array.new(completed_by.size) { completed_by.pop }
+    end
+
+    it 'runs the event loop in the waiting thread' do
+      expect(adapter.call(request('fast')).value!.code).to eq 200
+      expect(completed_by_threads).to eq [Thread.current]
+    end
+
+    it 'completes requests nobody waits on in the background' do
+      adapter.call(request('fast'))
+
+      # Poll without waiting on the promise:
+      Timeout.timeout(1) { sleep 0.01 while completed_by.empty? }
+
+      expect(completed_by_threads).not_to include Thread.current
+    end
+
+    it 'times out without blocking other requests' do
+      expect { adapter.call(request('slow')).value!(0.1) }.to raise_error Timeout::Error
+      expect(adapter.call(request('fast')).value!.code).to eq 200
+    end
+
+    it 'processes requests from many threads' do
+      threads = Array.new(8) do
+        Thread.new do
+          Array.new(5) { adapter.call(request('fast')).value!.code }
+        end
+      end
+
+      expect(threads.flat_map(&:value)).to all eq 200
+    end
+
+    # Only the adapter's own promises are completed by whichever thread
+    # runs the event loop. Callbacks chained to them must still run in
+    # the thread waiting on them, and only when waiting on them.
+    describe 'chained callbacks' do
+      it 'does not run them before waiting on them' do
+        ran_in = Queue.new
+        promise = adapter.call(request('fast'))
+        chained = promise.then { ran_in << Thread.current }
+
+        promise.value!
+        expect(ran_in).to be_empty
+
+        chained.value!
+        expect(ran_in.pop(timeout: 1)).to eq Thread.current
+      end
+
+      it 'runs them in the waiting thread when another thread runs the loop' do
+        # Keep the loop busy in another thread, until after the fast
+        # request completed.
+        driver = Thread.new { adapter.call(request('slow')).value! }
+        sleep 0.1
+
+        chained = adapter.call(request('fast')).then do |response|
+          [Thread.current, response.code]
+        end
+
+        expect(chained.value!).to eq [Thread.current, 200]
+        expect(completed_by_threads.first).to eq driver
+      ensure
+        driver&.join
+      end
+    end
+
+    context 'when waiting from within the event loop' do
+      it 'does not run the loop again' do
+        adapter.instance_variable_get(:@loop).acquire(0.1)
+
+        expect(adapter.drive(Restify::Promise.new, Restify::Timeout.new(0.1))).to be false
+      end
+    end
+  end
 end

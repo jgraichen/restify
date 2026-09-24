@@ -28,6 +28,7 @@ module Restify
 
   module Adapter
     require 'restify/adapter/base'
+    require 'restify/adapter/loop_lock'
     require 'restify/adapter/typhoeus'
     require 'restify/adapter/ethon'
   end

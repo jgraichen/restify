@@ -11,17 +11,24 @@ module Restify
     # An adapter using libcurl's multi interface via `Ethon` in
     # `socket_action` mode, driven by a nio4r-based event loop.
     #
-    # All libcurl and selector interaction happens on a single
-    # background thread that is spawned on demand and restarted if it
-    # ever dies. Requests are handed over to that thread using a {Queue}
-    # and the event loop is woken up via {NIO::Selector#wakeup}. Both
-    # are safe to call from any thread, therefore no other
-    # synchronization is needed.
+    # Requests are handed over to the event loop using a queue and the
+    # loop is woken up via `NIO::Selector#wakeup`. Both are safe to call
+    # from any thread.
+    #
+    # This is important because the event loop is run from either any
+    # waiting thread or a dedicated background thread.
+    #
+    # The background thread that is spawned on demand and restarted if
+    # it ever dies. A thread waiting on a request's promise takes over
+    # the loop and runs it itself until the promise is complete, see
+    # `#drive`. This avoids handing each request and response between
+    # threads, which is expensive (thread wakeup). Only one thread runs
+    # the loop at a time, therefore all libcurl and selector interaction
+    # is still serialized.
     #
     # Missing features:
     #
     #     * WebMock support
-    #     * Content encodings?
     #
     class Ethon < Base
       include Logging
@@ -77,6 +84,11 @@ module Restify
         @queue  = Queue.new
         @mutex  = Mutex.new
         @thread = nil
+        @pid    = Process.pid
+
+        # Wake up the background thread from `select` when a waiting
+        # thread wants to run the loop.
+        @loop = LoopLock.new { @selector.wakeup }
 
         super()
       end
@@ -98,7 +110,43 @@ module Restify
         @selector.wakeup
       end
 
+      # Run the event loop in the calling thread until the promise is
+      # complete or the timeout expires, see `Promise#wait`.
+      #
+      # Several threads can wait at the same time, but only one runs the
+      # loop. The others sleep until either their promise completes or
+      # the loop is released. The background thread keeps processing
+      # requests nobody waits on, but releases the loop as soon as a
+      # thread starts waiting.
+      #
+      # This only processes transfers, i.e. fulfills or rejects the
+      # adapter's promises. Callbacks chained with `Promise#then` still
+      # only run in the thread waiting on them.
+      #
+      # Returns false when the loop cannot be run in the calling thread,
+      # i.e. when waiting from within the loop itself.
+      #
+      def drive(promise, timeout) # rubocop:disable Naming/PredicateMethod
+        return false if @loop.owned?
+
+        while @loop.acquire(timeout) { promise.complete? }
+          begin
+            step(timeout.remaining) until promise.complete? || !timeout.remaining.positive?
+          rescue StandardError => e
+            logger.error(e)
+          ensure
+            @loop.release
+          end
+        end
+
+        true
+      end
+
       private
+
+      def driver
+        self
+      end
 
       def convert(request, writer)
         Easy.new.tap do |easy|
@@ -113,6 +161,10 @@ module Restify
 
           easy.on_complete do |completed|
             complete(completed, request, writer)
+
+            # Wake up threads waiting on the loop to check if their
+            # result is available now.
+            @loop.notify
           end
         end
       end
@@ -220,8 +272,13 @@ module Restify
       def thread
         @mutex.synchronize do
           # Spawn thread if not yet started, or recreate it if it died
-          # (e.g. after fork)
+          # (e.g. after fork). Reset the loop in the child process.
           if @thread.nil? || !@thread.status
+            if @pid != Process.pid
+              @pid = Process.pid
+              @loop.reset!
+            end
+
             debug 'loop:spawn'
             @thread = Thread.new { run }
           end
@@ -232,30 +289,42 @@ module Restify
 
       def run
         loop do
-          dequeue_all
+          @loop.acquire_background
 
-          # libcurl needs to be notified about its own timeouts, e.g. to
-          # start newly added transfers or to time out stalled ones.
-          timeout!
-
-          timeout = select_timeout
-          debug 'loop:select', timeout: timeout
-
-          # nil on timeout; empty array when woken up
-          @selector.select(timeout)&.each do |monitor|
-            # libcurl can remove sockets while earlier events of the
-            # same batch are processed, e.g. when a completed transfer
-            # tears down other connections. Skip monitors that are gone
-            # by now.
-            next unless @monitors[monitor.value].equal?(monitor)
-
-            socket_action(monitor.value, readiness(monitor))
+          begin
+            step
+          ensure
+            @loop.release
           end
         rescue StandardError => e
           logger.error(e)
         end
       ensure
         debug 'loop:exit'
+      end
+
+      # Run one iteration of the event loop. Must only be called by the
+      # thread owning the loop.
+      def step(limit = nil)
+        dequeue_all
+
+        # libcurl needs to be notified about its own timeouts, e.g. to
+        # start newly added transfers or to time out stalled ones.
+        timeout!
+
+        timeout = select_timeout
+        timeout = limit if limit && (timeout.nil? || timeout > limit)
+        debug 'loop:select', timeout: timeout
+
+        # nil on timeout; empty array when woken up
+        @selector.select(timeout)&.each do |monitor|
+          # libcurl can remove sockets while earlier events of the same
+          # batch are processed, e.g. when a completed transfer tears
+          # down other connections. Skip monitors that are gone by now.
+          next unless @monitors[monitor.value].equal?(monitor)
+
+          socket_action(monitor.value, readiness(monitor))
+        end
       end
 
       def dequeue_all

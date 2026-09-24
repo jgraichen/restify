@@ -21,6 +21,17 @@ describe Restify::Timeout do
     end
   end
 
+  describe '#remaining' do
+    it 'returns the seconds left' do
+      expect(timer.remaining).to be_within(0.05).of(0.2)
+    end
+
+    it 'is not positive after having timed out' do
+      sleep timer.remaining
+      expect(timer.remaining).not_to be_positive
+    end
+  end
+
   describe '#wait_on!' do
     it 'calls block on IVar timeout' do
       expect do

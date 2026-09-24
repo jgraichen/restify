@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### New
 
 - Add experimental `Restify::Adapter::Ethon` adapter directly using libcurl in a background event loop
+- Perf: Run event loop in waiting threads to avoid slow handover between threads
 
 ### Changes
 

@@ -217,6 +217,51 @@ describe Restify::Promise do
     it 'can time out' do
       expect { promise.wait(0.1) }.to raise_error Timeout::Error
     end
+
+    context 'with a driver' do
+      subject(:promise) { described_class.create(driver:) {|w| writers << w } }
+
+      let(:driver) { instance_double(Restify::Adapter::Ethon) }
+      let(:writers) { [] }
+      let(:writer) { writers.first }
+
+      before { promise }
+
+      it 'lets the driver complete the promise in the waiting thread' do
+        expect(driver).to receive(:drive).once do |p, timeout|
+          expect(p).to be promise
+          expect(timeout).to be_a Restify::Timeout
+          writer.fulfill 42
+          true
+        end
+
+        expect(promise.value!).to eq 42
+      end
+
+      it 'waits as usual when the driver declines' do
+        allow(driver).to receive(:drive).and_return(false)
+
+        Thread.new do
+          sleep 0.05
+          writer.fulfill 42
+        end
+
+        expect(promise.value!).to eq 42
+      end
+
+      it 'times out when the driver returns without completing it' do
+        allow(driver).to receive(:drive).and_return(true)
+
+        expect { promise.wait(0.1) }.to raise_error Timeout::Error
+      end
+
+      it 'does not call the driver for a complete promise' do
+        expect(driver).not_to receive(:drive)
+        writer.fulfill 42
+
+        expect(promise.value!).to eq 42
+      end
+    end
   end
 
   describe '#value' do
