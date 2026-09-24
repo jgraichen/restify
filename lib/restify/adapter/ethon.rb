@@ -26,10 +26,6 @@ module Restify
     # the loop at a time, therefore all libcurl and selector interaction
     # is still serialized.
     #
-    # Missing features:
-    #
-    #     * WebMock support
-    #
     class Ethon < Base
       include Logging
 

@@ -35,6 +35,8 @@ end
 require_relative 'support/opentelemetry'
 require_relative 'support/stub_server'
 
+require 'restify/webmock'
+
 RSpec.configure do |config|
   config.order = 'random'
 

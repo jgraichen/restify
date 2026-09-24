@@ -101,6 +101,27 @@ puts "#{commit['commit']['message']}"
 
 See commented example in main spec [`spec/restify_spec.rb`](https://github.com/jgraichen/restify/blob/master/spec/restify_spec.rb#L100) or in the `examples` directory.
 
+## Testing with WebMock
+
+Restify can intercept requests for [WebMock](https://github.com/bblimke/webmock), independent of the adapter in use. Load it after WebMock, before WebMock is enabled, e.g. in your `spec_helper.rb`:
+
+```ruby
+require 'webmock/rspec'
+require 'restify/webmock'
+```
+
+Note: Stubbed responses are returned as they are, including redirects, like WebMock does for other libcurl-based libraries. Requests not stubbed are passed on to the adapter if WebMock allows connections.
+
+For tests relying on actual HTTP behavior, e.g. following redirects, run a local stub server instead, so that requests are sent over the network by the adapter.
+
+WebMock's own Typhoeus integration is not needed for Restify and can be disabled. Otherwise, requests are reported a second time, when they are passed on to the Typhoeus adapter:
+
+```ruby
+WebMock.enable!(except: %i[typhoeus])
+```
+
+Keep it enabled if your application uses Typhoeus directly, too.
+
 ## Contributing
 
 1. [Fork it](http://github.com/jgraichen/restify/fork)
