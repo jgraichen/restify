@@ -13,7 +13,13 @@ Restify is build upon the following libraries:
 
 * [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby)
 * [addressable](https://github.com/sporkmonger/addressable)
-* [typhoeus](https://github.com/typhoeus/typhoeus)
+* [ethon](https://github.com/typhoeus/ethon), using libcurl
+
+Restify uses libcurl via Ethon by default. The older [Typhoeus](https://github.com/typhoeus/typhoeus) adapter is still available. To use it, add `typhoeus` to your Gemfile and configure it:
+
+```ruby
+Restify.adapter = Restify::Adapter::Typhoeus.new
+```
 
 The HTTP adapters are mostly run in a background thread and may not survive mid-application forks.
 

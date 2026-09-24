@@ -29,8 +29,10 @@ module Restify
   module Adapter
     require 'restify/adapter/base'
     require 'restify/adapter/loop_lock'
-    require 'restify/adapter/typhoeus'
     require 'restify/adapter/ethon'
+
+    # Optional, requires the `typhoeus` gem.
+    autoload :Typhoeus, 'restify/adapter/typhoeus'
   end
 
   module Processors

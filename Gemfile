@@ -8,6 +8,11 @@ gemspec
 gem 'rake'
 gem 'rake-release'
 
+# Optional adapter dependencies
+group :benchmark, :test do
+  gem 'typhoeus', '~> 1.3'
+end
+
 group :benchmark do
   gem 'benchmark-ips'
   gem 'benchmark-memory'

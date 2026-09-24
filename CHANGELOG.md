@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### New
 
-- Add experimental `Restify::Adapter::Ethon` adapter directly using libcurl in a background event loop
+- Add `Restify::Adapter::Ethon` adapter directly using libcurl in a background event loop
 - Perf: Run event loop in waiting threads to avoid slow handover between threads
 - Add `restify/webmock` to intercept requests with WebMock for all adapters
 
@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Breaks
 
 - Raise minimum Ruby version to 3.3
+- Use `Restify::Adapter::Ethon` by default. With WebMock, require
+  `restify/webmock`, as WebMock's Typhoeus integration does not apply anymore.
+- `typhoeus` is an optional dependency now. Add it to your Gemfile to use
+  `Restify::Adapter::Typhoeus`.
 
 ## 2.1.0 - (2026-06-20)
 

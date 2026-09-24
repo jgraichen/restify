@@ -51,8 +51,8 @@ describe Restify::Global do
       end
     end
 
-    it 'defaults to Typhoeus adapter' do
-      expect(adapter).to be_a Restify::Adapter::Typhoeus
+    it 'defaults to Ethon adapter' do
+      expect(adapter).to be_a Restify::Adapter::Ethon
     end
   end
 

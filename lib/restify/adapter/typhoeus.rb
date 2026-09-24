@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
-require 'typhoeus'
+begin
+  require 'typhoeus'
+rescue LoadError => e
+  raise LoadError.new(
+    "Restify::Adapter::Typhoeus requires the `typhoeus` gem, add it to your Gemfile (#{e.message})",
+  )
+end
 
 Ethon.logger = Logging.logger[Ethon]
 

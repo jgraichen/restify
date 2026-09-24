@@ -9,9 +9,7 @@ module Restify
     end
 
     def adapter
-      @adapter ||= begin
-        Restify::Adapter::Typhoeus.new
-      end
+      @adapter ||= Restify::Adapter::Ethon.new
     end
 
     def adapter=(adapter)
