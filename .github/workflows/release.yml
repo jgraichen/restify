@@ -24,6 +24,8 @@ jobs:
         with:
           ruby-version: ruby
           bundler-cache: false
+
+      - run: bundle install
         env:
           BUNDLE_JOBS: 4
           BUNDLE_RETRY: 10
@@ -33,5 +35,4 @@ jobs:
       - uses: taiki-e/create-gh-release-action@eba8ea96c86cca8a37f1b56e94b4d13301fba651 # v1.11.0
         with:
           changelog: CHANGELOG.md
-          draft: true
           token: ${{ secrets.GITHUB_TOKEN }}
