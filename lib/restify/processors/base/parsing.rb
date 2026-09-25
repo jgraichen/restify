@@ -9,6 +9,8 @@ module Restify
       # Parses generic data structures into resources
       #
       module Parsing
+        RELATION_NAME = /\A\w+_url\z/i
+
         def load
           # No data, e.g. when a server sets a content type but sends an
           # empty body.
@@ -27,41 +29,44 @@ module Restify
 
         def parse(object, root: false)
           case object
-            when Hash
-              data      = object.each_with_object({}) {|each, obj| parse_data(each, obj) }
-              relations = object.each_with_object({}) {|each, obj| parse_rels(each, obj) }
-
-              Resource.new context,
-                data:,
-                response: root ? response : nil,
-                relations:
-
-            when Array
-              object.map {|each| parse(each) }
-            else
-              object
+            when Hash then build_resource(object, root)
+            when Array then object.map {|each| parse(each) }
+            else object
           end
         end
 
         private
 
-        def parse_data(pair, data)
-          data[pair[0].to_s] = parse pair[1]
+        # Build data and relations of a resource in one pass.
+        def build_resource(object, root)
+          data = {}
+          relations = {}
+
+          object.each_pair do |key, value|
+            key = key.to_s
+            data[key] = parse(value)
+            parse_relation(relations, key, value) if value.is_a?(String)
+          end
+
+          Resource.new(
+            context,
+            data:,
+            response: root ? response : nil,
+            relations:,
+          )
         end
 
-        def parse_rels(pair, relations)
-          name = case pair[0].to_s.downcase
-                   when /\A(\w+)_url\z/
-                     Regexp.last_match[1]
-                   when 'url'
-                     'self'
-                   else
-                     return
+        def parse_relation(relations, key, value)
+          name = if key.match?(RELATION_NAME)
+                   key[0, key.length - 4].downcase
+                 elsif key.casecmp?('url')
+                   'self'
                  end
 
-          return if relations.key?(name) || pair[1].nil? || pair[1].to_s =~ /\A\w*\z/
+          return if name.nil? || relations.key?(name)
+          return if value.empty?
 
-          relations[name] = pair[1].to_s
+          relations[name] = value
         end
       end
     end

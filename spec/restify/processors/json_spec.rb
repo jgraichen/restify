@@ -96,6 +96,21 @@ describe Restify::Processors::Json do
         it { expect(resource.relation(:search)).to eq 'https://google.com{?q}' }
       end
 
+      context 'relation fields with relative references' do
+        let(:context) { Restify::Context.new('http://test.host/users/42') }
+        let(:body) do
+          <<-JSON
+            {"items_url": "items", "status_url": "none"}
+          JSON
+        end
+
+        it 'resolves them against the context URI' do
+          expect(resource.relation(:items).expand({}).to_s).to eq 'http://test.host/users/items'
+        end
+
+        it { is_expected.to have_relation :status }
+      end
+
       context 'object with implicit self relation' do
         let(:body) do
           <<-JSON
@@ -104,6 +119,58 @@ describe Restify::Processors::Json do
         end
 
         it { expect(resource.relation(:self)).to eq '/self' }
+      end
+
+      context 'relation fields in any case' do
+        let(:body) do
+          <<-JSON
+            {"Search_URL": "/search", "URL": "/self"}
+          JSON
+        end
+
+        it { expect(resource.relation(:search)).to eq '/search' }
+        it { expect(resource.relation(:self)).to eq '/self' }
+      end
+
+      context 'several fields for the same relation' do
+        let(:body) do
+          <<-JSON
+            {"url": "/first", "self_url": "/second"}
+          JSON
+        end
+
+        it { expect(resource.relation(:self)).to eq '/first' }
+      end
+
+      context 'relation fields without URLs' do
+        let(:body) do
+          <<-JSON
+            {"a_url": null, "c_url": "", "d_url": 42, "e_url": 1.5,
+             "f_url": true, "g_url": {"href": "/g"}, "h_url": ["/h"]}
+          JSON
+        end
+
+        it { expect(resource._restify_relations).to be_empty }
+      end
+
+      context 'fields similar to relations' do
+        let(:body) do
+          <<-JSON
+            {"_url": "/a", "url_b": "/b"}
+          JSON
+        end
+
+        it { expect(resource._restify_relations).to be_empty }
+      end
+
+      context 'relation fields with non-ASCII characters' do
+        let(:body) do
+          <<-JSON
+            {"\u00FCber_url": "/a", "\u212A_url": "/kelvin", "\u212Aurl": "/b"}
+          JSON
+        end
+
+        it { expect(resource._restify_relations).to be_empty }
       end
 
       context 'single array' do
