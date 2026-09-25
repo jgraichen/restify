@@ -160,6 +160,23 @@ describe Restify::Promise do
       end
     end
 
+    context 'with a task raising an exception' do
+      let(:task) { proc { raise ArgumentError.new('kaboom') } }
+
+      it 'rejects the promise with it' do
+        expect { result }.to raise_error ArgumentError, 'kaboom'
+      end
+    end
+
+    # No exception must escape from a task, not even a non-StandardError.
+    context 'with a task raising a non-StandardError' do
+      let(:task) { proc { raise NotImplementedError.new('kaboom') } }
+
+      it 'rejects the promise with it' do
+        expect { result }.to raise_error NotImplementedError, 'kaboom'
+      end
+    end
+
     context 'with dependencies, but no task' do
       let(:dependencies) do
         [

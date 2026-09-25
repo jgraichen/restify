@@ -18,7 +18,7 @@ module Restify
       # When dependencies were passed in, but none are left after flattening,
       # then we don't have to wait for explicit dependencies or resolution
       # through a writer.
-      complete true, [], nil if !@task && @dependencies.empty? && dependencies.any?
+      complete(true, [], nil) if !@task && @dependencies.empty? && dependencies.any?
     end
 
     def wait(timeout = nil)
@@ -44,22 +44,21 @@ module Restify
       synchronize { ns_execute timeout }
     end
 
-    protected
+    private
 
-    # @!visibility private
     def ns_execute(timeout = nil)
       return unless compare_and_set_state(:processing, :pending)
       return unless @task || @dependencies.any?
 
-      executor = Concurrent::SafeTaskExecutor.new \
-        method(:ns_exec), rescue_exception: true
-
-      success, value, reason = executor.execute(timeout)
-
-      complete success, value, reason
+      begin
+        value = ns_exec(timeout)
+      rescue Exception => e # rubocop:disable Lint/RescueException
+        complete(false, nil, e)
+      else
+        complete(true, value, nil)
+      end
     end
 
-    # @!visibility private
     def ns_exec(timeout = nil)
       t = Timeout.new(timeout, self)
 
