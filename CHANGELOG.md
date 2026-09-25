@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+## 3.0.0.rc1 - (2026-09-25)
+
+---
+
+### New
+
 - Add `Restify::Adapter::Ethon` adapter directly using libcurl in a background event loop
 - Perf: Run event loop in waiting threads to avoid slow handover between threads
 - Add `restify/webmock` to intercept requests with WebMock for all adapters
@@ -19,7 +31,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Restrict requests and redirects to HTTP(S), as libcurl supports many more
   protocols such as `file://` or `gopher://`
-- `Restify::Request#uri`, now always parsed and returned as `Addressable::URI`
 - Drop EOL Ruby versions 3.1 and 3.2
 - Drop `hitimes` dependency, using `Process.clock_gettime` for timeouts
 - Return resources without data for empty response bodies, even with a JSON
@@ -32,12 +43,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Encode response bodies using the charset from the `Content-Type` header
 - Do not share connections of the Ethon adapter with forked child processes
 - Do not deadlock the Typhoeus adapter with `sync: true` when used from multiple threads
-- Raise the matching `ResponseError`, e.g. `BadRequest`, for error responses
-  with an empty or invalid body (#31)
+- Raise the `ResponseError` for the status code, e.g. `NotFound`, instead of a
+  `JSON::ParserError` for error responses with an empty or invalid JSON body (#31)
 
 ### Breaks
 
 - Raise minimum Ruby version to 3.3
+- `Restify::Request#uri` is always parsed and returned as `Addressable::URI`
 - Use `Restify::Adapter::Ethon` by default. With WebMock, require
   `restify/webmock`, as WebMock's Typhoeus integration does not apply anymore.
 - `typhoeus` is an optional dependency now. Add it to your Gemfile to use
