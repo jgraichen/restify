@@ -72,6 +72,20 @@ describe Restify::Context do
     end
   end
 
+  describe '#join' do
+    let(:uri) { 'http://localhost/base/' }
+
+    it 'resolves relative URIs' do
+      expect(context.join('../other').to_s).to eq 'http://localhost/other'
+    end
+
+    it 'returns absolute URIs as they are' do
+      absolute = Addressable::URI.parse('http://example.org/path')
+
+      expect(context.join(absolute)).to be absolute
+    end
+  end
+
   describe '#request' do
     subject(:request) { context.request(:get, '/').value! }
 

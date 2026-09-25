@@ -38,6 +38,10 @@ describe Restify::Adapter::Ethon do
       expect(value.uri.to_s).to eq 'http://example.org/base'
     end
 
+    it 'reuses the request URI without redirects' do
+      expect(value.uri).to be request.uri
+    end
+
     context 'when redirected' do
       let(:effective_url) { 'http://example.org/other/base' }
 

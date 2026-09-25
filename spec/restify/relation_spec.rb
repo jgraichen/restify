@@ -28,6 +28,29 @@ describe Restify::Relation do
 
     it { is_expected.to be_a Addressable::URI }
 
+    context 'without template variables' do
+      let(:pattern) { '/resource?a=1' }
+      let(:params) { {} }
+
+      it { expect(expanded.to_s).to eq 'http://test.host/resource?a=1' }
+
+      it 'reuses a frozen URI' do
+        expect(expanded).to be_frozen
+        expect(relation.expand({})).to be expanded
+      end
+
+      context 'with query parameters' do
+        let(:params) { {b: 2} }
+
+        it { expect(expanded.to_s).to eq 'http://test.host/resource?a=1&b=2' }
+
+        it 'does not change the reused URI' do
+          expanded
+          expect(relation.expand({}).to_s).to eq 'http://test.host/resource?a=1'
+        end
+      end
+    end
+
     context 'with nil' do
       let(:params) { {id: nil} }
 

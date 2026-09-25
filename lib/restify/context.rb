@@ -30,8 +30,18 @@ module Restify
       @options = kwargs
     end
 
+    # Resolve a URI against the context URI. Absolute URIs are returned
+    # as they are, e.g. when already joined by a relation.
+    #
+    # @param uri [Addressable::URI, String] URI to resolve.
+    # @return [Addressable::URI] Absolute URI.
+    #
     def join(uri)
-      self.uri.join uri
+      if uri.is_a?(Addressable::URI) && uri.absolute?
+        uri
+      else
+        self.uri.join(uri)
+      end
     end
 
     def inherit(uri, **)

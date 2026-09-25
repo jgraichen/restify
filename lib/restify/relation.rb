@@ -55,13 +55,15 @@ module Restify
     end
 
     def expand(params)
-      params    = convert params
-      variables = extract! params
+      params    = convert(params)
+      variables = extract!(params)
 
-      uri = template.expand variables
-      uri.query_values = (uri.query_values || {}).merge params if params.any?
+      return expand_static(params) if template.variables.empty?
 
-      context.join uri
+      uri = template.expand(variables)
+      uri.query_values = (uri.query_values || {}).merge(params) if params.any?
+
+      context.join(uri)
     end
 
     def pattern
@@ -73,6 +75,18 @@ module Restify
     end
 
     private
+
+    # A template without variables always expands to the same URI. It
+    # can be parsed and joined only once. The URI is frozen, as all
+    # requests share it.
+    def expand_static(params)
+      @static_uri ||= context.join(template.pattern).freeze
+      return @static_uri if params.empty?
+
+      @static_uri.dup.tap do |uri|
+        uri.query_values = (uri.query_values || {}).merge(params)
+      end
+    end
 
     def convert(params)
       params.each_pair.with_object({}) do |param, hash|

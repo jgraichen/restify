@@ -265,7 +265,11 @@ module Restify
 
       def effective_uri(easy, request)
         url = easy.effective_url
-        url ? Addressable::URI.parse(url) : request.uri
+
+        # Only parse the URL after redirects, as parsing is expensive.
+        return request.uri if url.nil? || url == request.uri.to_s
+
+        Addressable::URI.parse(url)
       end
 
       def convert_headers(raw)
