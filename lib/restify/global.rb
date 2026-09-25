@@ -8,30 +8,11 @@ module Restify
       Relation.new context, context.uri
     end
 
+    attr_writer :adapter
+    attr_accessor :cache, :logger
+
     def adapter
       @adapter ||= Restify::Adapter::Ethon.new
-    end
-
-    def adapter=(adapter)
-      @adapter = adapter
-    end
-
-    # Cache for all requests, if any. Nothing is cached by default.
-    #
-    # @return [#call, nil] An object responding to
-    #   `#call(request) { |request| promise }`, returning a promise of the
-    #   response. The block performs the actual request.
-    #
-    attr_reader :cache
-
-    def cache=(cache)
-      @cache = cache
-    end
-
-    attr_reader :logger
-
-    def logger=(logger)
-      @logger = logger
     end
 
     private
