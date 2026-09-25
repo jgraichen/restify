@@ -22,8 +22,7 @@ describe Restify::Adapter::Ethon::Pool do
   end
 
   def release(*handles)
-    handles.each {|handle| pool.complete(handle) }
-    pool.release_completed
+    handles.each {|handle| pool.release(handle) }
   end
 
   describe '#checkout' do
@@ -48,16 +47,7 @@ describe Restify::Adapter::Ethon::Pool do
     end
   end
 
-  describe '#complete' do
-    it 'does not make the handle available before its release' do
-      handle = pool.checkout
-      pool.complete(handle)
-
-      expect(pool.checkout).not_to be handle
-    end
-  end
-
-  describe '#release_completed' do
+  describe '#release' do
     it 'resets handles' do
       handle = pool.checkout
       release(handle)
@@ -78,15 +68,13 @@ describe Restify::Adapter::Ethon::Pool do
   end
 
   describe '#forked!' do
-    it 'does not release idle or completed handles' do
+    it 'does not release idle handles' do
       idle = pool.checkout
-      completed = pool.checkout
       release(idle)
-      pool.complete(completed)
 
       pool.forked!
 
-      expect([idle, completed].map {|handle| handle.handle.autorelease }).to eq [false, false]
+      expect(idle.handle.autorelease).to be false
       expect(pool.checkout).not_to be idle
     end
   end

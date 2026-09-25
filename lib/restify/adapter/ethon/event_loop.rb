@@ -23,9 +23,7 @@ module Restify
           inout: :rw,
         }.freeze
 
-        def initialize(**multi, &after_step)
-          @after_step = after_step
-
+        def initialize(**multi)
           @selector = NIO::Selector.new
           @monitors = {}
           @timer    = nil
@@ -149,8 +147,6 @@ module Restify
 
             socket_action(monitor.value, readiness(monitor))
           end
-
-          @after_step&.call
         end
 
         def dequeue_all

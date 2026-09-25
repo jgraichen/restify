@@ -128,12 +128,7 @@ module Restify
       def setup
         @pid    = Process.pid
         @pool   = Pool.new(size: POOL_SIZE) { Easy.new }
-        @events = EventLoop.new(**@multi_options) do
-          # Ethon uses completed handles until libcurl returns,
-          # therefore they are only released after each iteration of the
-          # loop.
-          @pool.release_completed
-        end
+        @events = EventLoop.new(**@multi_options)
       end
 
       def check_fork!
@@ -167,9 +162,7 @@ module Restify
           easy.on_complete do |completed|
             complete(completed, request, writer)
 
-            # Ethon still uses the handle after this callback, therefore
-            # it is released after the loop iteration, see #setup.
-            @pool.complete(completed)
+            @pool.release(completed)
 
             # Wake up threads waiting on the loop to check if their
             # result is available now.

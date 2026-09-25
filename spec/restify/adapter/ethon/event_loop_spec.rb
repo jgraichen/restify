@@ -3,10 +3,8 @@
 require 'spec_helper'
 
 describe Restify::Adapter::Ethon::EventLoop do
-  subject(:events) { described_class.new { steps << Thread.current } }
+  subject(:events) { described_class.new }
 
-  # Threads that completed an iteration of the loop.
-  let(:steps) { Queue.new }
   let(:threads) { [] }
 
   let(:options) do
@@ -48,14 +46,6 @@ describe Restify::Adapter::Ethon::EventLoop do
       expect(events.drive(promise, Restify::Timeout.new(1))).to be true
       expect(promise.value.code).to eq 200
       expect(completed_by.pop(timeout: 1)).to eq Thread.current
-    end
-
-    it 'calls the block after iterations' do
-      easy, promise, = transfer
-      events.enqueue(easy)
-      events.drive(promise, Restify::Timeout.new(1))
-
-      expect(steps.pop(timeout: 1)).to eq Thread.current
     end
 
     it 'gives up when the timeout expires' do
