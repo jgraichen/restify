@@ -17,9 +17,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Breaks
 
-## 3.0.0.rc1 - (2026-09-25)
+## 3.0.0.rc2 - (2026-09-25)
 
 ---
+
+First release candidate for 3.0. `3.0.0.rc1` was tagged, but not published due to a broken release pipeline.
 
 ### New
 
