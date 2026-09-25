@@ -6,91 +6,32 @@ describe Restify::Adapter::Ethon do
   describe 'completed transfers' do
     subject(:value) do
       Restify::Promise.create do |writer|
-        described_class.new.send(
-          :complete,
-          easy,
-          request,
-          writer,
-        )
+        described_class.new.send(:complete, easy, request, writer)
       end.value!
     end
 
     let(:request) { Restify::Request.new(uri: 'http://example.org/base') }
-    let(:return_code) { :ok }
-    let(:response_code) { 200 }
-    let(:effective_url) { 'http://example.org/base' }
-
-    # A transfer is handed back from libcurl with its return code and,
-    # for HTTP, the status code of the response.
-    def easy
-      instance_double(
-        described_class::Easy,
-        return_code:,
-        response_code:,
-        effective_url:,
-        response_headers: "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n",
-        response_body: '{}',
-      )
-    end
+    let(:easy) { instance_double(described_class::Easy, return_code: :ok, response_code: 200) }
 
     it 'fulfills the promise with the response' do
-      expect(value.code).to eq 200
-      expect(value.uri.to_s).to eq 'http://example.org/base'
+      response = instance_double(Restify::Response)
+      allow(easy).to receive(:response).with(request).and_return(response)
+
+      expect(value).to be response
     end
 
-    it 'reuses the request URI without redirects' do
-      expect(value.uri).to be request.uri
-    end
+    it 'rejects the promise on network errors' do
+      allow(easy).to receive(:response).and_raise(Restify::NetworkError.new(request, 'kaboom'))
 
-    context 'when redirected' do
-      let(:effective_url) { 'http://example.org/other/base' }
-
-      it 'uses the effective URL as the response URI' do
-        expect(value.uri.to_s).to eq 'http://example.org/other/base'
-      end
-    end
-
-    context 'when the transfer failed' do
-      let(:return_code) { :couldnt_connect }
-      let(:response_code) { 0 }
-
-      it 'rejects the promise' do
-        expect { value }.to raise_error Restify::NetworkError, /connect/i
-      end
-    end
-
-    # Non-HTTP protocols are refused before a transfer is started, but
-    # libcurl still reports success with a zero status code whenever no
-    # HTTP status was received, and no status code at all when it cannot
-    # be read back. Neither has a response to process.
-    context 'without an HTTP status' do
-      let(:response_code) { 0 }
-
-      it 'rejects the promise' do
-        expect { value }.to raise_error Restify::NetworkError, /without HTTP status/
-      end
-    end
-
-    context 'with an unavailable HTTP status' do
-      let(:response_code) { nil }
-
-      it 'rejects the promise' do
-        expect { value }.to raise_error Restify::NetworkError, /without HTTP status/
-      end
+      expect { value }.to raise_error Restify::NetworkError, /kaboom/
     end
 
     # Unexpected errors must reject the promise too, as the caller would
     # otherwise keep waiting for it until it times out.
-    context 'when building the response fails' do
-      def easy
-        super.tap do |double|
-          allow(double).to receive(:response_headers).and_raise('kaboom')
-        end
-      end
+    it 'rejects the promise on unexpected errors' do
+      allow(easy).to receive(:response).and_raise('kaboom')
 
-      it 'rejects the promise' do
-        expect { value }.to raise_error 'kaboom'
-      end
+      expect { value }.to raise_error 'kaboom'
     end
   end
 
@@ -184,9 +125,101 @@ describe Restify::Adapter::Ethon do
 
     context 'when waiting from within the event loop' do
       it 'does not run the loop again' do
-        adapter.instance_variable_get(:@loop).acquire(0.1)
+        adapter.instance_variable_get(:@events).instance_variable_get(:@lock).acquire(0.1)
 
         expect(adapter.drive(Restify::Promise.new, Restify::Timeout.new(0.1))).to be false
+      end
+    end
+  end
+
+  describe 'reusing easy handles' do
+    let(:adapter) { described_class.new }
+    let(:root) { Restify.new('http://localhost:9292/echo', adapter:) }
+
+    # Easy handles of completed transfers, in order.
+    let(:handles) { [] }
+
+    before do
+      allow(adapter).to receive(:complete).and_wrap_original do |m, easy, *args|
+        handles << easy
+        m.call(easy, *args)
+      end
+    end
+
+    def echo(method, *, **)
+      JSON.parse(root.send(method, *, **).value!.response.body)
+    end
+
+    it 'reuses the handle of a completed request' do
+      2.times { root.get.value! }
+
+      expect(handles[1]).to be handles[0]
+    end
+
+    it 'does not reuse handles of requests in progress' do
+      Restify::Promise.new(Array.new(2) { root.get }).value!
+
+      expect(handles[1]).not_to be handles[0]
+    end
+
+    # Nothing must leak from one request into the next one.
+    describe 'subsequent requests' do
+      it 'use the method of each request' do
+        %i[post get head put patch delete get].each do |method|
+          response = root.send(method).value!.response
+          next if method == :head
+
+          expect(JSON.parse(response.body)).to include('REQUEST_METHOD' => method.to_s.upcase)
+        end
+      end
+
+      it 'do not send a previous body' do
+        root.post('payload').value!
+
+        expect(echo(:get)).not_to have_key('CONTENT_LENGTH')
+      end
+
+      it 'do not send previous headers' do
+        root.get(headers: {'X-Custom' => 'yes'}).value!
+
+        expect(echo(:get)).not_to have_key('HTTP_X_CUSTOM')
+      end
+
+      it 'receive a body after a HEAD request' do
+        root.head.value!
+
+        expect(root.get.value!.response.body).not_to be_empty
+      end
+    end
+
+    describe 'request bodies' do
+      before { stub_request(:any, 'http://stubserver/body') }
+
+      let(:root) { Restify.new('http://localhost:9292/body', adapter:) }
+
+      %i[post put patch].each do |method|
+        it "sends #{method.upcase} bodies" do
+          root.send(method, 'payload').value!
+          root.send(method, 'other').value!
+
+          expect(a_request(method, 'http://stubserver/body').with(body: 'payload')).to have_been_made.once
+          expect(a_request(method, 'http://stubserver/body').with(body: 'other')).to have_been_made.once
+        end
+      end
+    end
+  end
+
+  describe 'options' do
+    it 'raises on unknown options' do
+      expect { described_class.new(options: {unknown: 1}) }.to raise_error ArgumentError, /Unknown libcurl option/
+    end
+
+    it 'sets options on each request' do
+      adapter = described_class.new(options: {useragent: 'restify-spec'})
+      root = Restify.new('http://localhost:9292/echo', adapter:)
+
+      2.times do
+        expect(JSON.parse(root.get.value!.response.body)).to include('HTTP_USER_AGENT' => 'restify-spec')
       end
     end
   end

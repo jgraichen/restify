@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changes
 
 - Perf: Avoid parsing/joining URIs when not necessary, e.g., for relations without variables or absolute URIs.
+- Perf: Reuse libcurl handles in the Ethon adapter
+- Perf: Optimize libcurl option preparation in the Ethon adapter
 
 ### Fixes
 

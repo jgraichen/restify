@@ -39,6 +39,8 @@ describe Restify do
       # have the Restify span as a parent.
       spans[0].tap do |span|
         expect(span.instrumentation_scope.name).to include('Ethon')
+        expect(span.name).to eq 'GET'
+        expect(span.attributes).to include('http.request.method' => 'GET')
         expect(span.parent_span_id).to eq spans[1].span_id
       end
     end
