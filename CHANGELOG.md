@@ -45,6 +45,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Invalid response bodies do not raise from `#value!` anymore. The resource is
   returned, e.g. with relations from headers, and accessing its data raises a
   `Restify::ParseError` with the parser error as its cause (#31).
+- Remove `activesupport` dependency. `Restify.cache` defaults to `nil`, as the
+  previous default cache did not cache anything (yet).
 - Remove `logging` dependency. Set a `Logger`-compatible logger with
   `Restify.logger = Logger.new(...)`, nothing is logged by default. Restify does
   not change `Ethon.logger` anymore.

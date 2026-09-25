@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'active_support'
-require 'active_support/cache'
 
 describe Restify::Cache do
   subject(:cache) { described_class.new(store) }
 
-  let(:store) { instance_double(ActiveSupport::Cache::Store) }
+  let(:store) { Object.new }
 
   describe '#call' do
     let(:request) { instance_double(Restify::Request) }

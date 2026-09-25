@@ -71,4 +71,59 @@ describe Restify::Context do
       it_behaves_like 'serialization'
     end
   end
+
+  describe '#request' do
+    subject(:request) { context.request(:get, '/').value! }
+
+    let(:adapter) do
+      response = Restify::Response.new(nil, Addressable::URI.parse(uri), 200, {}, 'body')
+
+      instance_double(Restify::Adapter::Base).tap do |adapter|
+        allow(adapter).to receive(:call).and_return(Restify::Promise.fulfilled(response))
+      end
+    end
+
+    let(:cache) do
+      Object.new.tap do |cache|
+        def cache.call(request)
+          yield(request)
+        end
+      end
+    end
+
+    let(:kwargs) { {adapter:} }
+
+    it 'calls the adapter without a cache' do
+      expect(adapter).to receive(:call).with(Restify::Request)
+
+      request
+    end
+
+    context 'with a cache' do
+      let(:kwargs) { {adapter:, cache:} }
+
+      it 'lets the cache call the adapter' do
+        expect(cache).to receive(:call).with(Restify::Request).and_call_original
+        expect(adapter).to receive(:call).with(Restify::Request)
+
+        request
+      end
+    end
+
+    context 'with a global cache' do
+      around do |example|
+        Restify.cache = cache
+        example.run
+      ensure
+        Restify.cache = nil
+      end
+
+      it 'lets the cache call the adapter' do
+        expect(cache).to receive(:call).with(Restify::Request).and_call_original
+        expect(adapter).to receive(:call).with(Restify::Request)
+
+        request
+      end
+    end
+  end
 end

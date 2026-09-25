@@ -78,8 +78,8 @@ describe Restify::Global do
   describe '#cache' do
     subject(:cache) { global.cache }
 
-    it 'defaults to cache instance' do
-      expect(cache).to be_a Restify::Cache
+    it 'is not set by default' do
+      expect(cache).to be_nil
     end
   end
 

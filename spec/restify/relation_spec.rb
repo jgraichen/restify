@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'active_support'
 
 describe Restify::Relation do
   subject(:relation) { described_class.new context, pattern }
@@ -48,11 +47,8 @@ describe Restify::Relation do
     end
 
     context 'with Object' do
-      let(:object) do
-        Class.new do
-          undef to_param
-        end.new
-      end
+      # Without #to_param, e.g. from ActiveSupport
+      let(:object) { Class.new.new }
       let(:params) { {id: object} }
 
       it 'raise a TypeError from adressable' do

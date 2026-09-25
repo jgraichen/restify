@@ -56,7 +56,7 @@ module Restify
         data:,
       )
 
-      ret = cache.call(request) {|req| adapter.call(req) }
+      ret = cache ? cache.call(request) {|req| adapter.call(req) } : adapter.call(request)
       ret.then do |response|
         raise ResponseError.from_code(response) if response.errored?
 

@@ -16,13 +16,13 @@ module Restify
       @adapter = adapter
     end
 
-    def cache
-      @cache ||= begin
-        require 'active_support'
-        require 'active_support/cache'
-        Restify::Cache.new store: ActiveSupport::Cache::MemoryStore.new
-      end
-    end
+    # Cache for all requests, if any. Nothing is cached by default.
+    #
+    # @return [#call, nil] An object responding to
+    #   `#call(request) { |request| promise }`, returning a promise of the
+    #   response. The block performs the actual request.
+    #
+    attr_reader :cache
 
     def cache=(cache)
       @cache = cache
