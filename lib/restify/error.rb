@@ -13,6 +13,19 @@ module Restify
     end
   end
 
+  # A {ParseError} is raised when accessing the data of a resource,
+  # whose response body could not be parsed, e.g. invalid JSON. The
+  # original error is available as {#cause}.
+  #
+  class ParseError < StandardError
+    attr_reader :response
+
+    def initialize(response, message)
+      @response = response
+      super("Could not parse response body for `#{response&.uri}': #{message}")
+    end
+  end
+
   # A {ResponseError} is returned on a non-successful
   # response from server. Usually it will either be a
   # {ClientError} or a {ServerError}.

@@ -10,7 +10,19 @@ module Restify
       #
       module Parsing
         def load
-          parse deserialized_body, root: true
+          # No data, e.g. when a server sets a content type but sends an
+          # empty body.
+          return if body.nil? || body.empty?
+
+          begin
+            data = deserialized_body
+          rescue StandardError => e
+            # Keep the resource, e.g. with relations from headers, but
+            # raise on accessing its data.
+            return Resource.new(context, response:, error: e)
+          end
+
+          parse(data, root: true)
         end
 
         def parse(object, root: false)

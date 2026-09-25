@@ -6,12 +6,13 @@ module Restify
   class Resource < SimpleDelegator
     # @api private
     #
-    def initialize(context, response: nil, data: nil, relations: {})
+    def initialize(context, response: nil, data: nil, relations: {}, error: nil)
       super(data)
 
       @context   = context
       @response  = response
       @relations = relations
+      @error     = error
     end
 
     # Check if resource has a relation with given name.
@@ -42,13 +43,30 @@ module Restify
 
     alias rel relation
 
+    # @api private
+    def __getobj__
+      # `Delegator` removes `Kernel#raise`, and the cause can only be
+      # set when raising.
+      ::Kernel.raise ParseError.new(@response, @error.message), cause: @error if @error
+
+      super
+    end
+
     # @!method data
     #
     #   Return response data. Usually a hash or array.
     #
     #   @return [Object] Response data.
+    #   @raise [ParseError] If the response body could not be parsed.
     #
     alias data __getobj__
+
+    # @api private
+    def respond_to_missing?(name, include_private = false)
+      return false if @error
+
+      super
+    end
 
     # @!method response
     #
@@ -95,7 +113,7 @@ module Restify
     # @api private
     def inspect
       text = {
-        '@data' => data,
+        (@error ? '@error' : '@data') => @error || data,
         '@relations' => @relations,
       }.map {|k, v| "#{k}=#{v.inspect}" }.join(' ')
 

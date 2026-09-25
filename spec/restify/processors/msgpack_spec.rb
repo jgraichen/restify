@@ -41,6 +41,42 @@ describe Restify::Processors::Msgpack do
 
     before { allow(response).to receive(:body).and_return(body) }
 
+    describe 'empty body' do
+      let(:body) { '' }
+
+      it { is_expected.to be_a Restify::Resource }
+      it { expect(resource.data).to be_nil }
+    end
+
+    describe 'invalid body' do
+      let(:body) { "\xC1".b }
+
+      before do
+        allow(response).to receive_messages(
+          uri: Addressable::URI.parse('http://test.host/'),
+          links: Restify::Link.parse('<http://test.host/other>; rel="other"'),
+        )
+      end
+
+      it { is_expected.to be_a Restify::Resource }
+      it { is_expected.to have_relation :other }
+      it { expect(resource.response).to be response }
+
+      it 'raises on accessing data' do
+        expect { resource.data }.to raise_error(Restify::ParseError) do |error|
+          expect(error.response).to be response
+          expect(error.cause).to be_a MessagePack::MalformedFormatError
+        end
+      end
+
+      it 'raises on accessing delegated data' do
+        expect { resource['json'] }.to raise_error Restify::ParseError
+      end
+
+      it { is_expected.not_to respond_to :each }
+      it { expect(resource.inspect).to include '@error=' }
+    end
+
     describe 'parsing' do
       context 'single object' do
         let(:body) do

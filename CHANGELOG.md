@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `Restify::Request#uri`, now always parsed and returned as `Addressable::URI`
 - Drop EOL Ruby versions 3.1 and 3.2
 - Drop `hitimes` dependency, using `Process.clock_gettime` for timeouts
+- Return resources without data for empty response bodies, even with a JSON
+  or MessagePack content type (#31)
 
 ### Fixes
 
@@ -30,6 +32,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Encode response bodies using the charset from the `Content-Type` header
 - Do not share connections of the Ethon adapter with forked child processes
 - Do not deadlock the Typhoeus adapter with `sync: true` when used from multiple threads
+- Raise the matching `ResponseError`, e.g. `BadRequest`, for error responses
+  with an empty or invalid body (#31)
 
 ### Breaks
 
@@ -38,6 +42,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   `restify/webmock`, as WebMock's Typhoeus integration does not apply anymore.
 - `typhoeus` is an optional dependency now. Add it to your Gemfile to use
   `Restify::Adapter::Typhoeus`.
+- Invalid response bodies do not raise from `#value!` anymore. The resource is
+  returned, e.g. with relations from headers, and accessing its data raises a
+  `Restify::ParseError` with the parser error as its cause (#31).
 - Remove `logging` dependency. Set a `Logger`-compatible logger with
   `Restify.logger = Logger.new(...)`, nothing is logged by default. Restify does
   not change `Ethon.logger` anymore.

@@ -5,11 +5,12 @@ require 'spec_helper'
 describe Restify do
   before do
     stub_request(:get, 'http://stubserver/base')
-      .to_return(status: http_status, headers:)
+      .to_return(status: http_status, headers:, body:)
   end
 
   let(:http_status) { '200 OK' }
   let(:headers) { {} }
+  let(:body) { '' }
 
   describe 'Error handling' do
     subject(:request) { Restify.new('http://localhost:9292/base').get.value! }
@@ -19,6 +20,26 @@ describe Restify do
 
       it 'throws a BadRequest exception' do
         expect { request }.to raise_error Restify::BadRequest
+      end
+
+      # #31: Rails sets a JSON content type even for empty bodies.
+      context 'with a JSON content type and an empty body' do
+        let(:headers) { {'Content-Type' => 'application/json'} }
+
+        it 'throws a BadRequest exception' do
+          expect { request }.to raise_error Restify::BadRequest
+        end
+      end
+
+      context 'with an invalid JSON body' do
+        let(:headers) { {'Content-Type' => 'application/json'} }
+        let(:body) { '{"errors": ' }
+
+        it 'throws a BadRequest exception with the raw body as errors' do
+          expect { request }.to raise_error(Restify::BadRequest) do |error|
+            expect(error.errors).to eq '{"errors": '
+          end
+        end
       end
     end
 

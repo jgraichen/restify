@@ -153,13 +153,20 @@ module Restify
       (400...600).cover? code
     end
 
+    # Decoded body for error messages, or nil if the body is empty or
+    # could not be parsed.
+    #
     # @api private
     def decoded_body
-      @decoded_body ||= begin
+      return @decoded_body if defined?(@decoded_body)
+
+      @decoded_body = begin
         case content_type
           when %r{\Aapplication/json($|;)}
-            ::JSON.parse(body)
+            ::JSON.parse(body) unless body.nil? || body.empty?
         end
+      rescue ::JSON::ParserError
+        nil
       end
     end
 
