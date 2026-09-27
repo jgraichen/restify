@@ -11,8 +11,10 @@ describe Restify::Timeout do
     end
 
     it 'is not positive after having timed out' do
-      sleep timer.remaining
-      expect(timer.remaining).not_to be_positive
+      expired = described_class.new(0.01)
+      sleep expired.remaining
+
+      expect(expired.remaining).not_to be_positive
     end
   end
 
