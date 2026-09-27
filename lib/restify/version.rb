@@ -5,7 +5,7 @@ module Restify
     MAJOR = 3
     MINOR = 0
     PATCH = 0
-    STAGE = :rc2
+    STAGE = :rc3
     STRING = [MAJOR, MINOR, PATCH, STAGE].compact.join('.').freeze
 
     def self.to_s
