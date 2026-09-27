@@ -80,6 +80,13 @@ describe Restify::Adapter::Ethon do
       expect(adapter.call(request('fast')).value!.code).to eq 200
     end
 
+    it 'can wait again after a timeout' do
+      promise = adapter.call(request('slow'))
+
+      expect { promise.value!(0.1) }.to raise_error Timeout::Error
+      expect(promise.value!(1).code).to eq 200
+    end
+
     it 'processes requests from many threads' do
       threads = Array.new(8) do
         Thread.new do

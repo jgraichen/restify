@@ -17,12 +17,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Perf: Reuse libcurl handles in the Ethon adapter
 - Perf: Optimize libcurl option preparation in the Ethon adapter
 - Perf: Optimize parsing of data and relations
+- Perf: Replace `Concurrent::IVar` with a lightweight promise implementation
+- Remove `concurrent-ruby` dependency
 
 ### Fixes
 
+- Apply `Restify::Timeout.default_timeout` when waiting on a promise without
+  an explicit timeout, e.g. with the Typhoeus adapter, instead of waiting forever
+- A timeout while waiting on a promise does not reject the promise anymore.
+  Waiting again, e.g. with a longer timeout, continues where the last wait gave up.
+- Honor the timeout of all threads waiting on the same promise, not only of the
+  thread running its `#then` blocks
 - Only create relations from `*_url` fields with string values, e.g. not from numbers, objects, or arrays
 
 ### Breaks
+
+- `Restify::Promise` does not inherit from `Concurrent::IVar` anymore
 
 ## 3.0.0.rc2 - (2026-09-25)
 

@@ -23,7 +23,6 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 3.3.0'
 
   spec.add_dependency 'addressable', '~> 2.3'
-  spec.add_dependency 'concurrent-ruby', '~> 1.0'
   spec.add_dependency 'ethon', '~> 0.18.0'
   spec.add_dependency 'msgpack', '~> 1.2'
   spec.add_dependency 'nio4r', '~> 2.0'

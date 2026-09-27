@@ -26,7 +26,7 @@ module Restify
           OpenTelemetry.propagation.inject(request.headers)
 
           super.tap do |x|
-            x.add_observer do |_, response, err|
+            x.add_observer do |response, err|
               if response
                 span.set_attribute('http.response.status_code', response&.code)
                 span.status = OpenTelemetry::Trace::Status.error unless (100..399).cover?(response&.code)
