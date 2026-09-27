@@ -11,7 +11,6 @@ Restify can be used to consume hypermedia REST APIs (like GitHubs), to build a s
 
 Restify is build upon the following libraries:
 
-* [concurrent-ruby](https://github.com/ruby-concurrency/concurrent-ruby)
 * [addressable](https://github.com/sporkmonger/addressable)
 * [ethon](https://github.com/typhoeus/ethon), using libcurl
 

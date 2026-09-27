@@ -8,62 +8,44 @@ module Restify
       attr_accessor :default_timeout
     end
 
-    # Default wait timeout of 300 seconds.
     self.default_timeout = 300
 
+    # @return [Float] Seconds to wait in total.
+    attr_reader :duration
+
     def initialize(timeout, target = nil)
-      @timeout = parse_timeout(timeout)
       @target = target
-      @deadline = now + @timeout
-    end
-
-    def wait_on!(ivar)
-      ivar.value!(wait_interval).tap do
-        raise self unless ivar.complete?
-      end
-    rescue ::Timeout::Error
-      raise self
-    end
-
-    def timeout!
-      raise self if wait_interval <= 0
+      @duration = parse_timeout(timeout)
+      @deadline = now + @duration
     end
 
     def remaining
-      wait_interval
+      @deadline - now
     end
 
     def exception
-      Error.new(@target)
+      Error.new(@target, @duration)
     end
 
     private
-
-    def wait_interval
-      @deadline - now
-    end
 
     def now
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
 
     def parse_timeout(value)
-      return self.class.default_timeout if value.nil?
+      value = self.class.default_timeout if value.nil?
+      timeout = Float(value, exception: false)
 
-      begin
-        value = Float(value)
-      rescue ArgumentError
-        raise ArgumentError.new \
-          "Timeout must be an number but is #{value}"
-      end
+      raise ArgumentError.new("Timeout must be a number but is #{value.inspect}") unless timeout
+      raise ArgumentError.new("Timeout must be > 0 but is #{value.inspect}.") unless timeout.positive?
+      raise ArgumentError.new("Timeout must be finite but is #{value.inspect}.") unless timeout.finite?
 
-      raise ArgumentError.new "Timeout must be > 0 but is #{value.inspect}." unless value.positive?
-
-      value
+      timeout
     end
 
     class << self
-      def new(timeout, *args)
+      def new(timeout, target = nil)
         return timeout if timeout.is_a?(self)
 
         super
@@ -71,15 +53,16 @@ module Restify
     end
 
     class Error < ::Timeout::Error
-      attr_reader :target
+      attr_reader :target, :duration
 
-      def initialize(target)
+      def initialize(target, duration)
         @target = target
+        @duration = duration
 
         if @target
-          super("Operation on #{@target} timed out")
+          super("Operation on #{@target} timed out after #{duration}s")
         else
-          super('Operation timed out')
+          super("Operation timed out after #{duration}s")
         end
       end
     end

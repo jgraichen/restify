@@ -13,13 +13,13 @@ describe Restify::Adapter::LoopLock do
   # Run the block in another thread, and wait until it has returned.
   # The thread is kept alive until the example finished.
   def other(&)
-    done = Concurrent::Event.new
+    done = Queue.new
     threads << Thread.new do
       yield
-      done.set
+      done << true
       sleep
     end
-    expect(done.wait(1)).to be true
+    expect(done.pop(timeout: 1)).to be true
   end
 
   def elapsed
@@ -47,16 +47,16 @@ describe Restify::Adapter::LoopLock do
     end
 
     it 'waits for another thread to release the loop' do
-      acquired = Concurrent::Event.new
+      acquired = Queue.new
       released = false
       threads << Thread.new do
         lock.acquire(1)
-        acquired.set
+        acquired << true
         sleep 0.1
         released = true
         lock.release
       end
-      expect(acquired.wait(1)).to be true
+      expect(acquired.pop(timeout: 1)).to be true
 
       expect(lock.acquire(1)).to be true
       expect(released).to be true

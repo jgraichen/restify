@@ -73,7 +73,7 @@ module WebMock
           yield.tap do |promise|
             # Observers run when the request is complete, even when
             # nobody waits on the promise.
-            promise.add_observer do |_, response, _|
+            promise.add_observer do |response, _|
               next unless response
 
               CallbackRegistry.invoke_callbacks(

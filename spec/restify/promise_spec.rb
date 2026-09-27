@@ -4,6 +4,26 @@ require 'spec_helper'
 
 describe Restify::Promise do
   let(:promise) { described_class.new }
+  let(:threads) { [] }
+
+  after do
+    threads.each(&:kill).each(&:join)
+  end
+
+  def pending_promise
+    writer = nil
+    promise = described_class.create {|w| writer = w }
+    [promise, writer]
+  end
+
+  # Run the block in another thread, and return once the thread blocks,
+  # e.g. waiting on a promise.
+  def blocking(&)
+    thread = Thread.new(&)
+    threads << thread
+    Thread.pass until thread.stop?
+    thread
+  end
 
   describe 'factory methods' do
     describe '#fulfilled' do
@@ -118,24 +138,21 @@ describe Restify::Promise do
         end
       end
 
-      context 'when fulfilling the promise asynchronously' do
-        subject(:promise) do
-          described_class.create do |writer|
-            Thread.new do
-              sleep 0.1
-              writer.fulfill 42
-            end
-          end
-        end
-
+      context 'when fulfilling the promise later' do
         it 'returns a pending promise' do
+          promise, = pending_promise
+
           expect(promise.fulfilled?).to be false
           expect(promise.rejected?).to be false
           expect(promise.pending?).to be true
         end
 
         it 'waits for the fulfillment value' do
-          expect(promise.value!).to eq 42
+          promise, writer = pending_promise
+          waiter = blocking { promise.value! }
+
+          writer.fulfill 42
+          expect(waiter.value).to eq 42
         end
       end
     end
@@ -232,7 +249,7 @@ describe Restify::Promise do
 
   describe '#wait' do
     it 'can time out' do
-      expect { promise.wait(0.1) }.to raise_error Timeout::Error
+      expect { promise.wait(0.01) }.to raise_error Timeout::Error
     end
 
     context 'with a driver' do
@@ -257,19 +274,16 @@ describe Restify::Promise do
 
       it 'waits as usual when the driver declines' do
         allow(driver).to receive(:drive).and_return(false)
+        waiter = blocking { promise.value! }
 
-        Thread.new do
-          sleep 0.05
-          writer.fulfill 42
-        end
-
-        expect(promise.value!).to eq 42
+        writer.fulfill 42
+        expect(waiter.value).to eq 42
       end
 
       it 'times out when the driver returns without completing it' do
         allow(driver).to receive(:drive).and_return(true)
 
-        expect { promise.wait(0.1) }.to raise_error Timeout::Error
+        expect { promise.wait(0.01) }.to raise_error Timeout::Error
       end
 
       it 'does not call the driver for a complete promise' do
@@ -281,15 +295,181 @@ describe Restify::Promise do
     end
   end
 
+  describe 'timeouts' do
+    it 'uses the default timeout' do
+      previous = Restify::Timeout.default_timeout
+      Restify::Timeout.default_timeout = 0.01
+
+      expect { promise.wait }.to raise_error Restify::Timeout::Error
+    ensure
+      Restify::Timeout.default_timeout = previous
+    end
+
+    it 'does not reject the promise' do
+      dependency, writer = pending_promise
+      chained = dependency.then {|v| v + 1 }
+
+      expect { chained.value!(0.01) }.to raise_error Restify::Timeout::Error
+      expect(chained).to be_pending
+
+      writer.fulfill 1
+      expect(chained.value!).to eq 2
+    end
+
+    it 'does not run the task again after a timeout' do
+      calls = 0
+      inner, writer = pending_promise
+      chained = described_class.fulfilled(1).then do
+        calls += 1
+        inner
+      end
+
+      expect { chained.value!(0.01) }.to raise_error Restify::Timeout::Error
+
+      writer.fulfill 2
+      expect(chained.value!).to eq 2
+      expect(calls).to eq 1
+    end
+
+    it 'times out while another thread runs the task' do
+      dependency, writer = pending_promise
+      chained = dependency.then {|v| v + 1 }
+      running = blocking { chained.value! }
+
+      expect { chained.value!(0.01) }.to raise_error Restify::Timeout::Error
+      expect(running).to be_alive
+
+      writer.fulfill 1
+      expect(running.value).to eq 2
+    end
+
+    # Giving up after a timeout releases the claim the same way.
+    it 'lets a waiting thread take over when the running thread is killed' do
+      dependency, writer = pending_promise
+      chained = dependency.then {|v| v + 1 }
+      running = blocking { chained.value! }
+      waiting = blocking { chained.value! }
+
+      running.kill.join
+
+      writer.fulfill 1
+      expect(waiting.value).to eq 2
+    end
+
+    it 'runs the task once for concurrent waiters' do
+      dependency, writer = pending_promise
+      calls = Queue.new
+      chained = dependency.then {|v| calls << v }
+      waiters = Array.new(5) { blocking { chained.value! } }
+
+      writer.fulfill 1
+      waiters.each(&:join)
+      expect(calls.size).to eq 1
+    end
+  end
+
+  describe '#then' do
+    it 'waits on a promise returned from the task' do
+      chained = described_class.fulfilled(1).then do |v|
+        described_class.fulfilled(v + 1)
+      end
+
+      expect(chained.value!).to eq 2
+    end
+
+    it 'rejects with the reason of a rejected dependency' do
+      chained = described_class.rejected(ArgumentError.new('nope')).then { 42 }
+
+      expect { chained.value! }.to raise_error ArgumentError, 'nope'
+    end
+
+    it 'rejects with the reason of a promise returned from the task' do
+      chained = described_class.fulfilled(1).then do
+        described_class.rejected(ArgumentError.new('nope'))
+      end
+
+      expect { chained.value! }.to raise_error ArgumentError, 'nope'
+    end
+
+    it 'runs lazily' do
+      calls = 0
+      chained = described_class.fulfilled(1).then { calls += 1 }
+
+      expect(calls).to eq 0
+      chained.value!
+      expect(calls).to eq 1
+    end
+  end
+
+  describe '#add_observer' do
+    let(:writers) { [] }
+    let(:promise) { described_class.create {|w| writers << w } }
+    let(:writer) { writers.first }
+
+    before { promise }
+
+    it 'is called when fulfilled' do
+      calls = []
+      promise.add_observer {|value, reason| calls << [value, reason] }
+
+      expect(calls).to eq []
+      writer.fulfill 42
+      expect(calls).to eq [[42, nil]]
+    end
+
+    it 'is called when rejected' do
+      error = ArgumentError.new
+      calls = []
+      promise.add_observer {|value, reason| calls << [value, reason] }
+
+      writer.reject error
+      expect(calls).to eq [[nil, error]]
+    end
+
+    it 'is called right away when already complete' do
+      calls = []
+      writer.fulfill 42
+
+      promise.add_observer {|value, _| calls << value }
+      expect(calls).to eq [42]
+    end
+
+    it 'calls later observers when one raises' do
+      calls = []
+      promise.add_observer { raise 'kaboom' }
+      promise.add_observer {|value, _| calls << value }
+
+      expect { writer.fulfill 42 }.not_to raise_error
+      expect(calls).to eq [42]
+    end
+  end
+
+  describe 'Writer' do
+    let(:writers) { [] }
+    let(:promise) { described_class.create {|w| writers << w } }
+    let(:writer) { writers.first }
+
+    before { promise }
+
+    it 'cannot complete a promise twice' do
+      writer.fulfill 1
+
+      expect { writer.fulfill 2 }.to raise_error Restify::Promise::AlreadyCompleteError
+      expect { writer.reject ArgumentError }.to raise_error Restify::Promise::AlreadyCompleteError
+      expect { writer.set { 2 } }.to raise_error Restify::Promise::AlreadyCompleteError
+      expect(promise.value!).to eq 1
+    end
+  end
+
   describe '#value' do
     it 'can time out' do
-      expect { promise.value(0.1) }.to raise_error Timeout::Error
+      expect { promise.value(0.01) }.to raise_error Timeout::Error
     end
   end
 
   describe '#value!' do
     it 'can time out' do
-      expect { promise.value!(0.1) }.to raise_error Timeout::Error
+      expect { promise.value!(0.01) }.to raise_error Timeout::Error
     end
   end
 end
