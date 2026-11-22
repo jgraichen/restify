@@ -33,7 +33,6 @@ module Restify
         # the parent process.
         def forked!
           @mutex.synchronize do
-            @idle.each {|easy| easy.handle.autorelease = false }
             @idle.clear
           end
         end

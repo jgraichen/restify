@@ -280,6 +280,11 @@ describe Restify::Adapter::Ethon do
       expect(Array.new(2) { connects.pop(timeout: 1) }).to eq [1, 0]
 
       result = in_child do
+        # Ethon refuses new handles in a child of a process that already
+        # used libcurl, unless the application opts in, e.g. in a Puma
+        # `before_worker_boot` hook.
+        Ethon::Curl.allow_handles_after_fork!
+
         code = adapter.call(request('fast')).value!.code
         [code, connects.pop(timeout: 1)]
       end
@@ -302,6 +307,14 @@ describe Restify::Adapter::Ethon do
 
       expect(result).to include 'before fork'
       expect(promise.value!.code).to eq 200
+    end
+
+    it 'leaves new requests in the child process to Ethon\'s fork safety' do
+      adapter.call(request('fast')).value!
+
+      result = in_child { adapter.call(request('fast')) }
+
+      expect(result).to be_a Ethon::Errors::ForkSafety
     end
   end
 end
