@@ -13,11 +13,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changes
 
-- Require Ethon 0.19. If libcurl was already used before forking, new requests in a forked child process require calling `Ethon::Curl.allow_handles_after_fork!` first.
-
 ### Fixes
 
 ### Breaks
+
+## 3.0.0-rc4 - (2026-11-22)
+
+---
+
+### Breaks
+
+- Require Ethon 0.19. If libcurl was already used before forking, new requests in a forked child process require calling `Ethon::Curl.allow_handles_after_fork!` first.
 
 ## 3.0.0-rc3 - (2026-09-27)
 
