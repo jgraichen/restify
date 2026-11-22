@@ -109,10 +109,7 @@ module Restify
           pending = @multi.easy_handles.dup
           pending << @queue.pop(true) until @queue.empty?
 
-          @multi.handle.autorelease = false
-
           pending.each do |easy|
-            easy.handle.autorelease = false
             easy._restify_writer.reject(
               Restify::NetworkError.new(
                 easy._restify_request,

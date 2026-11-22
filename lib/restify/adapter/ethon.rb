@@ -85,7 +85,7 @@ module Restify
       end
 
       def call_native(request, writer)
-        check_fork!
+        setup
 
         easy = convert(request, writer)
 
@@ -111,12 +111,18 @@ module Restify
       # only run in the thread waiting on them.
       #
       # Returns false when the loop cannot be run in the calling thread,
-      # i.e. when waiting from within the loop itself.
+      # i.e. when waiting from within the loop itself, or when there is
+      # no loop in this process (anymore).
       #
       def drive(promise, timeout)
-        check_fork!
+        events = @mutex.synchronize do
+          forked! if forked?
+          @events
+        end
 
-        @events.drive(promise, timeout)
+        return false unless events
+
+        events.drive(promise, timeout)
       end
 
       private
@@ -125,30 +131,43 @@ module Restify
         self
       end
 
+      # Set up the event loop and handle pool, unless already done in
+      # the current process.
+      #
+      # In a forked child, Ethon raises `Ethon::Errors::ForkSafety` here
+      # if libcurl was already initialized before the fork, unless the
+      # application called `Ethon::Curl.allow_handles_after_fork!`.
       def setup
-        @pid    = Process.pid
-        @pool   = Pool.new(size: POOL_SIZE) { Easy.new }
-        @events = EventLoop.new(**@multi_options)
-      end
-
-      def check_fork!
         return if @pid == Process.pid
 
-        @mutex.synchronize { forked! if @pid != Process.pid }
+        @mutex.synchronize do
+          forked! if forked?
+          next if @pid
+
+          @pool   = Pool.new(size: POOL_SIZE) { Easy.new }
+          @events = EventLoop.new(**@multi_options)
+          @pid    = Process.pid
+        end
+      end
+
+      def forked?
+        !@pid.nil? && @pid != Process.pid
       end
 
       # A forked child process inherits the parent's event loop,
       # connections and sockets. They must neither be used nor cleaned
       # up here, as the parent still uses them.
       #
-      # Therefore, abandon the state without releasing it, and set up
-      # everything again.
+      # Therefore, abandon the state without releasing it. A new event
+      # loop is only set up with the next request.
       def forked!
         @events.forked!
         @pool.forked!
 
+        @events = nil
+        @pool   = nil
         @thread = nil
-        setup
+        @pid    = nil
       end
 
       def convert(request, writer)

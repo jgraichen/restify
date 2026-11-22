@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Restify::Adapter::Ethon::Pool do
   subject(:pool) do
     described_class.new(size: 2) do
-      created << Handle.new(0, Pointer.new(true))
+      created << Handle.new(0)
       created.last
     end
   end
@@ -13,8 +13,7 @@ describe Restify::Adapter::Ethon::Pool do
   let(:created) { [] }
 
   before do
-    stub_const('Pointer', Struct.new(:autorelease))
-    stub_const('Handle', Struct.new(:resets, :handle) do
+    stub_const('Handle', Struct.new(:resets) do
       def reset
         self.resets += 1
       end
@@ -68,13 +67,12 @@ describe Restify::Adapter::Ethon::Pool do
   end
 
   describe '#forked!' do
-    it 'does not release idle handles' do
+    it 'forgets idle handles' do
       idle = pool.checkout
       release(idle)
 
       pool.forked!
 
-      expect(idle.handle.autorelease).to be false
       expect(pool.checkout).not_to be idle
     end
   end

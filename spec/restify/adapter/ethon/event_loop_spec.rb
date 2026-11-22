@@ -83,14 +83,5 @@ describe Restify::Adapter::Ethon::EventLoop do
       expect(promise.reason).to be_a Restify::NetworkError
       expect(promise.reason.message).to include 'Request started before fork'
     end
-
-    it 'does not release pending handles' do
-      easy, = transfer
-      events.enqueue(easy)
-
-      events.forked!
-
-      expect(easy.handle.autorelease?).to be false
-    end
   end
 end
