@@ -4,6 +4,10 @@ require 'rake/release/task'
 
 Rake::Release::Task.new do |spec|
   spec.sign_tag = true
+
+  # Tag pre-releases as SemVer (`v3.0.0-rc4`), as required for creating
+  # the GitHub release, while the gem version stays `3.0.0.rc4`.
+  spec.version_tag = "v#{spec.version.to_s.sub(/\.(?=[a-z])/i, '-')}"
 end
 
 begin
